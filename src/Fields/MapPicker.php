@@ -2,6 +2,8 @@
 
 namespace EduardoRibeiroDev\FilamentLeaflet\Fields;
 
+use Closure;
+use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasGeoJsonFile;
 use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasMapConfig;
 use EduardoRibeiroDev\FilamentLeaflet\Enums\TileLayer;
 use Filament\Forms\Components\Field;
@@ -28,142 +30,151 @@ class MapPicker extends Field
             ->height(256);
     }
 
-    public function center(float $latitude, float $longitude): static
+    public function center(float|array|Closure $latitudeOrCoordinates, float|Closure $longitude): static
     {
-        $this->mapCenter = [$latitude, $longitude];
+        $latitudeOrCoordinates = $this->evaluate($latitudeOrCoordinates);
+
+        if (is_array($latitudeOrCoordinates)) {
+            $this->mapCenter = $latitudeOrCoordinates;
+        } else {
+            $this->mapCenter = [
+                $latitudeOrCoordinates,
+                $this->evaluate($longitude),
+            ];
+        }
 
         return $this;
     }
 
-    public function height(int $height): static
+    public function height(int|Closure $height): static
     {
-        $this->mapHeight = $height;
+        $this->mapHeight = $this->evaluate($height);
 
         return $this;
     }
 
-    public function zoom(int $zoomLevel): static
+    public function zoom(int|Closure $zoomLevel): static
     {
-        $this->defaultZoom = $zoomLevel;
+        $this->defaultZoom = $this->evaluate($zoomLevel);
 
         return $this;
     }
 
-    public function attributionControl(bool $enabled = true): static
+    public function attributionControl(bool|Closure $enabled = true): static
     {
-        $this->hasAttributionControl = $enabled;
+        $this->hasAttributionControl = $this->evaluate($enabled);
 
         return $this;
     }
 
-    public function fullscreenControl(bool $enabled = true): static
+    public function fullscreenControl(bool|Closure $enabled = true): static
     {
-        $this->hasFullscreenControl = $enabled;
+        $this->hasFullscreenControl = $this->evaluate($enabled);
 
         return $this;
     }
 
-    public function searchControl(bool $enabled = true): static
+    public function searchControl(bool|Closure $enabled = true): static
     {
-        $this->hasSearchControl = $enabled;
+        $this->hasSearchControl = $this->evaluate($enabled);
 
         return $this;
     }
 
-    public function scaleControl(bool $enabled = true): static
+    public function scaleControl(bool|Closure $enabled = true): static
     {
-        $this->hasScaleControl = $enabled;
+        $this->hasScaleControl = $this->evaluate($enabled);
 
         return $this;
     }
 
-    public function zoomControl(bool $enabled = true): static
+    public function zoomControl(bool|Closure $enabled = true): static
     {
-        $this->hasZoomControl = $enabled;
+        $this->hasZoomControl = $this->evaluate($enabled);
 
         return $this;
     }
 
-    public function drawControl(bool $enabled = true): static
+    public function drawControl(bool|Closure $enabled = true): static
     {
-        $this->hasDrawControl = $enabled;
+        $this->hasDrawControl = $this->evaluate($enabled);
 
         return $this;
     }
 
-    public function tileLayersUrl(TileLayer|string|array $urls): static
+    public function tileLayersUrl(TileLayer|Closure|string|array $urls): static
     {
-        $this->tileLayersUrl = $urls;
+        $this->tileLayersUrl = $this->evaluate($urls);
 
         return $this;
     }
 
-    public function minZoom(int $minZoom): static
+    public function minZoom(int|Closure $minZoom): static
     {
-        $this->minZoom = $minZoom;
+        $this->minZoom = $this->evaluate($minZoom);
 
         return $this;
     }
 
-    public function maxZoom(int $maxZoom): static
+    public function maxZoom(int|Closure $maxZoom): static
     {
-        $this->maxZoom = $maxZoom;
+        $this->maxZoom = $this->evaluate($maxZoom);
 
         return $this;
     }
 
-    public function geoJsonUrl(string $url): static
+    public function geoJsonUrl(string|Closure $url): static
     {
-        $this->geoJsonUrl = $url;
+        $this->geoJsonUrl = $this->evaluate($url);
 
         return $this;
     }
 
-    public function geoJsonData(array $data): static
+    public function geoJsonData(array|Closure $data): static
     {
-        $this->geoJsonData = $data;
+        $this->geoJsonData = $this->evaluate($data);
 
         return $this;
     }
 
-    public function geoJsonColors(array $colors): static
+    public function geoJsonColors(array|Closure $colors): static
     {
-        $this->geoJsonColors = $colors;
+        $this->geoJsonColors = $this->evaluate($colors);
 
         return $this;
     }
 
-    public function geoJsonTooltip(?string $tooltip): static
+    public function geoJsonTooltip(string|Closure|null $tooltip): static
     {
-        $this->geoJsonTooltip = $tooltip;
+        $this->geoJsonTooltip = $this->evaluate($tooltip);
 
         return $this;
     }
 
-    public function markers(array $markers): static
+    public function markers(array|Closure $markers): static
     {
-        $this->markers = $markers;
+        $this->markers = $this->evaluate($markers);
 
         return $this;
     }
 
-    public function shapes(array $shapes): static
+    public function shapes(array|Closure $shapes): static
     {
-        $this->shapes = $shapes;
+        $this->shapes = $this->evaluate($shapes);
 
         return $this;
     }
 
-    public function latitudeFieldName(?string $name): static
+    public function latitudeFieldName(string|Closure|null $name): static
     {
-        $this->latitudeFieldName = $name;
+        $this->latitudeFieldName = $this->evaluate($name);
 
         return $this;
     }
 
-    public function longitudeFieldName(?string $name): static
+    public function longitudeFieldName(string|Closure|null $name): static
     {
-        $this->longitudeFieldName = $name;
+        $this->longitudeFieldName = $this->evaluate($name);
 
         return $this;
     }
@@ -171,15 +182,12 @@ class MapPicker extends Field
     public function setUp(): void
     {
         parent::setUp();
+        
+        $record = $this->getRecord();
 
-        $this->afterStateHydrated(function (MapPicker $component, $state) {
-            if (is_array($state) && isset($state['latitude']) && isset($state['longitude'])) {
-                $component->state([
-                    'latitude' => $state['latitude'],
-                    'longitude' => $state['longitude'],
-                ]);
-            }
-        });
+        if ($record && method_exists($record, 'getGeoJsonUrl')) {
+            $this->geoJsonUrl($record->getGeoJsonUrl());
+        }
     }
 
     protected function getMarkers(): array

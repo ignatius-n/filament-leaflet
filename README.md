@@ -17,6 +17,7 @@ A powerful and elegant Leaflet integration for Filament PHP that makes creating 
 ## What's New
 
 - 🧩 **Form Field: MapPicker** — a brand new Filament form field that lets you pick coordinates directly inside a form. It supports methods like `center()`, `height()`, `zoom()`, `tileLayersUrl()`, `geoJsonData()`, `markers()` and automatically syncs latitude/longitude values with the form state.
+- 🧭 **Model GeoJSON Files** — new `HasGeoJsonFile` trait and `getGeoJsonUrl()` on models. When a record exposes a GeoJSON file/attribute, `MapPicker` will automatically load it (including temporary URLs when using storage disks). Configure attribute name, disk and expiration via the trait's properties.
 - 🔗 **Filament Schemas Integration** — when the map is used inside a schema/component (e.g., fields, components) the frontend will call the exposed Livewire methods `handleMapClick` and `handleLayerClick` on the component (via `ExposedLivewireMethod`). This makes handling map and layer clicks easy from the parent component.
 - 🗂️ **Layer Group Improvements** — `FeatureGroup` now automatically generates a `Polygon` that envelopes the group's points (useful for visualizing areas). New style helpers: `weight()`, `opacity()`, `fillOpacity()`, `dashArray()`.
 - ✏️ **Editable Layers & Draw Control** — improvements to the draw control and consistent support for editable layers (editable groups are now managed correctly on the frontend).
@@ -115,6 +116,79 @@ MapPicker::make('location')
 ```
 
 By default, `MapPicker` updates the form's `latitude` and `longitude` fields. Customize the field names with `latitudeFieldName()` and `longitudeFieldName()`.
+
+Loading GeoJSON from model files
+
+If your model exposes a GeoJSON file or URL (for example by using the provided `HasGeoJsonFile` concern or by implementing a `getGeoJsonUrl()` method), `MapPicker` will automatically call `getGeoJsonUrl()` on the record and load the GeoJSON into the map when the field is mounted. The `HasGeoJsonFile` trait helps with common patterns (attribute name, storage disk and temporary URL expiration).
+
+Example model using the trait:
+
+```php
+use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasGeoJsonFile;
+
+class DeliveryZone extends Model
+{
+    use HasGeoJsonFile;
+
+    // Optional: override defaults
+    protected string $geoJsonFileAttribute = 'geojson';
+    protected ?string $geoJsonFileDisk = 's3';
+    protected ?int $expirationMinutes = 60;
+}
+```
+
+Note: Many `MapPicker` setter methods accept `Closure`s for dynamic evaluation (e.g., `->center(fn() => [$lat, $lng])`, `->geoJsonUrl(fn() => $someUrl)`).
+
+#### Using Closures for Dynamic Configuration
+
+The `MapPicker` field supports `Closure`s in most configuration methods. These are evaluated by Filament's `evaluate()` method, allowing you to access the current record and other context dynamically:
+
+```php
+use EduardoRibeiroDev\FilamentLeaflet\Fields\MapPicker;
+use EduardoRibeiroDev\FilamentLeaflet\Support\Markers\Marker;
+use EduardoRibeiroDev\FilamentLeaflet\Enums\TileLayer;
+
+MapPicker::make('location')
+    // Dynamic height based on screen or state
+    ->height(fn($record) => $record?->is_large_zone ? 500 : 300)
+    
+    // Center on the record's existing coordinates
+    ->center(fn($record) => [
+        $record?->latitude ?? -23.5505,
+        $record?->longitude ?? -46.6333
+    ])
+    
+    // Dynamic zoom based on record properties
+    ->zoom(fn($record) => $record?->coverage_type === 'city' ? 11 : 6)
+    
+    // Load tile layer based on user preference
+    ->tileLayersUrl(fn() => auth()->user()?->map_tile_preference ?? TileLayer::OpenStreetMap)
+    
+    // Load markers based on record relationships
+    ->markers(fn($record) => 
+        $record?->warehouses->map(fn($warehouse) => 
+            Marker::make($warehouse->latitude, $warehouse->longitude)
+                ->title($warehouse->name)
+                ->blue()
+        )->toArray() ?? []
+    )
+
+    // Load shapes conditionally based on user permissions
+    ->shapes(fn($record) => 
+        auth()->user()?->can('view_restricted_zones')
+            ? $record?->getRestrictedZones()
+            : $record?->getPublicZones() ?? []
+    );
+
+    // Dynamic GeoJSON URL based on region type
+    ->geoJsonUrl(fn($get) => 
+        match($get('region_type')) {
+            'states' => 'https://cdn.example.com/states.geojson',
+            'cities' => 'https://cdn.example.com/cities.geojson',
+            default => null,
+        }
+    );
+```
 
 ### Map Widget Configuration
 
@@ -631,7 +705,7 @@ protected function getLayers(): array
                 Marker::make($w->latitude, $w->longitude)
                     ->title($w->name)
                     ->red()
-            )->toArray()
+            )->all()
         ])
         ->name('Warehouses')
         ->orange()
@@ -647,7 +721,7 @@ protected function getLayers(): array
                         'contact' => $p->contact_name,
                         'phone' => $p->phone,
                     ])
-            )->toArray()
+            )->all()
         ])
         ->name('Partner Locations')
         ->id('partners-group'),
@@ -1086,6 +1160,8 @@ public function handleMapClick(float $latitude, float $longitude): void
 ## Advanced Features
 
 ### Model Integration
+
+> Tip: To expose GeoJSON files from your models (for widgets or the `MapPicker` field), you can use the `HasGeoJsonFile` concern or implement a `getGeoJsonUrl()` method on the model. The concern helps with attribute name, storage disk and temporary URL expiration.
 
 #### CRUD Operations
 
