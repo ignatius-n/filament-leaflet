@@ -385,7 +385,8 @@ trait HasMapConfig
                 $attribution  = ($layer instanceof TileLayer) ? $layer->getAttribution() : null;
 
                 return [$label, $url, $attribution];
-            })->toArray();
+            })->values()
+            ->toArray();
     }
 
     /**
