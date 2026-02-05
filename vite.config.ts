@@ -6,7 +6,7 @@ export default defineConfig({
     build: {
         outDir: 'resources/dist',
         lib: {
-            entry: path.resolve(__dirname, 'resources/js/components/leafletMap.js'),
+            entry: path.resolve(__dirname, 'resources/js/leaflet-map.js'),
             fileName: 'leaflet-map',
             formats: ['es'],
         },

@@ -7,7 +7,6 @@ use EduardoRibeiroDev\FilamentLeaflet\Support\BaseLayer;
 use EduardoRibeiroDev\FilamentLeaflet\Support\BaseLayerGroup;
 use EduardoRibeiroDev\FilamentLeaflet\Support\Groups\LayerGroup;
 use EduardoRibeiroDev\FilamentLeaflet\Support\Shapes\Shape;
-use Filament\Support\Components\Attributes\ExposedLivewireMethod;
 use Livewire\Attributes\On;
 
 trait HasMapConfig
@@ -325,7 +324,6 @@ trait HasMapConfig
     /**
      * Evento disparado quando um layer é clicado
      */
-    #[ExposedLivewireMethod]
     public function handleLayerClick(string $layerId): void
     {
         // Busca o layer e executa sua ação
@@ -339,7 +337,6 @@ trait HasMapConfig
     /**
      * Executado quando o mapa é clicado.
      */
-    #[ExposedLivewireMethod]
     public function handleMapClick(float $latitude, float $longitude): void {}
 
     /**

@@ -3,9 +3,9 @@
 namespace EduardoRibeiroDev\FilamentLeaflet\Fields;
 
 use Closure;
-use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasGeoJsonFile;
 use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasMapConfig;
 use EduardoRibeiroDev\FilamentLeaflet\Enums\TileLayer;
+use EduardoRibeiroDev\FilamentLeaflet\Support\Markers\Marker;
 use Filament\Forms\Components\Field;
 use Filament\Support\Components\Attributes\ExposedLivewireMethod;
 
@@ -13,6 +13,8 @@ class MapPicker extends Field
 {
     use HasMapConfig {
         getGeoJsonTooltip as getParentGeoJsonTooltip;
+        getGeoJsonUrl as getParentGeoJsonUrl;
+        getMapData as getParentMapData;
     }
 
     protected string $view = 'filament-leaflet::fields.map-picker';
@@ -23,12 +25,8 @@ class MapPicker extends Field
     protected array $shapes = [];
     protected ?string $latitudeFieldName = 'latitude';
     protected ?string $longitudeFieldName = 'longitude';
-
-    public static function make(?string $name = null): static
-    {
-        return parent::make($name)
-            ->height(256);
-    }
+    protected bool $storeAsJson = false;
+    protected ?Marker $pickMarker = null;
 
     public function center(float|array|Closure $latitudeOrCoordinates, float|Closure $longitude): static
     {
@@ -179,16 +177,23 @@ class MapPicker extends Field
         return $this;
     }
 
-    public function setUp(): void
+    public function storeAsJson(bool|Closure $value = true): static
     {
-        parent::setUp();
-        
-        $record = $this->getRecord();
+        $this->storeAsJson = $this->evaluate($value);
 
-        if ($record && method_exists($record, 'getGeoJsonUrl')) {
-            $this->geoJsonUrl($record->getGeoJsonUrl());
-        }
+        return $this;
     }
+
+    public function pickMarker(Marker|Closure|null $marker)
+    {
+        $this->pickMarker = $this->evaluate($marker, [
+            'marker' => $this->pickMarker
+        ]);
+
+        return $this;
+    }
+
+    /** ---------- GETTERS ---------- */
 
     protected function getMarkers(): array
     {
@@ -202,19 +207,82 @@ class MapPicker extends Field
 
     protected function getGeoJsonTooltip(): string
     {
-        if ($this->geoJsonTooltip !== null) {
+        if ($this->geoJsonTooltip) {
             return $this->geoJsonTooltip;
         }
 
         return $this->getParentGeoJsonTooltip();
     }
 
-    #[ExposedLivewireMethod]
-    public function handleMapClick(float $latitude, float $longitude): void
+    protected function getGeoJsonUrl(): ?string
     {
-        $this->state([
-            $this->latitudeFieldName => $latitude,
-            $this->longitudeFieldName => $longitude
-        ]);
+        if ($this->geoJsonUrl) {
+            return $this->geoJsonUrl;
+        }
+
+        $record = $this->getRecord();
+        if ($record && method_exists($record, 'getGeoJsonUrl')) {
+            return $record->getGeoJsonUrl();
+        }
+
+        return $this->getParentGeoJsonUrl();
+    }
+
+    #[ExposedLivewireMethod]
+    public function handleMapClick(float $latitude, float $longitude): void {}
+
+    #[ExposedLivewireMethod]
+    public function handleLayerClick(string $layerId): void {}
+
+    private function getMapFieldData(): array
+    {
+        return [
+            'key'                => $this->getKey(),
+            'pickMarker'         => $this->pickMarker->toArray(),
+            'latitudeFieldName'  => $this->latitudeFieldName,
+            'longitudeFieldName' => $this->longitudeFieldName,
+            'statePath'          => $this->getStatePath(),
+        ];
+    }
+
+    public function getMapData(): array
+    {
+        return array_merge(
+            $this->getParentMapData(),
+            ['field' => $this->getMapFieldData()]
+        );
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->height(284);
+        $this->pickMarker(new Marker(0, 0));
+        $this->dehydrated(false);
+        $this->saveRelationshipsUsing(function($record, $state) {
+            if ($this->storeAsJson) {
+                $record->{$this->getName()} = [
+                    $this->latitudeFieldName => $state[$this->latitudeFieldName],
+                    $this->longitudeFieldName => $state[$this->longitudeFieldName]
+                ];
+            } else {
+                $record->{$this->latitudeFieldName} = $state[$this->latitudeFieldName];
+                $record->{$this->longitudeFieldName} = $state[$this->longitudeFieldName];
+            }
+
+            $record->save();
+        });
+        $this->afterStateHydrated(function ($record) {
+            if (!$record) return;
+
+            if ($this->storeAsJson) {
+                $this->state($record->{$this->getName()});
+            } else {
+                $this->state([
+                    $this->latitudeFieldName => $record->{$this->latitudeFieldName},
+                    $this->longitudeFieldName => $record->{$this->longitudeFieldName}
+                ]);
+            }
+        });
     }
 }

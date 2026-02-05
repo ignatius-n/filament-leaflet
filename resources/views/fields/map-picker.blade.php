@@ -1,6 +1,6 @@
 @php
     $config = $getMapData();
-    $key = $getKey();
+    $statePath = $getStatePath();
 @endphp
 
 <x-dynamic-component
@@ -9,7 +9,7 @@
 >
     <x-filament-leaflet::map
         :config="$config"
-        :key="$key"
+        :state-path="$statePath"
     />
 
 </x-dynamic-component>

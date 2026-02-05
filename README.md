@@ -17,13 +17,15 @@ A powerful and elegant Leaflet integration for Filament PHP that makes creating 
 ## What's New
 
 - 🧩 **Form Field: MapPicker** — a brand new Filament form field that lets you pick coordinates directly inside a form. It supports methods like `center()`, `height()`, `zoom()`, `tileLayersUrl()`, `geoJsonData()`, `markers()` and automatically syncs latitude/longitude values with the form state.
-- 🧭 **Model GeoJSON Files** — new `HasGeoJsonFile` trait and `getGeoJsonUrl()` on models. When a record exposes a GeoJSON file/attribute, `MapPicker` will automatically load it (including temporary URLs when using storage disks). Configure attribute name, disk and expiration via the trait's properties.
-- 🔗 **Filament Schemas Integration** — when the map is used inside a schema/component (e.g., fields, components) the frontend will call the exposed Livewire methods `handleMapClick` and `handleLayerClick` on the component (via `ExposedLivewireMethod`). This makes handling map and layer clicks easy from the parent component.
+- 🧭 **Model GeoJSON Files** — new `HasGeoJsonFile` trait and `getGeoJsonUrl()` on models. When a record exposes a GeoJSON file/attribute, `MapPicker` will automatically load it (including temporary URLs when using storage disks). Configure attribute name, disk and expiration via `getExpirationTime()` method.
+- 🔗 **Filament Schemas Integration** — when the map is used inside a schema/component (e.g., fields, components) the frontend will call the Livewire methods `handleMapClick` and `handleLayerClick` on the component. This makes handling map and layer clicks easy from the parent component.
 - 🗂️ **Layer Group Improvements** — `FeatureGroup` now automatically generates a `Polygon` that envelopes the group's points (useful for visualizing areas). New style helpers: `weight()`, `opacity()`, `fillOpacity()`, `dashArray()`.
 - ✏️ **Editable Layers & Draw Control** — improvements to the draw control and consistent support for editable layers (editable groups are now managed correctly on the frontend).
 - 🎨 **Better Color & Options Control** — the `HasColor`, `HasFillColor` and `HasOptions` concerns unify the API for colors, fills and visual options (`->blue()`, `->fillBlue()`, `->option()`, etc.).
-- 🧭 **UX: Pick Marker** — when clicking the map inside a form, a temporary marker is shown to give visual feedback for the selected point.
+- 🧭 **UX: Pick Marker** — when clicking the map inside a form, a temporary marker is shown to give visual feedback for the selected point. Use `pickMarker()` to customize it.
 - 🎨 **Centralized Styles** — map styles were moved to `resources/css/index.css` and are automatically loaded by the JS component.
+- 🏗️ **Refactored JavaScript Architecture** — new `LeafletMapCore` class provides core map functionality, while `leaflet-map.js` handles Filament/Livewire integration. This separation improves maintainability and extensibility.
+- 💾 **Enhanced JSON Storage** — new `storeAsJson()` method on `MapPicker` for storing coordinates as JSON in a single database column instead of separate fields.
 
 See the sections below for usage examples.
 
@@ -115,7 +117,14 @@ MapPicker::make('location')
     ->geoJsonTooltip('<h4>{state}</h4><b>Density: {density}</b>')
 ```
 
-By default, `MapPicker` updates the form's `latitude` and `longitude` fields. Customize the field names with `latitudeFieldName()` and `longitudeFieldName()`.
+By default, `MapPicker` updates the form's `latitude` and `longitude` fields. Customize the field names with `latitudeFieldName()` and `longitudeFieldName()`. For storing coordinates as JSON in a single column, use `storeAsJson()`:
+
+```php
+MapPicker::make('location')
+    ->storeAsJson()  // Store as JSON: { "latitude": -23.5505, "longitude": -46.6333 }
+    ->latitudeFieldName('lat')
+    ->longitudeFieldName('lng')
+```
 
 Loading GeoJSON from model files
 
@@ -124,6 +133,7 @@ If your model exposes a GeoJSON file or URL (for example by using the provided `
 Example model using the trait:
 
 ```php
+use DateTime;
 use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasGeoJsonFile;
 
 class DeliveryZone extends Model
@@ -131,9 +141,20 @@ class DeliveryZone extends Model
     use HasGeoJsonFile;
 
     // Optional: override defaults
-    protected string $geoJsonFileAttribute = 'geojson';
-    protected ?string $geoJsonFileDisk = 's3';
-    protected ?int $expirationMinutes = 60;
+    public function getGeoJsonFileAttributeName(): string
+    {
+        return 'geojson_file';
+    }
+
+    public function getGeoJsonFileDisk(): ?string
+    {
+        return 's3';
+    }
+
+    public function getExpirationTime(): ?DateTime
+    {
+        return now()->addHour();
+    }
 }
 ```
 
@@ -1159,9 +1180,27 @@ public function handleMapClick(float $latitude, float $longitude): void
 
 ## Advanced Features
 
+### JavaScript Architecture
+
+The package uses a two-layer JavaScript architecture for flexibility and maintainability:
+
+**LeafletMapCore** (`leaflet-map-core.js`)
+- Core Leaflet functionality (map creation, layers, controls, interactions)
+- Independent of Filament/Livewire - can be used standalone
+- Accepts callbacks for custom event handling
+- Methods: `init()`, `addLayers()`, `setupEventHandlers()`, `updateMapData()`, etc.
+
+**leaflet-map** (`leaflet-map.js`)
+- Wrapper for Filament/Livewire integration
+- Initializes `LeafletMapCore` with appropriate callbacks
+- Handles state synchronization for `MapPicker` fields
+- Manages Livewire method calls and event dispatching
+
+This separation allows you to extend the core map functionality or create custom implementations without modifying the package.
+
 ### Model Integration
 
-> Tip: To expose GeoJSON files from your models (for widgets or the `MapPicker` field), you can use the `HasGeoJsonFile` concern or implement a `getGeoJsonUrl()` method on the model. The concern helps with attribute name, storage disk and temporary URL expiration.
+> Tip: To expose GeoJSON files from your models (for widgets or the `MapPicker` field), you can use the `HasGeoJsonFile` concern or implement a `getGeoJsonUrl()` method on the model. The concern helps with attribute name, storage disk and temporary URL expiration via the `getExpirationTime()` method.
 
 #### CRUD Operations
 
@@ -1583,7 +1622,26 @@ class StoreMapWidget extends MapWidget
 | `afterMarkerCreated($record)` | Hook after marker creation |
 | `mutateFormDataBeforeCreate($data)` | Transform form data before save |
 
-### Marker Methods
+### MapPicker Methods
+
+| Method | Description |
+|--------|-------------|
+| `make($name)` | Create a new MapPicker field |
+| `center($lat, $lng)` | Set map center coordinates |
+| `zoom($level)` | Set initial zoom level |
+| `height($pixels)` | Set map height |
+| `tileLayersUrl($layers)` | Set tile layer(s) |
+| `markers($array)` | Set initial markers |
+| `shapes($array)` | Set initial shapes |
+| `geoJsonUrl($url)` | Set GeoJSON URL |
+| `geoJsonData($data)` | Set GeoJSON density data |
+| `geoJsonTooltip($tooltip)` | Set GeoJSON tooltip template |
+| `latitudeFieldName($name)` | Customize latitude field name |
+| `longitudeFieldName($name)` | Customize longitude field name |
+| `storeAsJson($bool)` | Store coordinates as JSON in single column |
+| `pickMarker($marker)` | Customize the temporary marker shown on click |
+| `handleMapClick($lat, $lng)` | Exposed Livewire method for map clicks |
+| `handleLayerClick($layerId)` | Exposed Livewire method for layer clicks |
 
 | Method | Description |
 |--------|-------------|
@@ -1722,6 +1780,17 @@ Available colors for markers and shapes:
 - `Color::Grey` / `->grey()` - #666
 - `Color::Black` / `->black()` - #000
 - `Color::Gold` / `->gold()` - #ffd700
+
+## Concern Methods Reference
+
+### HasGeoJsonFile
+
+| Method | Description |
+|--------|-------------|
+| `getGeoJsonFileAttributeName()` | Returns the model attribute storing GeoJSON (default: 'geojson') |
+| `getGeoJsonFileDisk()` | Returns the storage disk for the file (default: null = local) |
+| `getExpirationTime()` | Returns DateTime for temporary URL expiration (default: null = permanent) |
+| `getGeoJsonUrl()` | Returns the accessible URL for the GeoJSON file |
 
 ## Best Practices
 

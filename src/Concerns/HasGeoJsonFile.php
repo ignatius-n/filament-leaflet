@@ -2,22 +2,17 @@
 
 namespace EduardoRibeiroDev\FilamentLeaflet\Concerns;
 
+use DateTime;
 use Illuminate\Support\Facades\Storage;
-
-use function Illuminate\Support\now;
 
 trait HasGeoJsonFile
 {
-    protected string $geoJsonFileAttribute = 'geojson';
-    protected ?string $geoJsonFileDisk = null;
-    protected ?int $expirationMinutes = null;
-
     /**
      * Returns the model attribute name that stores the geojson.
      */
     public function getGeoJsonFileAttributeName(): string
     {
-        return $this->geoJsonFileAttribute ?? 'geojson';
+        return 'geojson';
     }
 
     /**
@@ -25,7 +20,15 @@ trait HasGeoJsonFile
      */
     public function getGeoJsonFileDisk(): ?string
     {
-        return $this->geoJsonFileDisk;
+        return null;
+    }
+
+    /**
+     * Returns the number of minutes until a temporary URL expires, or null for no expiration.
+     */
+    public function getExpirationTime(): ?DateTime
+    {
+        return null;
     }
 
     /**
@@ -49,10 +52,10 @@ trait HasGeoJsonFile
         $storage = Storage::disk($disk);
 
         if ($storage->exists($value)) {
-            if ($this->expirationMinutes) {
+            if (($expirationTime = $this->getExpirationTime())) {
                 return $storage->temporaryUrl(
                     $value,
-                    now()->addMinutes($this->expirationMinutes)
+                    $expirationTime
                 );
             }
 

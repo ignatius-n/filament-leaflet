@@ -1,21 +1,20 @@
 @props([
     'config',
-    'key' => null
+    'statePath' => null
 ])
 
 @php
-    use Filament\Support\Facades\FilamentAsset;
     use Illuminate\Support\Js;
 @endphp
 
 <div
     wire:ignore
-    style="height: {{ $config['mapHeight'] }}px"
     x-data="leafletMap(
-        $wire,
+        $wire, 
         {{ Js::from($config) }},
-        {{ Js::from($key) }}
+        {{ Js::from($statePath) }}
     )"
+    style="height: {{ $config['mapHeight'] }}px"
 >
     <div id="{{ $config['mapId'] }}"></div>
 </div>

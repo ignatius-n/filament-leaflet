@@ -1,13 +1,13 @@
 function _mergeNamespaces(z, B) {
   for (var Z = 0; Z < B.length; Z++) {
-    const H = B[Z];
-    if (typeof H != "string" && !Array.isArray(H)) {
-      for (const T in H)
+    const F = B[Z];
+    if (typeof F != "string" && !Array.isArray(F)) {
+      for (const T in F)
         if (T !== "default" && !(T in z)) {
-          const C = Object.getOwnPropertyDescriptor(H, T);
+          const C = Object.getOwnPropertyDescriptor(F, T);
           C && Object.defineProperty(z, T, C.get ? C : {
             enumerable: !0,
-            get: () => H[T]
+            get: () => F[T]
           });
         }
     }
@@ -21,10 +21,10 @@ var leafletSrc$1 = { exports: {} };
 var leafletSrc = leafletSrc$1.exports, hasRequiredLeafletSrc;
 function requireLeafletSrc() {
   return hasRequiredLeafletSrc || (hasRequiredLeafletSrc = 1, (function(z, B) {
-    (function(Z, H) {
-      H(B);
+    (function(Z, F) {
+      F(B);
     })(leafletSrc, (function(Z) {
-      var H = "1.9.4";
+      var F = "1.9.4";
       function T(_) {
         var k, P, M, S;
         for (P = 1, M = arguments.length; P < M; P++) {
@@ -285,8 +285,8 @@ function requireLeafletSrc() {
             if (S) {
               this._firingCount = this._firingCount + 1 || 1;
               for (var D = 0, A = S.length; D < A; D++) {
-                var N = S[D], F = N.fn;
-                N.once && this.off(_, F, N.ctx), F.call(N.ctx || this, M);
+                var N = S[D], H = N.fn;
+                N.once && this.off(_, H, N.ctx), H.call(N.ctx || this, M);
               }
               this._firingCount--;
             }
@@ -830,8 +830,8 @@ function requireLeafletSrc() {
           var k = _.getCenter(), P = this.wrapLatLng(k), M = k.lat - P.lat, S = k.lng - P.lng;
           if (M === 0 && S === 0)
             return _;
-          var D = _.getSouthWest(), A = _.getNorthEast(), N = new st(D.lat - M, D.lng - S), F = new st(A.lat - M, A.lng - S);
-          return new yt(N, F);
+          var D = _.getSouthWest(), A = _.getNorthEast(), N = new st(D.lat - M, D.lng - S), H = new st(A.lat - M, A.lng - S);
+          return new yt(N, H);
         }
       }, Nt = T({}, zt, {
         wrapLng: [-180, 180],
@@ -841,8 +841,8 @@ function requireLeafletSrc() {
         R: 6371e3,
         // distance between two geographical points using spherical law of cosines approximation
         distance: function(_, k) {
-          var P = Math.PI / 180, M = _.lat * P, S = k.lat * P, D = Math.sin((k.lat - _.lat) * P / 2), A = Math.sin((k.lng - _.lng) * P / 2), N = D * D + Math.cos(M) * Math.cos(S) * A * A, F = 2 * Math.atan2(Math.sqrt(N), Math.sqrt(1 - N));
-          return this.R * F;
+          var P = Math.PI / 180, M = _.lat * P, S = k.lat * P, D = Math.sin((k.lat - _.lat) * P / 2), A = Math.sin((k.lng - _.lng) * P / 2), N = D * D + Math.cos(M) * Math.cos(S) * A * A, H = 2 * Math.atan2(Math.sqrt(N), Math.sqrt(1 - N));
+          return this.R * H;
         }
       }), Mi = 6378137, Ue = {
         R: Mi,
@@ -911,10 +911,10 @@ function requireLeafletSrc() {
         return document.createElementNS("http://www.w3.org/2000/svg", _);
       }
       function Si(_, k) {
-        var P = "", M, S, D, A, N, F;
+        var P = "", M, S, D, A, N, H;
         for (M = 0, D = _.length; M < D; M++) {
           for (N = _[M], S = 0, A = N.length; S < A; S++)
-            F = N[S], P += (S ? "L" : "M") + F.x + " " + F.y;
+            H = N[S], P += (S ? "L" : "M") + H.x + " " + H.y;
           P += k ? Y.svg ? "z" : "x" : "";
         }
         return P || "M0 0";
@@ -1046,10 +1046,10 @@ function requireLeafletSrc() {
           }
           if (!(D.pointerType === "mouse" || D.sourceCapabilities && !D.sourceCapabilities.firesTouchEvents)) {
             var A = tn(D);
-            if (!(A.some(function(F) {
-              return F instanceof HTMLLabelElement && F.attributes.for;
-            }) && !A.some(function(F) {
-              return F instanceof HTMLInputElement || F instanceof HTMLSelectElement;
+            if (!(A.some(function(H) {
+              return H instanceof HTMLLabelElement && H.attributes.for;
+            }) && !A.some(function(H) {
+              return H instanceof HTMLInputElement || H instanceof HTMLSelectElement;
             }))) {
               var N = Date.now();
               N - P <= po ? (M++, M === 2 && k(_o(D))) : M = 1, P = N;
@@ -1538,9 +1538,9 @@ function requireLeafletSrc() {
               center: _.getCenter(),
               zoom: S
             };
-          var D = M.subtract(P).divideBy(2), A = this.project(_.getSouthWest(), S), N = this.project(_.getNorthEast(), S), F = this.unproject(A.add(N).divideBy(2).add(D), S);
+          var D = M.subtract(P).divideBy(2), A = this.project(_.getSouthWest(), S), N = this.project(_.getNorthEast(), S), H = this.unproject(A.add(N).divideBy(2).add(D), S);
           return {
-            center: F,
+            center: H,
             zoom: S
           };
         },
@@ -1591,9 +1591,9 @@ function requireLeafletSrc() {
           this._stop();
           var M = this.project(this.getCenter()), S = this.project(_), D = this.getSize(), A = this._zoom;
           _ = et(_), k = k === void 0 ? A : k;
-          var N = Math.max(D.x, D.y), F = N * this.getZoomScale(A, k), G = S.distanceTo(M) || 1, j = 1.42, K = j * j;
+          var N = Math.max(D.x, D.y), H = N * this.getZoomScale(A, k), G = S.distanceTo(M) || 1, j = 1.42, K = j * j;
           function tt(ft) {
-            var Be = ft ? -1 : 1, hs = ft ? F : N, us = F * F - N * N + Be * K * K * G * G, cs = 2 * hs * K * G, wi = us / cs, Rn = Math.sqrt(wi * wi + 1) - wi, ds = Rn < 1e-9 ? -18 : Math.log(Rn);
+            var Be = ft ? -1 : 1, hs = ft ? H : N, us = H * H - N * N + Be * K * K * G * G, cs = 2 * hs * K * G, wi = us / cs, Rn = Math.sqrt(wi * wi + 1) - wi, ds = Rn < 1e-9 ? -18 : Math.log(Rn);
             return ds;
           }
           function mt(ft) {
@@ -1664,10 +1664,10 @@ function requireLeafletSrc() {
         // the map will not be panned.
         panInside: function(_, k) {
           k = k || {};
-          var P = J(k.paddingTopLeft || k.padding || [0, 0]), M = J(k.paddingBottomRight || k.padding || [0, 0]), S = this.project(this.getCenter()), D = this.project(_), A = this.getPixelBounds(), N = vt([A.min.add(P), A.max.subtract(M)]), F = N.getSize();
+          var P = J(k.paddingTopLeft || k.padding || [0, 0]), M = J(k.paddingBottomRight || k.padding || [0, 0]), S = this.project(this.getCenter()), D = this.project(_), A = this.getPixelBounds(), N = vt([A.min.add(P), A.max.subtract(M)]), H = N.getSize();
           if (!N.contains(D)) {
             this._enforcingBounds = !0;
-            var G = D.subtract(N.getCenter()), j = N.extend(D).getSize().subtract(F);
+            var G = D.subtract(N.getCenter()), j = N.extend(D).getSize().subtract(H);
             S.x += G.x < 0 ? -j.x : j.x, S.y += G.y < 0 ? -j.y : j.y, this.panTo(this.unproject(S), k), this._enforcingBounds = !1;
           }
           return this;
@@ -1758,8 +1758,8 @@ function requireLeafletSrc() {
               bounds: S,
               timestamp: _.timestamp
             };
-            for (var F in _.coords)
-              typeof _.coords[F] == "number" && (N[F] = _.coords[F]);
+            for (var H in _.coords)
+              typeof _.coords[H] == "number" && (N[H] = _.coords[H]);
             this.fire("locationfound", N);
           }
         },
@@ -1834,7 +1834,7 @@ function requireLeafletSrc() {
         // the given bounds in its entirety.
         getBoundsZoom: function(_, k, P) {
           _ = ct(_), P = J(P || [0, 0]);
-          var M = this.getZoom() || 0, S = this.getMinZoom(), D = this.getMaxZoom(), A = _.getNorthWest(), N = _.getSouthEast(), F = this.getSize().subtract(P), G = vt(this.project(N, M), this.project(A, M)).getSize(), j = Y.any3d ? this.options.zoomSnap : 1, K = F.x / G.x, tt = F.y / G.y, mt = k ? Math.max(K, tt) : Math.min(K, tt);
+          var M = this.getZoom() || 0, S = this.getMinZoom(), D = this.getMaxZoom(), A = _.getNorthWest(), N = _.getSouthEast(), H = this.getSize().subtract(P), G = vt(this.project(N, M), this.project(A, M)).getSize(), j = Y.any3d ? this.options.zoomSnap : 1, K = H.x / G.x, tt = H.y / G.y, mt = k ? Math.max(K, tt) : Math.min(K, tt);
           return M = this.getScaleZoom(mt, M), j && (M = Math.round(M / (j / 100)) * (j / 100), M = k ? Math.ceil(M / j) * j : Math.floor(M / j) * j), Math.max(S, Math.min(D, M));
         },
         // @method getSize(): Point
@@ -2113,15 +2113,15 @@ function requireLeafletSrc() {
           }
           if (S.length) {
             k === "contextmenu" && pt(_);
-            var N = S[0], F = {
+            var N = S[0], H = {
               originalEvent: _
             };
             if (_.type !== "keypress" && _.type !== "keydown" && _.type !== "keyup") {
               var G = N.getLatLng && (!N._radius || N._radius <= 10);
-              F.containerPoint = G ? this.latLngToContainerPoint(N.getLatLng()) : this.mouseEventToContainerPoint(_), F.layerPoint = this.containerPointToLayerPoint(F.containerPoint), F.latlng = G ? N.getLatLng() : this.layerPointToLatLng(F.layerPoint);
+              H.containerPoint = G ? this.latLngToContainerPoint(N.getLatLng()) : this.mouseEventToContainerPoint(_), H.layerPoint = this.containerPointToLayerPoint(H.containerPoint), H.latlng = G ? N.getLatLng() : this.layerPointToLatLng(H.layerPoint);
             }
             for (A = 0; A < S.length; A++)
-              if (S[A].fire(k, F, !0), F.originalEvent._stopped || S[A].options.bubblingMouseEvents === !1 && Ne(this._mouseEvents, k) !== -1)
+              if (S[A].fire(k, H, !0), H.originalEvent._stopped || S[A].options.bubblingMouseEvents === !1 && Ne(this._mouseEvents, k) !== -1)
                 return;
           }
         },
@@ -2779,18 +2779,18 @@ function requireLeafletSrc() {
         }
       });
       function ln(_, k, P) {
-        var M, S = [1, 4, 2, 8], D, A, N, F, G, j, K, tt;
+        var M, S = [1, 4, 2, 8], D, A, N, H, G, j, K, tt;
         for (D = 0, j = _.length; D < j; D++)
           _[D]._code = qt(_[D], k);
         for (N = 0; N < 4; N++) {
           for (K = S[N], M = [], D = 0, j = _.length, A = j - 1; D < j; A = D++)
-            F = _[D], G = _[A], F._code & K ? G._code & K || (tt = Te(G, F, K, k, P), tt._code = qt(tt, k), M.push(tt)) : (G._code & K && (tt = Te(G, F, K, k, P), tt._code = qt(tt, k), M.push(tt)), M.push(F));
+            H = _[D], G = _[A], H._code & K ? G._code & K || (tt = Te(G, H, K, k, P), tt._code = qt(tt, k), M.push(tt)) : (G._code & K && (tt = Te(G, H, K, k, P), tt._code = qt(tt, k), M.push(tt)), M.push(H));
           _ = M;
         }
         return _;
       }
       function hn(_, k) {
-        var P, M, S, D, A, N, F, G, j;
+        var P, M, S, D, A, N, H, G, j;
         if (!_ || _.length === 0)
           throw new Error("latlngs not passed");
         kt(_) || (console.warn("latlngs are not flat! Only the first ring will be used"), _ = _[0]);
@@ -2801,9 +2801,9 @@ function requireLeafletSrc() {
           var Lt = et(_[P]);
           Pt.push(k.project(et([Lt.lat - K.lat, Lt.lng - K.lng])));
         }
-        for (N = F = G = 0, P = 0, M = _t - 1; P < _t; M = P++)
-          S = Pt[P], D = Pt[M], A = S.y * D.x - D.y * S.x, F += (S.x + D.x) * A, G += (S.y + D.y) * A, N += A * 3;
-        N === 0 ? j = Pt[0] : j = [F / N, G / N];
+        for (N = H = G = 0, P = 0, M = _t - 1; P < _t; M = P++)
+          S = Pt[P], D = Pt[M], A = S.y * D.x - D.y * S.x, H += (S.x + D.x) * A, G += (S.y + D.y) * A, N += A * 3;
+        N === 0 ? j = Pt[0] : j = [H / N, G / N];
         var ie = k.unproject(J(j));
         return et([ie.lat + K.lat, ie.lng + K.lng]);
       }
@@ -2841,9 +2841,9 @@ function requireLeafletSrc() {
         return A;
       }
       function _i(_, k, P, M, S) {
-        var D = 0, A, N, F;
+        var D = 0, A, N, H;
         for (N = M + 1; N <= S - 1; N++)
-          F = fe(_[N], _[M], _[S], !0), F > D && (A = N, D = F);
+          H = fe(_[N], _[M], _[S], !0), H > D && (A = N, D = H);
         D > P && (k[A] = 1, _i(_, k, P, M, A), _i(_, k, P, A, S));
       }
       function Oo(_, k) {
@@ -2853,18 +2853,18 @@ function requireLeafletSrc() {
       }
       var dn;
       function fn(_, k, P, M, S) {
-        var D = M ? dn : qt(_, P), A = qt(k, P), N, F, G;
+        var D = M ? dn : qt(_, P), A = qt(k, P), N, H, G;
         for (dn = A; ; ) {
           if (!(D | A))
             return [_, k];
           if (D & A)
             return !1;
-          N = D || A, F = Te(_, k, N, P, S), G = qt(F, P), N === D ? (_ = F, D = G) : (k = F, A = G);
+          N = D || A, H = Te(_, k, N, P, S), G = qt(H, P), N === D ? (_ = H, D = G) : (k = H, A = G);
         }
       }
       function Te(_, k, P, M, S) {
-        var D = k.x - _.x, A = k.y - _.y, N = M.min, F = M.max, G, j;
-        return P & 8 ? (G = _.x + D * (F.y - _.y) / A, j = F.y) : P & 4 ? (G = _.x + D * (N.y - _.y) / A, j = N.y) : P & 2 ? (G = F.x, j = _.y + A * (F.x - _.x) / D) : P & 1 && (G = N.x, j = _.y + A * (N.x - _.x) / D), new X(G, j, S);
+        var D = k.x - _.x, A = k.y - _.y, N = M.min, H = M.max, G, j;
+        return P & 8 ? (G = _.x + D * (H.y - _.y) / A, j = H.y) : P & 4 ? (G = _.x + D * (N.y - _.y) / A, j = N.y) : P & 2 ? (G = H.x, j = _.y + A * (H.x - _.x) / D) : P & 1 && (G = N.x, j = _.y + A * (N.x - _.x) / D), new X(G, j, S);
       }
       function qt(_, k) {
         var P = 0;
@@ -2875,8 +2875,8 @@ function requireLeafletSrc() {
         return P * P + M * M;
       }
       function fe(_, k, P, M) {
-        var S = k.x, D = k.y, A = P.x - S, N = P.y - D, F = A * A + N * N, G;
-        return F > 0 && (G = ((_.x - S) * A + (_.y - D) * N) / F, G > 1 ? (S = P.x, D = P.y) : G > 0 && (S += A * G, D += N * G)), A = _.x - S, N = _.y - D, M ? A * A + N * N : new X(S, D);
+        var S = k.x, D = k.y, A = P.x - S, N = P.y - D, H = A * A + N * N, G;
+        return H > 0 && (G = ((_.x - S) * A + (_.y - D) * N) / H, G > 1 ? (S = P.x, D = P.y) : G > 0 && (S += A * G, D += N * G)), A = _.x - S, N = _.y - D, M ? A * A + N * N : new X(S, D);
       }
       function kt(_) {
         return !Tt(_[0]) || typeof _[0][0] != "object" && typeof _[0][0] < "u";
@@ -2885,7 +2885,7 @@ function requireLeafletSrc() {
         return console.warn("Deprecated use of _flat, please use L.LineUtil.isFlat instead."), kt(_);
       }
       function pn(_, k) {
-        var P, M, S, D, A, N, F, G;
+        var P, M, S, D, A, N, H, G;
         if (!_ || _.length === 0)
           throw new Error("latlngs not passed");
         kt(_) || (console.warn("latlngs are not flat! Only the first ring will be used"), _ = _[0]);
@@ -2903,9 +2903,9 @@ function requireLeafletSrc() {
         else
           for (P = 0, D = 0; P < mt - 1; P++)
             if (A = _t[P], N = _t[P + 1], S = A.distanceTo(N), D += S, D > M) {
-              F = (D - M) / S, G = [
-                N.x - F * (N.x - A.x),
-                N.y - F * (N.y - A.y)
+              H = (D - M) / S, G = [
+                N.x - H * (N.x - A.x),
+                N.y - H * (N.y - A.y)
               ];
               break;
             }
@@ -2941,8 +2941,8 @@ function requireLeafletSrc() {
           return M = -P * Math.log(Math.max(N, 1e-10)), new X(_.lng * k * P, M);
         },
         unproject: function(_) {
-          for (var k = 180 / Math.PI, P = this.R, M = this.R_MINOR / P, S = Math.sqrt(1 - M * M), D = Math.exp(-_.y / P), A = Math.PI / 2 - 2 * Math.atan(D), N = 0, F = 0.1, G; N < 15 && Math.abs(F) > 1e-7; N++)
-            G = S * Math.sin(A), G = Math.pow((1 - G) / (1 + G), S / 2), F = Math.PI / 2 - 2 * Math.atan(D * G) - A, A += F;
+          for (var k = 180 / Math.PI, P = this.R, M = this.R_MINOR / P, S = Math.sqrt(1 - M * M), D = Math.exp(-_.y / P), A = Math.PI / 2 - 2 * Math.atan(D), N = 0, H = 0.1, G; N < 15 && Math.abs(H) > 1e-7; N++)
+            G = S * Math.sin(A), G = Math.pow((1 - G) / (1 + G), S / 2), H = Math.PI / 2 - 2 * Math.atan(D * G) - A, A += H;
           return new st(A * k, _.x * k / P);
         }
       }, Ao = {
@@ -3358,14 +3358,14 @@ function requireLeafletSrc() {
           return this._draggable && this._draggable._moved;
         },
         _adjustPan: function(_) {
-          var k = this._marker, P = k._map, M = this._marker.options.autoPanSpeed, S = this._marker.options.autoPanPadding, D = Wt(k._icon), A = P.getPixelBounds(), N = P.getPixelOrigin(), F = vt(
+          var k = this._marker, P = k._map, M = this._marker.options.autoPanSpeed, S = this._marker.options.autoPanPadding, D = Wt(k._icon), A = P.getPixelBounds(), N = P.getPixelOrigin(), H = vt(
             A.min._subtract(N).add(S),
             A.max._subtract(N).subtract(S)
           );
-          if (!F.contains(D)) {
+          if (!H.contains(D)) {
             var G = J(
-              (Math.max(F.max.x, D.x) - F.max.x) / (A.max.x - F.max.x) - (Math.min(F.min.x, D.x) - F.min.x) / (A.min.x - F.min.x),
-              (Math.max(F.max.y, D.y) - F.max.y) / (A.max.y - F.max.y) - (Math.min(F.min.y, D.y) - F.min.y) / (A.min.y - F.min.y)
+              (Math.max(H.max.x, D.x) - H.max.x) / (A.max.x - H.max.x) - (Math.min(H.min.x, D.x) - H.min.x) / (A.min.x - H.min.x),
+              (Math.max(H.max.y, D.y) - H.max.y) / (A.max.y - H.max.y) - (Math.min(H.min.y, D.y) - H.min.y) / (A.min.y - H.min.y)
             ).multiplyBy(M);
             P.panBy(G, { animate: !1 }), this._draggable._newPos._add(G), this._draggable._startPos._add(G), dt(k._icon, this._draggable._newPos), this._onDrag(_), this._panRequest = gt(this._adjustPan.bind(this, _));
           }
@@ -3747,8 +3747,8 @@ function requireLeafletSrc() {
         _project: function() {
           var _ = this._latlng.lng, k = this._latlng.lat, P = this._map, M = P.options.crs;
           if (M.distance === Nt.distance) {
-            var S = Math.PI / 180, D = this._mRadius / Nt.R / S, A = P.project([k + D, _]), N = P.project([k - D, _]), F = A.add(N).divideBy(2), G = P.unproject(F).lat, j = Math.acos((Math.cos(D * S) - Math.sin(k * S) * Math.sin(G * S)) / (Math.cos(k * S) * Math.cos(G * S))) / S;
-            (isNaN(j) || j === 0) && (j = D / Math.cos(Math.PI / 180 * k)), this._point = F.subtract(P.getPixelOrigin()), this._radius = isNaN(j) ? 0 : F.x - P.project([G, _ - j]).x, this._radiusY = F.y - A.y;
+            var S = Math.PI / 180, D = this._mRadius / Nt.R / S, A = P.project([k + D, _]), N = P.project([k - D, _]), H = A.add(N).divideBy(2), G = P.unproject(H).lat, j = Math.acos((Math.cos(D * S) - Math.sin(k * S) * Math.sin(G * S)) / (Math.cos(k * S) * Math.cos(G * S))) / S;
+            (isNaN(j) || j === 0) && (j = D / Math.cos(Math.PI / 180 * k)), this._point = H.subtract(P.getPixelOrigin()), this._radius = isNaN(j) ? 0 : H.x - P.project([G, _ - j]).x, this._radiusY = H.y - A.y;
           } else {
             var K = M.unproject(M.project(this._latlng).subtract([this._mRadius, 0]));
             this._point = P.latLngToLayerPoint(this._latlng), this._radius = this._point.x - P.latLngToLayerPoint(K).x;
@@ -3793,8 +3793,8 @@ function requireLeafletSrc() {
         // Returns the point closest to `p` on the Polyline.
         closestLayerPoint: function(_) {
           for (var k = 1 / 0, P = null, M = fe, S, D, A = 0, N = this._parts.length; A < N; A++)
-            for (var F = this._parts[A], G = 1, j = F.length; G < j; G++) {
-              S = F[G - 1], D = F[G];
+            for (var H = this._parts[A], G = 1, j = H.length; G < j; G++) {
+              S = H[G - 1], D = H[G];
               var K = M(_, S, D, !0);
               K < k && (k = K, P = M(_, S, D));
             }
@@ -3861,10 +3861,10 @@ function requireLeafletSrc() {
               this._parts = this._rings;
               return;
             }
-            var k = this._parts, P, M, S, D, A, N, F;
+            var k = this._parts, P, M, S, D, A, N, H;
             for (P = 0, S = 0, D = this._rings.length; P < D; P++)
-              for (F = this._rings[P], M = 0, A = F.length; M < A - 1; M++)
-                N = fn(F[M], F[M + 1], _, M, !0), N && (k[S] = k[S] || [], k[S].push(N[0]), (N[1] !== F[M + 1] || M === A - 2) && (k[S].push(N[1]), S++));
+              for (H = this._rings[P], M = 0, A = H.length; M < A - 1; M++)
+                N = fn(H[M], H[M + 1], _, M, !0), N && (k[S] = k[S] || [], k[S].push(N[0]), (N[1] !== H[M + 1] || M === A - 2) && (k[S].push(N[1]), S++));
           }
         },
         // simplify each clipped part of the polyline for performance
@@ -3880,12 +3880,12 @@ function requireLeafletSrc() {
         },
         // Needed by the `Canvas` renderer for interactivity
         _containsPoint: function(_, k) {
-          var P, M, S, D, A, N, F = this._clickTolerance();
+          var P, M, S, D, A, N, H = this._clickTolerance();
           if (!this._pxBounds || !this._pxBounds.contains(_))
             return !1;
           for (P = 0, D = this._parts.length; P < D; P++)
             for (N = this._parts[P], M = 0, A = N.length, S = A - 1; M < A; S = M++)
-              if (!(!k && M === 0) && cn(_, N[S], N[M]) <= F)
+              if (!(!k && M === 0) && cn(_, N[S], N[M]) <= H)
                 return !0;
           return !1;
         }
@@ -3934,10 +3934,10 @@ function requireLeafletSrc() {
         },
         // Needed by the `Canvas` renderer for interactivity
         _containsPoint: function(_) {
-          var k = !1, P, M, S, D, A, N, F, G;
+          var k = !1, P, M, S, D, A, N, H, G;
           if (!this._pxBounds || !this._pxBounds.contains(_))
             return !1;
-          for (D = 0, F = this._parts.length; D < F; D++)
+          for (D = 0, H = this._parts.length; D < H; D++)
             for (P = this._parts[D], A = 0, G = P.length, N = G - 1; A < G; N = A++)
               M = P[A], S = P[N], M.y > _.y != S.y > _.y && _.x < (S.x - M.x) * (_.y - M.y) / (S.y - M.y) + M.x && (k = !k);
           return k || Zt.prototype._containsPoint.call(this, _, !0);
@@ -4032,7 +4032,7 @@ function requireLeafletSrc() {
         }
       });
       function Ce(_, k) {
-        var P = _.type === "Feature" ? _.geometry : _, M = P ? P.coordinates : null, S = [], D = k && k.pointToLayer, A = k && k.coordsToLatLng || vi, N, F, G, j;
+        var P = _.type === "Feature" ? _.geometry : _, M = P ? P.coordinates : null, S = [], D = k && k.pointToLayer, A = k && k.coordsToLatLng || vi, N, H, G, j;
         if (!M && !P)
           return null;
         switch (P.type) {
@@ -4044,10 +4044,10 @@ function requireLeafletSrc() {
             return new At(S);
           case "LineString":
           case "MultiLineString":
-            return F = Se(M, P.type === "LineString" ? 0 : 1, A), new Zt(F, k);
+            return H = Se(M, P.type === "LineString" ? 0 : 1, A), new Zt(H, k);
           case "Polygon":
           case "MultiPolygon":
-            return F = Se(M, P.type === "Polygon" ? 1 : 2, A), new Qt(F, k);
+            return H = Se(M, P.type === "Polygon" ? 1 : 2, A), new Qt(H, k);
           case "GeometryCollection":
             for (G = 0, j = P.geometries.length; G < j; G++) {
               var K = Ce({
@@ -4617,8 +4617,8 @@ function requireLeafletSrc() {
             }
             var _ = this._map, k = parseInt(ae(this._container, "marginBottom"), 10) || 0, P = this._container.offsetHeight + k, M = this._containerWidth, S = new X(this._containerLeft, -P - this._containerBottom);
             S._add(Wt(this._container));
-            var D = _.layerPointToContainerPoint(S), A = J(this.options.autoPanPadding), N = J(this.options.autoPanPaddingTopLeft || A), F = J(this.options.autoPanPaddingBottomRight || A), G = _.getSize(), j = 0, K = 0;
-            D.x + M + F.x > G.x && (j = D.x + M - G.x + F.x), D.x - j - N.x < 0 && (j = D.x - N.x), D.y + P + F.y > G.y && (K = D.y + P - G.y + F.y), D.y - K - N.y < 0 && (K = D.y - N.y), (j || K) && (this.options.keepInView && (this._autopanning = !0), _.fire("autopanstart").panBy([j, K]));
+            var D = _.layerPointToContainerPoint(S), A = J(this.options.autoPanPadding), N = J(this.options.autoPanPaddingTopLeft || A), H = J(this.options.autoPanPaddingBottomRight || A), G = _.getSize(), j = 0, K = 0;
+            D.x + M + H.x > G.x && (j = D.x + M - G.x + H.x), D.x - j - N.x < 0 && (j = D.x - N.x), D.y + P + H.y > G.y && (K = D.y + P - G.y + H.y), D.y - K - N.y < 0 && (K = D.y - N.y), (j || K) && (this.options.keepInView && (this._autopanning = !0), _.fire("autopanstart").panBy([j, K]));
           }
         },
         _getAnchor: function() {
@@ -4759,8 +4759,8 @@ function requireLeafletSrc() {
         _adjustPan: function() {
         },
         _setPosition: function(_) {
-          var k, P, M = this._map, S = this._container, D = M.latLngToContainerPoint(M.getCenter()), A = M.layerPointToContainerPoint(_), N = this.options.direction, F = S.offsetWidth, G = S.offsetHeight, j = J(this.options.offset), K = this._getAnchor();
-          N === "top" ? (k = F / 2, P = G) : N === "bottom" ? (k = F / 2, P = 0) : N === "center" ? (k = F / 2, P = G / 2) : N === "right" ? (k = 0, P = G / 2) : N === "left" ? (k = F, P = G / 2) : A.x < D.x ? (N = "right", k = 0, P = G / 2) : (N = "left", k = F + (j.x + K.x) * 2, P = G / 2), _ = _.subtract(J(k, P, !0)).add(j).add(K), ut(S, "leaflet-tooltip-right"), ut(S, "leaflet-tooltip-left"), ut(S, "leaflet-tooltip-top"), ut(S, "leaflet-tooltip-bottom"), Q(S, "leaflet-tooltip-" + N), dt(S, _);
+          var k, P, M = this._map, S = this._container, D = M.latLngToContainerPoint(M.getCenter()), A = M.layerPointToContainerPoint(_), N = this.options.direction, H = S.offsetWidth, G = S.offsetHeight, j = J(this.options.offset), K = this._getAnchor();
+          N === "top" ? (k = H / 2, P = G) : N === "bottom" ? (k = H / 2, P = 0) : N === "center" ? (k = H / 2, P = G / 2) : N === "right" ? (k = 0, P = G / 2) : N === "left" ? (k = H, P = G / 2) : A.x < D.x ? (N = "right", k = 0, P = G / 2) : (N = "left", k = H + (j.x + K.x) * 2, P = G / 2), _ = _.subtract(J(k, P, !0)).add(j).add(K), ut(S, "leaflet-tooltip-right"), ut(S, "leaflet-tooltip-left"), ut(S, "leaflet-tooltip-top"), ut(S, "leaflet-tooltip-bottom"), Q(S, "leaflet-tooltip-" + N), dt(S, _);
         },
         _updatePosition: function() {
           var _ = this._map.latLngToLayerPoint(this._latlng);
@@ -5120,7 +5120,7 @@ function requireLeafletSrc() {
         _retainParent: function(_, k, P, M) {
           var S = Math.floor(_ / 2), D = Math.floor(k / 2), A = P - 1, N = new X(+S, +D);
           N.z = +A;
-          var F = this._tileCoordsToKey(N), G = this._tiles[F];
+          var H = this._tileCoordsToKey(N), G = this._tiles[H];
           return G && G.active ? (G.retain = !0, !0) : (G && G.loaded && (G.retain = !0), A > M ? this._retainParent(S, D, A, M) : !1);
         },
         _retainChildren: function(_, k, P, M) {
@@ -5128,11 +5128,11 @@ function requireLeafletSrc() {
             for (var D = 2 * k; D < 2 * k + 2; D++) {
               var A = new X(S, D);
               A.z = P + 1;
-              var N = this._tileCoordsToKey(A), F = this._tiles[N];
-              if (F && F.active) {
-                F.retain = !0;
+              var N = this._tileCoordsToKey(A), H = this._tiles[N];
+              if (H && H.active) {
+                H.retain = !0;
                 continue;
-              } else F && F.loaded && (F.retain = !0);
+              } else H && H.loaded && (H.retain = !0);
               P + 1 < M && this._retainChildren(S, D, P + 1, M);
             }
         },
@@ -5184,7 +5184,7 @@ function requireLeafletSrc() {
           if (k) {
             var P = this._clampZoom(k.getZoom());
             if (_ === void 0 && (_ = k.getCenter()), this._tileZoom !== void 0) {
-              var M = this._getTiledPixelBounds(_), S = this._pxBoundsToTileRange(M), D = S.getCenter(), A = [], N = this.options.keepBuffer, F = new lt(
+              var M = this._getTiledPixelBounds(_), S = this._pxBoundsToTileRange(M), D = S.getCenter(), A = [], N = this.options.keepBuffer, H = new lt(
                 S.getBottomLeft().subtract([N, -N]),
                 S.getTopRight().add([N, -N])
               );
@@ -5192,7 +5192,7 @@ function requireLeafletSrc() {
                 throw new Error("Attempted to load an infinite number of tiles");
               for (var G in this._tiles) {
                 var j = this._tiles[G].coords;
-                (j.z !== this._tileZoom || !F.contains(new X(j.x, j.y))) && (this._tiles[G].current = !1);
+                (j.z !== this._tileZoom || !H.contains(new X(j.x, j.y))) && (this._tiles[G].current = !1);
               }
               if (Math.abs(P - this._tileZoom) > 1) {
                 this._setView(_, P);
@@ -5663,14 +5663,14 @@ function requireLeafletSrc() {
         },
         _updatePoly: function(_, k) {
           if (this._drawing) {
-            var P, M, S, D, A = _._parts, N = A.length, F = this._ctx;
+            var P, M, S, D, A = _._parts, N = A.length, H = this._ctx;
             if (N) {
-              for (F.beginPath(), P = 0; P < N; P++) {
+              for (H.beginPath(), P = 0; P < N; P++) {
                 for (M = 0, S = A[P].length; M < S; M++)
-                  D = A[P][M], F[M ? "lineTo" : "moveTo"](D.x, D.y);
-                k && F.closePath();
+                  D = A[P][M], H[M ? "lineTo" : "moveTo"](D.x, D.y);
+                k && H.closePath();
               }
-              this._fillStroke(F, _);
+              this._fillStroke(H, _);
             }
           }
         },
@@ -6066,7 +6066,7 @@ function requireLeafletSrc() {
             k.fire("moveend");
           else {
             this._prunePositions(+/* @__PURE__ */ new Date());
-            var S = this._lastPos.subtract(this._positions[0]), D = (this._lastTime - this._times[0]) / 1e3, A = P.easeLinearity, N = S.multiplyBy(A / D), F = N.distanceTo([0, 0]), G = Math.min(P.inertiaMaxSpeed, F), j = N.multiplyBy(G / F), K = G / (P.inertiaDeceleration * A), tt = j.multiplyBy(-K / 2).round();
+            var S = this._lastPos.subtract(this._positions[0]), D = (this._lastTime - this._times[0]) / 1e3, A = P.easeLinearity, N = S.multiplyBy(A / D), H = N.distanceTo([0, 0]), G = Math.min(P.inertiaMaxSpeed, H), j = N.multiplyBy(G / H), K = G / (P.inertiaDeceleration * A), tt = j.multiplyBy(-K / 2).round();
             !tt.x && !tt.y ? k.fire("moveend") : (tt = k._limitOffset(tt, k.options.maxBounds), gt(function() {
               k.panBy(tt, {
                 duration: K,
@@ -6320,7 +6320,7 @@ function requireLeafletSrc() {
           this._zooming = !1, bt(this._animRequest), rt(document, "touchmove", this._onTouchMove, this), rt(document, "touchend touchcancel", this._onTouchEnd, this), this._map.options.zoomAnimation ? this._map._animateZoom(this._center, this._map._limitZoom(this._zoom), !0, this._map.options.zoomSnap) : this._map._resetView(this._center, this._map._limitZoom(this._zoom));
         }
       });
-      it.addInitHook("addHandler", "touchZoom", An), it.BoxZoom = Cn, it.DoubleClickZoom = Sn, it.Drag = Dn, it.Keyboard = On, it.ScrollWheelZoom = In, it.TapHold = zn, it.TouchZoom = An, Z.Bounds = lt, Z.Browser = Y, Z.CRS = zt, Z.Canvas = Pn, Z.Circle = gi, Z.CircleMarker = Me, Z.Class = It, Z.Control = Et, Z.DivIcon = bn, Z.DivOverlay = Ot, Z.DomEvent = wo, Z.DomUtil = yo, Z.Draggable = Ft, Z.Evented = ne, Z.FeatureGroup = At, Z.GeoJSON = Bt, Z.GridLayer = pe, Z.Handler = Dt, Z.Icon = $t, Z.ImageOverlay = Ie, Z.LatLng = st, Z.LatLngBounds = yt, Z.Layer = Mt, Z.LayerGroup = Xt, Z.LineUtil = zo, Z.Map = it, Z.Marker = Ee, Z.Mixin = Mo, Z.Path = Ht, Z.Point = X, Z.PolyUtil = Co, Z.Polygon = Qt, Z.Polyline = Zt, Z.Popup = ze, Z.PosAnimation = on, Z.Projection = Ao, Z.Rectangle = Mn, Z.Renderer = Rt, Z.SVG = ge, Z.SVGOverlay = wn, Z.TileLayer = ee, Z.Tooltip = Ae, Z.Transformation = Ge, Z.Util = Fn, Z.VideoOverlay = Ln, Z.bind = O, Z.bounds = vt, Z.canvas = Tn, Z.circle = Go, Z.circleMarker = Uo, Z.control = de, Z.divIcon = $o, Z.extend = T, Z.featureGroup = No, Z.geoJSON = yn, Z.geoJson = jo, Z.gridLayer = Qo, Z.icon = Fo, Z.imageOverlay = qo, Z.latLng = et, Z.latLngBounds = ct, Z.layerGroup = Ro, Z.map = bo, Z.marker = Ho, Z.point = J, Z.polygon = Vo, Z.polyline = Wo, Z.popup = Jo, Z.rectangle = is, Z.setOptions = at, Z.stamp = U, Z.svg = En, Z.svgOverlay = Ko, Z.tileLayer = xn, Z.tooltip = Xo, Z.transformation = oe, Z.version = H, Z.videoOverlay = Yo;
+      it.addInitHook("addHandler", "touchZoom", An), it.BoxZoom = Cn, it.DoubleClickZoom = Sn, it.Drag = Dn, it.Keyboard = On, it.ScrollWheelZoom = In, it.TapHold = zn, it.TouchZoom = An, Z.Bounds = lt, Z.Browser = Y, Z.CRS = zt, Z.Canvas = Pn, Z.Circle = gi, Z.CircleMarker = Me, Z.Class = It, Z.Control = Et, Z.DivIcon = bn, Z.DivOverlay = Ot, Z.DomEvent = wo, Z.DomUtil = yo, Z.Draggable = Ft, Z.Evented = ne, Z.FeatureGroup = At, Z.GeoJSON = Bt, Z.GridLayer = pe, Z.Handler = Dt, Z.Icon = $t, Z.ImageOverlay = Ie, Z.LatLng = st, Z.LatLngBounds = yt, Z.Layer = Mt, Z.LayerGroup = Xt, Z.LineUtil = zo, Z.Map = it, Z.Marker = Ee, Z.Mixin = Mo, Z.Path = Ht, Z.Point = X, Z.PolyUtil = Co, Z.Polygon = Qt, Z.Polyline = Zt, Z.Popup = ze, Z.PosAnimation = on, Z.Projection = Ao, Z.Rectangle = Mn, Z.Renderer = Rt, Z.SVG = ge, Z.SVGOverlay = wn, Z.TileLayer = ee, Z.Tooltip = Ae, Z.Transformation = Ge, Z.Util = Fn, Z.VideoOverlay = Ln, Z.bind = O, Z.bounds = vt, Z.canvas = Tn, Z.circle = Go, Z.circleMarker = Uo, Z.control = de, Z.divIcon = $o, Z.extend = T, Z.featureGroup = No, Z.geoJSON = yn, Z.geoJson = jo, Z.gridLayer = Qo, Z.icon = Fo, Z.imageOverlay = qo, Z.latLng = et, Z.latLngBounds = ct, Z.layerGroup = Ro, Z.map = bo, Z.marker = Ho, Z.point = J, Z.polygon = Vo, Z.polyline = Wo, Z.popup = Jo, Z.rectangle = is, Z.setOptions = at, Z.stamp = U, Z.svg = En, Z.svgOverlay = Ko, Z.tileLayer = xn, Z.tooltip = Xo, Z.transformation = oe, Z.version = F, Z.videoOverlay = Yo;
       var os = window.L;
       Z.noConflict = function() {
         return window.L = os, this;
@@ -6334,7 +6334,7 @@ const L$2 = /* @__PURE__ */ getDefaultExportFromCjs(leafletSrcExports), t = /* @
   default: L$2
 }, [leafletSrcExports]);
 (function(z, B, Z) {
-  function H(T, C) {
+  function F(T, C) {
     for (; (T = T.parentElement) && !T.classList.contains(C); ) ;
     return T;
   }
@@ -6506,7 +6506,7 @@ const L$2 = /* @__PURE__ */ getDefaultExportFromCjs(leafletSrcExports), t = /* @
     this._enabled && (this._isCurrentlyTwoClickDrawing = !1, L.Draw.SimpleShape.prototype.disable.call(this));
   }, _onMouseUp: function(T) {
     if (!this._shape && !this._isCurrentlyTwoClickDrawing) return void (this._isCurrentlyTwoClickDrawing = !0);
-    this._isCurrentlyTwoClickDrawing && !H(T.target, "leaflet-pane") || L.Draw.SimpleShape.prototype._onMouseUp.call(this);
+    this._isCurrentlyTwoClickDrawing && !F(T.target, "leaflet-pane") || L.Draw.SimpleShape.prototype._onMouseUp.call(this);
   }, _drawShape: function(T) {
     this._shape ? this._shape.setBounds(new L.LatLngBounds(this._startLatLng, T)) : (this._shape = new L.Rectangle(new L.LatLngBounds(this._startLatLng, T), this.options.shapeOptions), this._map.addLayer(this._shape));
   }, _fireCreatedEvent: function() {
@@ -7143,10 +7143,10 @@ const nativeAPI = (() => {
       "webkitfullscreenerror"
     ]
   ], B = z[0], Z = {};
-  for (const H of z)
-    if (H[1] in document) {
-      for (let T = 0; T < H.length; T++)
-        Z[B[T]] = H[T];
+  for (const F of z)
+    if (F[1] in document) {
+      for (let T = 0; T < F.length; T++)
+        Z[B[T]] = F[T];
       return Z;
     }
   return !1;
@@ -7175,10 +7175,10 @@ const nativeAPI = (() => {
       return;
     }
     await new Promise((Z) => {
-      const H = () => {
-        this.off("change", H), Z();
+      const F = () => {
+        this.off("change", F), Z();
       };
-      this.on("change", H);
+      this.on("change", F);
     });
   },
   // Add event listener for fullscreen changes
@@ -7217,14 +7217,14 @@ const FullScreen = leafletSrcExports.Control.extend({
   },
   _screenfull: fullscreenAPI,
   onAdd(z) {
-    let B = "leaflet-control-zoom-fullscreen", Z, H = "";
-    return z.zoomControl && !this.options.forceSeparateButton ? Z = z.zoomControl._container : Z = leafletSrcExports.DomUtil.create("div", "leaflet-bar"), this.options.content ? H = this.options.content : B += " leaflet-fullscreen-icon", this._createButton(this.options.title, B, H, Z, this.toggleFullScreen, this), this._map.fullscreenControl = this, this._map.on("enterFullscreen exitFullscreen", this._toggleState, this), Z;
+    let B = "leaflet-control-zoom-fullscreen", Z, F = "";
+    return z.zoomControl && !this.options.forceSeparateButton ? Z = z.zoomControl._container : Z = leafletSrcExports.DomUtil.create("div", "leaflet-bar"), this.options.content ? F = this.options.content : B += " leaflet-fullscreen-icon", this._createButton(this.options.title, B, F, Z, this.toggleFullScreen, this), this._map.fullscreenControl = this, this._map.on("enterFullscreen exitFullscreen", this._toggleState, this), Z;
   },
   onRemove() {
     leafletSrcExports.DomEvent.off(this.link, "click", leafletSrcExports.DomEvent.stop).off(this.link, "click", this.toggleFullScreen, this), this._screenfull.isEnabled && (leafletSrcExports.DomEvent.off(this._container, this._screenfull.nativeAPI.fullscreenchange, leafletSrcExports.DomEvent.stop).off(this._container, this._screenfull.nativeAPI.fullscreenchange, this._handleFullscreenChange, this), leafletSrcExports.DomEvent.off(document, this._screenfull.nativeAPI.fullscreenchange, leafletSrcExports.DomEvent.stop).off(document, this._screenfull.nativeAPI.fullscreenchange, this._handleFullscreenChange, this));
   },
-  _createButton(z, B, Z, H, T, C) {
-    return this.link = leafletSrcExports.DomUtil.create("a", B, H), this.link.href = "#", this.link.title = z, this.link.innerHTML = Z, this.link.setAttribute("role", "button"), this.link.setAttribute("aria-label", z), leafletSrcExports.DomEvent.disableClickPropagation(H), leafletSrcExports.DomEvent.on(this.link, "click", leafletSrcExports.DomEvent.stop).on(this.link, "click", T, C), this._screenfull.isEnabled && (leafletSrcExports.DomEvent.on(H, this._screenfull.nativeAPI.fullscreenchange, leafletSrcExports.DomEvent.stop).on(H, this._screenfull.nativeAPI.fullscreenchange, this._handleFullscreenChange, C), leafletSrcExports.DomEvent.on(document, this._screenfull.nativeAPI.fullscreenchange, leafletSrcExports.DomEvent.stop).on(document, this._screenfull.nativeAPI.fullscreenchange, this._handleFullscreenChange, C)), this.link;
+  _createButton(z, B, Z, F, T, C) {
+    return this.link = leafletSrcExports.DomUtil.create("a", B, F), this.link.href = "#", this.link.title = z, this.link.innerHTML = Z, this.link.setAttribute("role", "button"), this.link.setAttribute("aria-label", z), leafletSrcExports.DomEvent.disableClickPropagation(F), leafletSrcExports.DomEvent.on(this.link, "click", leafletSrcExports.DomEvent.stop).on(this.link, "click", T, C), this._screenfull.isEnabled && (leafletSrcExports.DomEvent.on(F, this._screenfull.nativeAPI.fullscreenchange, leafletSrcExports.DomEvent.stop).on(F, this._screenfull.nativeAPI.fullscreenchange, this._handleFullscreenChange, C), leafletSrcExports.DomEvent.on(document, this._screenfull.nativeAPI.fullscreenchange, leafletSrcExports.DomEvent.stop).on(document, this._screenfull.nativeAPI.fullscreenchange, this._handleFullscreenChange, C)), this.link;
   },
   toggleFullScreen() {
     const z = this._map;
@@ -7250,8 +7250,8 @@ const FullScreen = leafletSrcExports.Control.extend({
     this.link.title = this._map._isFullscreen ? this.options.title : this.options.titleCancel, this.link && this.link.classList && (this._map._isFullscreen ? this.link.classList.remove("leaflet-fullscreen-on") : this.link.classList.add("leaflet-fullscreen-on"));
   },
   _handleFullscreenChange(z) {
-    const B = this._map, Z = this.options.fullscreenElement || B.getContainer(), H = z.target === Z, T = !this._screenfull.isFullscreen && !B._exitFired;
-    H && T && (B._exitFired = !0, B.fire("exitFullscreen"), B._isFullscreen = !1, this._screenfull.exit().then(() => B.invalidateSize()));
+    const B = this._map, Z = this.options.fullscreenElement || B.getContainer(), F = z.target === Z, T = !this._screenfull.isFullscreen && !B._exitFired;
+    F && T && (B._exitFired = !0, B.fire("exitFullscreen"), B._isFullscreen = !1, this._screenfull.exit().then(() => B.invalidateSize()));
   }
 });
 leafletSrcExports.Map.include({
@@ -7263,7 +7263,7 @@ function e() {
   return e = Object.assign ? Object.assign.bind() : function(z) {
     for (var B = 1; B < arguments.length; B++) {
       var Z = arguments[B];
-      for (var H in Z) Object.prototype.hasOwnProperty.call(Z, H) && (z[H] = Z[H]);
+      for (var F in Z) Object.prototype.hasOwnProperty.call(Z, F) && (z[F] = Z[F]);
     }
     return z;
   }, e.apply(this, arguments);
@@ -7272,8 +7272,8 @@ function r(z, B) {
   z.prototype = Object.create(B.prototype), z.prototype.constructor = z, n(z, B);
 }
 function n(z, B) {
-  return n = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function(Z, H) {
-    return Z.__proto__ = H, Z;
+  return n = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function(Z, F) {
+    return Z.__proto__ = F, Z;
   }, n(z, B);
 }
 function o() {
@@ -7287,21 +7287,21 @@ function o() {
   }
 }
 function i(z, B, Z) {
-  return i = o() ? Reflect.construct.bind() : function(H, T, C) {
+  return i = o() ? Reflect.construct.bind() : function(F, T, C) {
     var O = [null];
     O.push.apply(O, T);
-    var R = new (Function.bind.apply(H, O))();
+    var R = new (Function.bind.apply(F, O))();
     return C && n(R, C.prototype), R;
   }, i.apply(null, arguments);
 }
-function s(z, B, Z, H) {
-  B === void 0 && (B = ""), H === void 0 && (H = {});
+function s(z, B, Z, F) {
+  B === void 0 && (B = ""), F === void 0 && (F = {});
   var T = document.createElement(z);
-  return B && (T.className = B), Object.keys(H).forEach(function(C) {
-    if (typeof H[C] == "function") {
+  return B && (T.className = B), Object.keys(F).forEach(function(C) {
+    if (typeof F[C] == "function") {
       var O = C.indexOf("on") === 0 ? C.substr(2).toLowerCase() : C;
-      T.addEventListener(O, H[C]);
-    } else C === "html" ? T.innerHTML = H[C] : C === "text" ? T.innerText = H[C] : T.setAttribute(C, H[C]);
+      T.addEventListener(O, F[C]);
+    } else C === "html" ? T.innerHTML = F[C] : C === "text" ? T.innerText = F[C] : T.setAttribute(C, F[C]);
   }), Z && Z.appendChild(T), T;
 }
 function a(z) {
@@ -7322,13 +7322,13 @@ function u(z, B) {
 }
 var h, p = 13, d = 40, f = 38, m = [p, 27, d, f, 37, 39], v = /* @__PURE__ */ (function() {
   function z(Z) {
-    var H = this, T = Z.handleSubmit, C = Z.searchLabel, O = Z.classNames, R = O === void 0 ? {} : O;
+    var F = this, T = Z.handleSubmit, C = Z.searchLabel, O = Z.classNames, R = O === void 0 ? {} : O;
     this.container = void 0, this.form = void 0, this.input = void 0, this.handleSubmit = void 0, this.hasError = !1, this.container = s("div", l("geosearch", R.container)), this.form = s("form", ["", R.form].join(" "), this.container, { autocomplete: "none", onClick: a, onDblClick: a, touchStart: a, touchEnd: a }), this.input = s("input", ["glass", R.input].join(" "), this.form, { type: "text", placeholder: C || "search", onInput: this.onInput, onKeyUp: function(U) {
-      return H.onKeyUp(U);
+      return F.onKeyUp(U);
     }, onKeyPress: function(U) {
-      return H.onKeyPress(U);
+      return F.onKeyPress(U);
     }, onFocus: this.onFocus, onBlur: this.onBlur, onClick: function() {
-      H.input.focus(), H.input.dispatchEvent(new Event("focus"));
+      F.input.focus(), F.input.dispatchEvent(new Event("focus"));
     } }), this.handleSubmit = T;
   }
   var B = z.prototype;
@@ -7338,9 +7338,9 @@ var h, p = 13, d = 40, f = 38, m = [p, 27, d, f, 37, 39], v = /* @__PURE__ */ (f
     u(this.form, "active");
   }, B.onSubmit = function(Z) {
     try {
-      var H = this;
-      return a(Z), u(T = H.container, "error"), c(T, "pending"), Promise.resolve(H.handleSubmit({ query: H.input.value })).then(function() {
-        u(H.container, "pending");
+      var F = this;
+      return a(Z), u(T = F.container, "error"), c(T, "pending"), Promise.resolve(F.handleSubmit({ query: F.input.value })).then(function() {
+        u(F.container, "pending");
       });
     } catch (C) {
       return Promise.reject(C);
@@ -7357,27 +7357,27 @@ var h, p = 13, d = 40, f = 38, m = [p, 27, d, f, 37, 39], v = /* @__PURE__ */ (f
   }, z;
 })(), g = /* @__PURE__ */ (function() {
   function z(Z) {
-    var H = this, T = Z.handleClick, C = Z.classNames, O = C === void 0 ? {} : C, R = Z.notFoundMessage;
+    var F = this, T = Z.handleClick, C = Z.classNames, O = C === void 0 ? {} : C, R = Z.notFoundMessage;
     this.handleClick = void 0, this.selected = -1, this.results = [], this.container = void 0, this.resultItem = void 0, this.notFoundMessage = void 0, this.onClick = function(U) {
-      if (typeof H.handleClick == "function") {
+      if (typeof F.handleClick == "function") {
         var W = U.target;
-        if (W && H.container.contains(W) && W.hasAttribute("data-key")) {
+        if (W && F.container.contains(W) && W.hasAttribute("data-key")) {
           var V = Number(W.getAttribute("data-key"));
-          H.handleClick({ result: H.results[V] });
+          F.handleClick({ result: F.results[V] });
         }
       }
     }, this.handleClick = T, this.notFoundMessage = R ? s("div", l(O.notfound), void 0, { html: R }) : void 0, this.container = s("div", l("results", O.resultlist)), this.container.addEventListener("click", this.onClick, !0), this.resultItem = s("div", l(O.item));
   }
   var B = z.prototype;
-  return B.render = function(Z, H) {
+  return B.render = function(Z, F) {
     var T = this;
     Z === void 0 && (Z = []), this.clear(), Z.forEach(function(C, O) {
       var R = T.resultItem.cloneNode(!0);
-      R.setAttribute("data-key", "" + O), R.innerHTML = H({ result: C }), T.container.appendChild(R);
+      R.setAttribute("data-key", "" + O), R.innerHTML = F({ result: C }), T.container.appendChild(R);
     }), Z.length > 0 ? (c(this.container.parentElement, "open"), c(this.container, "active")) : this.notFoundMessage && (this.container.appendChild(this.notFoundMessage), c(this.container.parentElement, "open")), this.results = Z;
   }, B.select = function(Z) {
-    return Array.from(this.container.children).forEach(function(H, T) {
-      return T === Z ? c(H, "active") : u(H, "active");
+    return Array.from(this.container.children).forEach(function(F, T) {
+      return T === Z ? c(F, "active") : u(F, "active");
     }), this.selected = Z, this.results[Z];
   }, B.count = function() {
     return this.results ? this.results.length : 0;
@@ -7390,7 +7390,7 @@ var h, p = 13, d = 40, f = 38, m = [p, 27, d, f, 37, 39], v = /* @__PURE__ */ (f
 }, resultFormat: function(z) {
   return "" + z.result.label;
 }, marker: { icon: t && leafletSrcExports.Icon ? new leafletSrcExports.Icon.Default() : void 0, draggable: !1 }, maxMarkers: 1, maxSuggestions: 5, retainZoomLevel: !1, animateZoom: !0, searchLabel: "Enter address", clearSearchLabel: "Clear search", notFoundMessage: "", messageHideDelay: 3e3, zoomLevel: 18, classNames: { container: "leaflet-bar leaflet-control leaflet-control-geosearch", button: "leaflet-bar-part leaflet-bar-part-single", resetButton: "reset", msgbox: "leaflet-bar message", form: "", input: "", resultlist: "", item: "", notfound: "leaflet-bar-notfound" }, autoComplete: !0, autoCompleteDelay: 250, autoClose: !1, keepResult: !1, updateMap: !0, resetButton: "×" }, b = "Leaflet must be loaded before instantiating the GeoSearch control", E = { options: e({}, y), classNames: e({}, y.classNames), initialize: function(z) {
-  var B, Z, H, T, C = this;
+  var B, Z, F, T, C = this;
   if (!t) throw new Error(b);
   if (!z.provider) throw new Error("Provider is missing from options");
   this.options = e({}, y, z), this.classNames = e({}, this.classNames, z.classNames), this.markers = new leafletSrcExports.FeatureGroup(), this.classNames.container += " leaflet-geosearch-" + this.options.style, this.searchElement = new v({ searchLabel: this.options.searchLabel, classNames: { container: this.classNames.container, form: this.classNames.form, input: this.classNames.input }, handleSubmit: function(O) {
@@ -7404,11 +7404,11 @@ var h, p = 13, d = 40, f = 38, m = [p, 27, d, f, 37, 39], v = /* @__PURE__ */ (f
     C.searchElement.input.value = R.label, C.onSubmit({ query: R.label, data: R });
   }, classNames: { resultlist: this.classNames.resultlist, item: this.classNames.item, notfound: this.classNames.notfound }, notFoundMessage: this.options.notFoundMessage }), this.searchElement.form.appendChild(this.resultList.container), this.searchElement.input.addEventListener("keyup", (B = function(O) {
     return C.autoSearch(O);
-  }, (Z = this.options.autoCompleteDelay) === void 0 && (Z = 250), H === void 0 && (H = !1), function() {
+  }, (Z = this.options.autoCompleteDelay) === void 0 && (Z = 250), F === void 0 && (F = !1), function() {
     var O = [].slice.call(arguments);
     T && clearTimeout(T), T = setTimeout(function() {
-      T = null, H || B.apply(void 0, O);
-    }, Z), H && !T && B.apply(void 0, O);
+      T = null, F || B.apply(void 0, O);
+    }, Z), F && !T && B.apply(void 0, O);
   }), !0), this.searchElement.input.addEventListener("keydown", function(O) {
     return C.selectResult(O);
   }, !0), this.searchElement.input.addEventListener("keydown", function(O) {
@@ -7417,8 +7417,8 @@ var h, p = 13, d = 40, f = 38, m = [p, 27, d, f, 37, 39], v = /* @__PURE__ */ (f
     O.preventDefault();
   }, !1);
 }, onAdd: function(z) {
-  var B = this.options, Z = B.showMarker, H = B.style;
-  if (this.map = z, Z && this.markers.addTo(z), H === "bar") {
+  var B = this.options, Z = B.showMarker, F = B.style;
+  if (this.map = z, Z && this.markers.addTo(z), F === "bar") {
     var T = z.getContainer().querySelector(".leaflet-control-container");
     this.container = s("div", "leaflet-control-geosearch leaflet-geosearch-bar"), this.container.appendChild(this.searchElement.form), T.appendChild(this.container);
   }
@@ -7437,7 +7437,7 @@ var h, p = 13, d = 40, f = 38, m = [p, 27, d, f, 37, 39], v = /* @__PURE__ */ (f
   if ([p, d, f].indexOf(z.keyCode) !== -1) if (z.preventDefault(), z.keyCode !== p) {
     var B = this.resultList.count() - 1;
     if (!(B < 0)) {
-      var Z = this.resultList.selected, H = z.keyCode === d ? Z + 1 : Z - 1, T = this.resultList.select(H < 0 ? B : H > B ? 0 : H);
+      var Z = this.resultList.selected, F = z.keyCode === d ? Z + 1 : Z - 1, T = this.resultList.select(F < 0 ? B : F > B ? 0 : F);
       this.searchElement.input.value = T.label;
     }
   } else {
@@ -7446,15 +7446,15 @@ var h, p = 13, d = 40, f = 38, m = [p, 27, d, f, 37, 39], v = /* @__PURE__ */ (f
   }
 }, clearResults: function(z, B) {
   if (B === void 0 && (B = !1), !z || z.keyCode === 27) {
-    var Z = this.options, H = Z.autoComplete;
-    !B && Z.keepResult || (this.searchElement.input.value = "", this.markers.clearLayers()), H && this.resultList.clear();
+    var Z = this.options, F = Z.autoComplete;
+    !B && Z.keepResult || (this.searchElement.input.value = "", this.markers.clearLayers()), F && this.resultList.clear();
   }
 }, autoSearch: function(z) {
   try {
     var B = this;
     if (m.indexOf(z.keyCode) > -1) return Promise.resolve();
-    var Z = z.target.value, H = B.options.provider, T = (function() {
-      if (Z.length) return Promise.resolve(H.search({ query: Z })).then(function(C) {
+    var Z = z.target.value, F = B.options.provider, T = (function() {
+      if (Z.length) return Promise.resolve(F.search({ query: Z })).then(function(C) {
         C = C.slice(0, B.options.maxSuggestions), B.resultList.render(C, B.options.resultFormat);
       });
       B.resultList.clear();
@@ -7474,21 +7474,21 @@ var h, p = 13, d = 40, f = 38, m = [p, 27, d, f, 37, 39], v = /* @__PURE__ */ (f
     return Promise.reject(Z);
   }
 }, showResult: function(z, B) {
-  var Z = this.options, H = Z.autoClose, T = Z.updateMap, C = this.markers.getLayers();
+  var Z = this.options, F = Z.autoClose, T = Z.updateMap, C = this.markers.getLayers();
   C.length >= this.options.maxMarkers && this.markers.removeLayer(C[0]);
   var O = this.addMarker(z, B);
-  T && this.centerMap(z), this.map.fireEvent("geosearch/showlocation", { location: z, marker: O }), H && this.closeResults();
+  T && this.centerMap(z), this.map.fireEvent("geosearch/showlocation", { location: z, marker: O }), F && this.closeResults();
 }, closeResults: function() {
   var z = this.searchElement.container;
   z.classList.contains("active") && u(z, "active"), this.clearResults();
 }, addMarker: function(z, B) {
-  var Z = this, H = this.options, T = H.marker, C = H.showPopup, O = H.popupFormat, R = new leafletSrcExports.Marker([z.y, z.x], T), U = z.label;
+  var Z = this, F = this.options, T = F.marker, C = F.showPopup, O = F.popupFormat, R = new leafletSrcExports.Marker([z.y, z.x], T), U = z.label;
   return typeof O == "function" && (U = O({ query: B, result: z })), R.bindPopup(U), this.markers.addLayer(R), C && R.openPopup(), T.draggable && R.on("dragend", function(W) {
     Z.map.fireEvent("geosearch/marker/dragend", { location: R.getLatLng(), event: W });
   }), R;
 }, centerMap: function(z) {
-  var B = this.options, Z = B.retainZoomLevel, H = B.animateZoom, T = z.bounds ? new leafletSrcExports.LatLngBounds(z.bounds) : new leafletSrcExports.LatLng(z.y, z.x).toBounds(10), C = T.isValid() ? T : this.markers.getBounds();
-  !Z && T.isValid() && !z.bounds || Z || !T.isValid() ? this.map.setView(C.getCenter(), this.getZoom(), { animate: H }) : this.map.fitBounds(C, { animate: H });
+  var B = this.options, Z = B.retainZoomLevel, F = B.animateZoom, T = z.bounds ? new leafletSrcExports.LatLngBounds(z.bounds) : new leafletSrcExports.LatLng(z.y, z.x).toBounds(10), C = T.isValid() ? T : this.markers.getBounds();
+  !Z && T.isValid() && !z.bounds || Z || !T.isValid() ? this.map.setView(C.getCenter(), this.getZoom(), { animate: F }) : this.map.fitBounds(C, { animate: F });
 }, getZoom: function() {
   var z = this.options, B = z.zoomLevel;
   return z.retainZoomLevel ? this.map.getZoom() : B;
@@ -7508,18 +7508,18 @@ var x = /* @__PURE__ */ (function() {
   var B = z.prototype;
   return B.getParamString = function(Z) {
     Z === void 0 && (Z = {});
-    var H = e({}, this.options.params, Z);
-    return Object.keys(H).map(function(T) {
-      return encodeURIComponent(T) + "=" + encodeURIComponent(H[T]);
+    var F = e({}, this.options.params, Z);
+    return Object.keys(F).map(function(T) {
+      return encodeURIComponent(T) + "=" + encodeURIComponent(F[T]);
     }).join("&");
-  }, B.getUrl = function(Z, H) {
-    return Z + "?" + this.getParamString(H);
+  }, B.getUrl = function(Z, F) {
+    return Z + "?" + this.getParamString(F);
   }, B.search = function(Z) {
     try {
-      var H = this, T = H.endpoint({ query: Z.query, type: h.SEARCH });
+      var F = this, T = F.endpoint({ query: Z.query, type: h.SEARCH });
       return Promise.resolve(fetch(T)).then(function(C) {
         return Promise.resolve(C.json()).then(function(O) {
-          return H.parse({ data: O });
+          return F.parse({ data: O });
         });
       });
     } catch (C) {
@@ -7528,16 +7528,16 @@ var x = /* @__PURE__ */ (function() {
   }, z;
 })(), L$1 = /* @__PURE__ */ (function(z) {
   function B() {
-    for (var H, T = arguments.length, C = new Array(T), O = 0; O < T; O++) C[O] = arguments[O];
-    return (H = z.call.apply(z, [this].concat(C)) || this).searchUrl = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find", H;
+    for (var F, T = arguments.length, C = new Array(T), O = 0; O < T; O++) C[O] = arguments[O];
+    return (F = z.call.apply(z, [this].concat(C)) || this).searchUrl = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find", F;
   }
   r(B, z);
   var Z = B.prototype;
-  return Z.endpoint = function(H) {
-    var T = H.query, C = typeof T == "string" ? { text: T } : T;
+  return Z.endpoint = function(F) {
+    var T = F.query, C = typeof T == "string" ? { text: T } : T;
     return C.f = "json", this.getUrl(this.searchUrl, C);
-  }, Z.parse = function(H) {
-    return H.data.locations.map(function(T) {
+  }, Z.parse = function(F) {
+    return F.data.locations.map(function(T) {
       return { x: T.feature.geometry.x, y: T.feature.geometry.y, label: T.name, bounds: [[T.extent.ymin, T.extent.xmin], [T.extent.ymax, T.extent.xmax]], raw: T };
     });
   }, B;
@@ -7546,319 +7546,486 @@ var I;
 (function(z) {
   z[z.INITIALIZED = 0] = "INITIALIZED", z[z.LOADING = 1] = "LOADING", z[z.SUCCESS = 2] = "SUCCESS", z[z.FAILURE = 3] = "FAILURE";
 })(I || (I = {}));
-document.addEventListener("livewire:init", () => {
-  const leafletMap = ($wire, config, componentKey) => ({
-    map: null,
-    config,
-    imgsPath: "/vendor/filament-leaflet/images",
-    layers: [],
-    layerGroups: {},
-    baseLayers: {},
-    geoJsonLayer: null,
-    info: null,
-    layerControl: null,
-    editableLayers: null,
-    isDrawing: !1,
-    pickMarker: null,
-    init() {
-      this.createMap(), this.addTileLayers(), this.addLayerGroups(), this.setupMapControls(), Object.keys(this.config.geoJsonData)?.length && (this.setupInfoControl(), this.loadGeoJson()), this.addLayers(), this.setupEventHandlers(), this.setupLivewireListeners(), this.setupLayerControl();
-    },
-    getTranslation(z, B = "") {
-      return window.filamentData.translations && window.filamentData.translations[z] ? window.filamentData.translations[z] : B;
-    },
-    createMap() {
-      this.map = L$2.map(this.config.mapId, this.config.mapConfig || {}).setView(this.config.defaultCoord, this.config.defaultZoom), new ResizeObserver(() => {
-        Alpine.raw(this.map).invalidateSize();
-      }).observe(Alpine.raw(this.map)._container);
-    },
-    addTileLayers() {
-      this.config.tileLayersUrl.forEach(([z, B, Z], H) => {
-        const T = L$2.tileLayer(B, {
-          maxZoom: this.config.zoomConfig.max,
-          minZoom: this.config.zoomConfig.min,
-          attribution: Z || ""
-        });
-        this.baseLayers[z] = T, H === 0 && T.addTo(Alpine.raw(this.map));
+class LeafletMapCore {
+  constructor(z, B = "/vendor/filament-leaflet/images") {
+    this.map = null, this.config = z, this.imgsPath = B, this.layers = [], this.layerGroups = {}, this.baseLayers = {}, this.geoJsonLayer = null, this.info = null, this.layerControl = null, this.editableLayers = null, this.isDrawing = !1;
+  }
+  /**
+   * Inicializa o mapa com todas as configurações
+   */
+  init() {
+    this.createMap(), this.addTileLayers(), this.addLayerGroups(), this.setupMapControls(), Object.keys(this.config.geoJsonData)?.length && (this.setupInfoControl(), this.loadGeoJson()), this.addLayers(), this.setupLayerControl();
+  }
+  /**
+   * Obtém tradução do sistema
+   */
+  getTranslation(z, B = "") {
+    return window.filamentData?.translations?.[z] || B;
+  }
+  /**
+   * Cria o mapa base
+   */
+  createMap() {
+    this.map = L$2.map(this.config.mapId, this.config.mapConfig || {}).setView(this.config.defaultCoord, this.config.defaultZoom), new ResizeObserver(() => {
+      this.map && Alpine.raw(this.map).invalidateSize();
+    }).observe(Alpine.raw(this.map)._container);
+  }
+  /**
+   * Adiciona camadas de tiles ao mapa
+   */
+  addTileLayers() {
+    this.config.tileLayersUrl.forEach(([z, B, Z], F) => {
+      const T = L$2.tileLayer(B, {
+        maxZoom: this.config.zoomConfig.max,
+        minZoom: this.config.zoomConfig.min,
+        attribution: Z || ""
       });
-    },
-    setupInfoControl() {
-      this.info = L$2.control(), this.info.onAdd = () => {
-        const z = L$2.DomUtil.create("div", "info");
-        return this.info._div = z, z.style.display = "none", z;
-      }, this.info.update = (z) => {
-        if (this.info._div)
-          if (z) {
-            this.info._div.style.display = "block";
-            let B = this.config.infoText.replace("{state}", z.name).replace("{density}", z.density);
-            this.info._div.innerHTML = B;
-          } else
-            this.info._div.style.display = "none";
-      }, this.info.addTo(Alpine.raw(this.map));
-    },
-    async loadGeoJson() {
-      if (this.config.geoJsonUrl)
-        try {
-          const B = await (await fetch(this.config.geoJsonUrl)).json(), Z = Object.entries(this.config.geoJsonData).filter(([H]) => B[H]).map(([H, T]) => ({
-            type: "Feature",
-            id: H,
-            properties: {
-              name: B[H].name,
-              density: T
-            },
-            geometry: {
-              type: "Polygon",
-              coordinates: B[H].coordinates
-            }
-          }));
-          this.geoJsonLayer = L$2.geoJson({
-            type: "FeatureCollection",
-            features: Z
-          }, {
-            style: (H) => this.getFeatureStyle(H),
-            onEachFeature: (H, T) => {
-              T.on({
-                mouseover: (C) => this.info?.update(C.target.feature.properties),
-                mouseout: () => this.info?.update(),
-                click: (C) => Alpine.raw(this.map).fitBounds(C.target.getBounds())
-              });
-            }
-          }).addTo(Alpine.raw(this.map));
-        } catch (z) {
-          console.error("Erro GeoJSON:", z);
-        }
-    },
-    getFeatureStyle(z) {
-      const B = Object.values(this.config.geoJsonData), Z = z.properties.density / Math.max(...B), H = Math.max(0, Math.ceil(Z * this.config.geoJsonColors.length) - 1);
-      return {
-        fillColor: this.config.geoJsonColors[H],
-        weight: 2,
-        opacity: 1,
-        color: "white",
-        dashArray: "3",
-        fillOpacity: 0.8
-      };
-    },
-    addLayers() {
-      const layers = Alpine.raw(this.config.layers);
-      layers?.length && layers.forEach((layerData) => {
-        let layer = null;
-        switch (layerData.type) {
-          case "marker":
-            layer = this.createMarker(layerData);
-            break;
-          case "circle":
-            layer = this.createCircle(layerData);
-            break;
-          case "circleMarker":
-            layer = this.createCircleMarker(layerData);
-            break;
-          case "rectangle":
-            layer = this.createRectangle(layerData);
-            break;
-          case "polygon":
-            layer = this.createPolygon(layerData);
-            break;
-          case "polyline":
-            layer = this.createPolyline(layerData);
-            break;
-          default:
-            console.warn(`Tipo de layer desconhecido: ${layerData.type}`);
-            return;
-        }
-        layer && (layer.options.layerId = layerData.id || null, layer.options.group = layerData.group || null, layerData.popup && this.bindPopup(layer, layerData.popup), layerData.tooltip && this.bindTooltip(layer, layerData.tooltip), layerData.clickAction && layer.on("click", () => {
-          componentKey ? $wire.callSchemaComponentMethod(
-            componentKey,
-            "handleLayerClick",
-            { layerId: layer.id }
-          ) : $wire.call(
-            "handleLayerClick",
-            [layer.id]
-          );
-        }), layerData.onMouseOver && layer.on("mouseover", function() {
-          eval(layerData.onMouseOver);
-        }), layerData.onMouseOut && layer.on("mouseout", function() {
-          eval(layerData.onMouseOut);
-        }), layerData.editable && Alpine.raw(this.editableLayers).addLayer(layer), layerData.group ? this.layerGroups[layerData.group].layer.addLayer(layer) : layer.addTo(Alpine.raw(this.map)), this.layers.push(layer));
-      });
-    },
-    addLayerGroups() {
-      this.editableLayers = new L$2.FeatureGroup(), this.editableLayers.addTo(Alpine.raw(this.map)), !(!Object.keys(this.config.layerGroups)?.length > 0) && this.config.layerGroups.forEach((z) => {
-        let B = null;
-        switch (z.type) {
-          case "group":
-            B = L$2.layerGroup(z.options);
-            break;
-          case "feature":
-            B = L$2.featureGroup(z.options);
-            break;
-          case "cluster":
-            B = L$2.markerClusterGroup(z.options);
-            break;
-        }
-        B && (B.addTo(Alpine.raw(this.map)), this.layerGroups[z.id] = {
-          name: z.name,
-          layer: B
-        });
-      });
-    },
-    createMarker(z) {
-      return !z.lat || !z.lng ? null : L$2.marker([z.lat, z.lng], {
-        icon: this.createIcon(z),
-        draggable: z.draggable || !1
-      });
-    },
-    createCircle(z) {
-      return z.center ? L$2.circle(z.center, z.options || {}) : null;
-    },
-    createCircleMarker(z) {
-      return z.center ? L$2.circleMarker(z.center, z.options || {}) : null;
-    },
-    createRectangle(z) {
-      return z.bounds ? L$2.rectangle(z.bounds, z.options || {}) : null;
-    },
-    createPolygon(z) {
-      return z.points ? L$2.polygon(z.points, z.options || {}) : null;
-    },
-    createPolyline(z) {
-      return z.points ? L$2.polyline(z.points, z.options || {}) : null;
-    },
-    createIcon(z) {
-      const B = {
-        iconSize: z.iconSize || [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41]
-      };
-      if (z.icon)
-        B.iconUrl = z.icon;
-      else {
-        const Z = z.color || "blue";
-        B.iconUrl = `${this.imgsPath}/marker-icon-2x-${Z}.png`, B.shadowUrl = `${this.imgsPath}/marker-shadow.png`;
+      this.baseLayers[z] = T, F === 0 && T.addTo(Alpine.raw(this.map));
+    });
+  }
+  /**
+   * Configura o controle de informações
+   */
+  setupInfoControl() {
+    this.info = L$2.control(), this.info.onAdd = () => {
+      const z = L$2.DomUtil.create("div", "info");
+      return this.info._div = z, z.style.display = "none", z;
+    }, this.info.update = (z) => {
+      if (this.info._div)
+        if (z) {
+          this.info._div.style.display = "block";
+          let B = this.config.infoText.replace("{state}", z.name).replace("{density}", z.density);
+          this.info._div.innerHTML = B;
+        } else
+          this.info._div.style.display = "none";
+    }, this.info.addTo(Alpine.raw(this.map));
+  }
+  /**
+   * Carrega dados GeoJSON
+   */
+  async loadGeoJson() {
+    if (this.config.geoJsonUrl)
+      try {
+        const B = await (await fetch(this.config.geoJsonUrl)).json(), Z = Object.entries(this.config.geoJsonData).filter(([F]) => B[F]).map(([F, T]) => ({
+          type: "Feature",
+          id: F,
+          properties: {
+            name: B[F].name,
+            density: T
+          },
+          geometry: {
+            type: "Polygon",
+            coordinates: B[F].coordinates
+          }
+        }));
+        this.geoJsonLayer = L$2.geoJson({
+          type: "FeatureCollection",
+          features: Z
+        }, {
+          style: (F) => this.getFeatureStyle(F),
+          onEachFeature: (F, T) => {
+            T.on({
+              mouseover: (C) => this.info?.update(C.target.feature.properties),
+              mouseout: () => this.info?.update(),
+              click: (C) => Alpine.raw(this.map).fitBounds(C.target.getBounds())
+            });
+          }
+        }).addTo(Alpine.raw(this.map));
+      } catch (z) {
+        console.error("Erro GeoJSON:", z);
       }
-      return L$2.icon(B);
-    },
-    bindPopup(z, B) {
-      let Z = '<div class="custom-popup">';
-      B.title && (Z += `<h4>${B.title}</h4>`), B.content && (Z += B.content), B.fields && Object.keys(B.fields).length > 0 && Object.entries(B.fields).forEach(([H, T]) => {
-        Z += `<p><span class="field-label">${H}:</span> ${T}</p>`;
-      }), Z += "</div>", z.bindPopup(Z, B.options || {});
-    },
-    bindTooltip(z, B) {
-      const Z = B.content, H = B.options || {};
-      z.bindTooltip(Z, H);
-    },
-    setupLayerControl() {
-      let z = Object.values(this.layerGroups).filter((H) => H && H.name).map((H) => [H.name, H.layer]);
-      z = Object.fromEntries(z);
-      const B = Object.keys(this.baseLayers).length > 1, Z = Object.keys(z).length > 0;
-      !B && !Z || (this.layerControl && Alpine.raw(this.map).removeControl(this.layerControl), this.layerControl = L$2.control.layers(
-        this.baseLayers,
-        z
-      ).addTo(Alpine.raw(this.map)));
-    },
-    setupMapControls() {
-      this.config.mapControls.attributionControl && this.setupAttributionControl(), this.config.mapControls.scaleControl && this.setupScaleControl(), this.config.mapControls.zoomControl && this.setupZoomControl(), this.config.mapControls.fullscreenControl && this.setupFullscreenControl(), this.config.mapControls.searchControl && this.setupSearchControl(), this.config.mapControls.drawControl && this.setupDrawControl();
-    },
-    setupAttributionControl() {
-      new L$2.control.attribution().addTo(Alpine.raw(this.map));
-    },
-    setupScaleControl() {
-      new L$2.control.scale().addTo(Alpine.raw(this.map));
-    },
-    setupZoomControl() {
-      new L$2.control.zoom().addTo(Alpine.raw(this.map));
-    },
-    setupSearchControl() {
-      const z = new L$1();
-      new w({
-        provider: z,
-        notFoundMessage: this.getTranslation("address_not_found", ""),
-        searchLabel: this.getTranslation("enter_address", ""),
+  }
+  /**
+   * Obtém o estilo de uma feature GeoJSON
+   */
+  getFeatureStyle(z) {
+    const B = Object.values(this.config.geoJsonData), Z = z.properties.density / Math.max(...B), F = Math.max(0, Math.ceil(Z * this.config.geoJsonColors.length) - 1);
+    return {
+      fillColor: this.config.geoJsonColors[F],
+      weight: 2,
+      opacity: 1,
+      color: "white",
+      dashArray: "3",
+      fillOpacity: 0.8
+    };
+  }
+  /**
+   * Adiciona camadas ao mapa
+   * Callback onLayerClick pode ser passado para personalizar o comportamento
+   */
+  addLayers(callbacks = {}) {
+    const layers = this.config.layers;
+    layers?.length && layers.forEach((layerData) => {
+      let layer = null;
+      switch (layerData.type) {
+        case "marker":
+          layer = this.createMarker(layerData);
+          break;
+        case "circle":
+          layer = this.createCircle(layerData);
+          break;
+        case "circleMarker":
+          layer = this.createCircleMarker(layerData);
+          break;
+        case "rectangle":
+          layer = this.createRectangle(layerData);
+          break;
+        case "polygon":
+          layer = this.createPolygon(layerData);
+          break;
+        case "polyline":
+          layer = this.createPolyline(layerData);
+          break;
+        default:
+          console.warn(`Tipo de layer desconhecido: ${layerData.type}`);
+          return;
+      }
+      layer && (layer.options.layerId = layerData.id || null, layer.options.group = layerData.group || null, layerData.popup && this.bindPopup(layer, layerData.popup), layerData.tooltip && this.bindTooltip(layer, layerData.tooltip), layerData.clickAction && callbacks.onLayerClick && layer.on("click", () => {
+        callbacks.onLayerClick(layer.options.layerId);
+      }), layerData.onMouseOver && layer.on("mouseover", function() {
+        eval(layerData.onMouseOver);
+      }), layerData.onMouseOut && layer.on("mouseout", function() {
+        eval(layerData.onMouseOut);
+      }), layerData.editable && this.editableLayers.addLayer(layer), layerData.group ? this.layerGroups[layerData.group].layer.addLayer(layer) : layer.addTo(Alpine.raw(this.map)), this.layers.push(layer));
+    });
+  }
+  /**
+   * Adiciona grupos de camadas
+   */
+  addLayerGroups() {
+    this.editableLayers = new L$2.FeatureGroup(), this.editableLayers.addTo(Alpine.raw(this.map)), !(!Object.keys(this.config.layerGroups)?.length > 0) && this.config.layerGroups.forEach((z) => {
+      let B = null;
+      switch (z.type) {
+        case "group":
+          B = L$2.layerGroup(z.options);
+          break;
+        case "feature":
+          B = L$2.featureGroup(z.options);
+          break;
+        case "cluster":
+          B = L$2.markerClusterGroup(z.options);
+          break;
+      }
+      B && (B.addTo(Alpine.raw(this.map)), this.layerGroups[z.id] = {
+        name: z.name,
+        layer: B
+      });
+    });
+  }
+  /**
+   * Cria um marcador
+   */
+  createMarker(z) {
+    return !z.lat || !z.lng ? null : L$2.marker([z.lat, z.lng], {
+      icon: this.createIcon(z),
+      draggable: z.draggable || !1
+    });
+  }
+  /**
+   * Cria um círculo
+   */
+  createCircle(z) {
+    return z.center ? L$2.circle(z.center, z.options || {}) : null;
+  }
+  /**
+   * Cria um marcador circular
+   */
+  createCircleMarker(z) {
+    return z.center ? L$2.circleMarker(z.center, z.options || {}) : null;
+  }
+  /**
+   * Cria um retângulo
+   */
+  createRectangle(z) {
+    return z.bounds ? L$2.rectangle(z.bounds, z.options || {}) : null;
+  }
+  /**
+   * Cria um polígono
+   */
+  createPolygon(z) {
+    return z.points ? L$2.polygon(z.points, z.options || {}) : null;
+  }
+  /**
+   * Cria uma polilinha
+   */
+  createPolyline(z) {
+    return z.points ? L$2.polyline(z.points, z.options || {}) : null;
+  }
+  /**
+   * Cria um ícone para marcadores
+   */
+  createIcon(z) {
+    const B = {
+      iconSize: z.iconSize || [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41]
+    };
+    if (z.icon)
+      B.iconUrl = z.icon;
+    else {
+      const Z = z.color || "blue";
+      B.iconUrl = `${this.imgsPath}/marker-icon-2x-${Z}.png`, B.shadowUrl = `${this.imgsPath}/marker-shadow.png`;
+    }
+    return L$2.icon(B);
+  }
+  /**
+   * Vincula popup a uma camada
+   */
+  bindPopup(z, B) {
+    let Z = '<div class="custom-popup">';
+    B.title && (Z += `<h4>${B.title}</h4>`), B.content && (Z += B.content), B.fields && Object.keys(B.fields).length > 0 && Object.entries(B.fields).forEach(([F, T]) => {
+      Z += `<p><span class="field-label">${F}:</span> ${T}</p>`;
+    }), Z += "</div>", z.bindPopup(Z, B.options || {});
+  }
+  /**
+   * Vincula tooltip a uma camada
+   */
+  bindTooltip(z, B) {
+    const Z = B.content, F = B.options || {};
+    z.bindTooltip(Z, F);
+  }
+  /**
+   * Configura o controle de camadas
+   */
+  setupLayerControl() {
+    let z = Object.values(this.layerGroups).filter((F) => F && F.name).map((F) => [F.name, F.layer]);
+    z = Object.fromEntries(z);
+    const B = Object.keys(this.baseLayers)?.length > 1, Z = Object.keys(z)?.length > 0;
+    !B && !Z || (this.layerControl && Alpine.raw(this.map).removeControl(this.layerControl), this.layerControl = L$2.control.layers(
+      this.baseLayers,
+      z
+    ).addTo(Alpine.raw(this.map)));
+  }
+  /**
+   * Configura os controles do mapa
+   */
+  setupMapControls() {
+    this.config.mapControls.attributionControl && this.setupAttributionControl(), this.config.mapControls.scaleControl && this.setupScaleControl(), this.config.mapControls.zoomControl && this.setupZoomControl(), this.config.mapControls.fullscreenControl && this.setupFullscreenControl(), this.config.mapControls.searchControl && this.setupSearchControl(), this.config.mapControls.drawControl && this.setupDrawControl();
+  }
+  /**
+   * Configura controle de atribuição
+   */
+  setupAttributionControl() {
+    new L$2.control.attribution().addTo(Alpine.raw(this.map));
+  }
+  /**
+   * Configura controle de escala
+   */
+  setupScaleControl() {
+    new L$2.control.scale().addTo(Alpine.raw(this.map));
+  }
+  /**
+   * Configura controle de zoom
+   */
+  setupZoomControl() {
+    new L$2.control.zoom().addTo(Alpine.raw(this.map));
+  }
+  /**
+   * Configura controle de busca
+   */
+  setupSearchControl() {
+    const z = new L$1();
+    new w({
+      provider: z,
+      notFoundMessage: this.getTranslation("address_not_found", ""),
+      searchLabel: this.getTranslation("enter_address", ""),
+      marker: {
+        icon: this.createIcon({
+          color: "blue"
+        }),
+        draggable: !1
+      }
+    }).addTo(Alpine.raw(this.map));
+  }
+  /**
+   * Configura controle de tela cheia
+   */
+  setupFullscreenControl() {
+    new FullScreen({
+      title: this.getTranslation("full_screen", ""),
+      titleCancel: this.getTranslation("exit_full_screen", ""),
+      forceSeparateButton: !0
+    }).addTo(Alpine.raw(this.map));
+  }
+  /**
+   * Configura controle de desenho
+   */
+  setupDrawControl() {
+    const z = new L$2.Control.Draw({
+      draw: {
         marker: {
           icon: this.createIcon({
             color: "blue"
-          }),
-          draggable: !1
+          })
         }
-      }).addTo(Alpine.raw(this.map));
+      },
+      edit: {
+        featureGroup: this.editableLayers,
+        poly: {
+          allowIntersection: !1
+        }
+      }
+    });
+    this.setupDrawTranslations(), z.addTo(Alpine.raw(this.map));
+  }
+  /**
+   * Configura traduções do controle de desenho
+   */
+  setupDrawTranslations() {
+    L$2.drawLocal.draw.toolbar.buttons.marker = this.getTranslation("draw_marker", "Marker"), L$2.drawLocal.draw.toolbar.buttons.polygon = this.getTranslation("draw_polygon", "Polygon"), L$2.drawLocal.draw.toolbar.buttons.polyline = this.getTranslation("draw_polyline", "Polyline"), L$2.drawLocal.draw.toolbar.buttons.rectangle = this.getTranslation("draw_rectangle", "Rectangle"), L$2.drawLocal.draw.toolbar.buttons.circle = this.getTranslation("draw_circle", "Circle"), L$2.drawLocal.draw.toolbar.buttons.circlemarker = this.getTranslation("draw_circlemarker", "Circlemarker"), L$2.drawLocal.draw.handlers.circle.tooltip.start = this.getTranslation("draw_handlers_circle_tooltip_start", "Click and drag to draw a circle."), L$2.drawLocal.draw.handlers.circlemarker.tooltip.start = this.getTranslation("draw_handlers_circlemarker_tooltip_start", "Click map to place circle marker."), L$2.drawLocal.draw.handlers.marker.tooltip.start = this.getTranslation("draw_handlers_marker_tooltip_start", "Click map to place marker."), L$2.drawLocal.draw.handlers.polygon.tooltip.start = this.getTranslation("draw_handlers_polygon_tooltip_start", "Click to start drawing polygon."), L$2.drawLocal.draw.handlers.polygon.tooltip.cont = this.getTranslation("draw_handlers_polygon_tooltip_cont", "Click to continue drawing polygon."), L$2.drawLocal.draw.handlers.polygon.tooltip.end = this.getTranslation("draw_handlers_polygon_tooltip_end", "Click first point to close polygon."), L$2.drawLocal.draw.handlers.polyline.error = this.getTranslation("draw_handlers_polyline_error", "Line intersects itself."), L$2.drawLocal.draw.handlers.polyline.tooltip.start = this.getTranslation("draw_handlers_polyline_tooltip_start", "Click to start drawing polyline."), L$2.drawLocal.draw.handlers.polyline.tooltip.cont = this.getTranslation("draw_handlers_polyline_tooltip_cont", "Click to continue drawing polyline."), L$2.drawLocal.draw.handlers.polyline.tooltip.end = this.getTranslation("draw_handlers_polyline_tooltip_end", "Click last point to finish polyline."), L$2.drawLocal.draw.handlers.rectangle.tooltip.start = this.getTranslation("draw_handlers_rectangle_tooltip_start", "Click and drag to draw rectangle."), L$2.drawLocal.draw.handlers.simpleshape.tooltip.end = this.getTranslation("draw_handlers_simpleshape_tooltip_end", "Release mouse to finish drawing."), L$2.drawLocal.draw.toolbar.actions.title = this.getTranslation("draw_toolbar_actions_title", "Cancel drawing"), L$2.drawLocal.draw.toolbar.actions.text = this.getTranslation("draw_toolbar_actions_text", "Cancel"), L$2.drawLocal.draw.toolbar.finish.title = this.getTranslation("draw_toolbar_finish_title", "Finish drawing"), L$2.drawLocal.draw.toolbar.finish.text = this.getTranslation("draw_toolbar_finish_text", "Finish"), L$2.drawLocal.draw.toolbar.undo.title = this.getTranslation("draw_toolbar_undo_title", "Delete last point drawn"), L$2.drawLocal.draw.toolbar.undo.text = this.getTranslation("draw_toolbar_undo_text", "Delete last point"), L$2.drawLocal.edit.toolbar.buttons.edit = this.getTranslation("edit_toolbar_buttons_edit", "Edit layers"), L$2.drawLocal.edit.toolbar.buttons.editDisabled = this.getTranslation("edit_toolbar_buttons_editdisabled", "No layers to edit"), L$2.drawLocal.edit.toolbar.buttons.remove = this.getTranslation("edit_toolbar_buttons_remove", "Delete layers"), L$2.drawLocal.edit.toolbar.buttons.removeDisabled = this.getTranslation("edit_toolbar_buttons_removedisabled", "No layers to remove"), L$2.drawLocal.edit.toolbar.actions.save.title = this.getTranslation("edit_toolbar_actions_save_title", "Save changes"), L$2.drawLocal.edit.toolbar.actions.save.text = this.getTranslation("edit_toolbar_actions_save_text", "Save"), L$2.drawLocal.edit.toolbar.actions.cancel.title = this.getTranslation("edit_toolbar_actions_cancel_title", "Cancel changes"), L$2.drawLocal.edit.toolbar.actions.cancel.text = this.getTranslation("edit_toolbar_actions_cancel_text", "Cancel"), L$2.drawLocal.edit.toolbar.actions.clearAll.title = this.getTranslation("edit_toolbar_actions_clearAll_title", "Clear all"), L$2.drawLocal.edit.toolbar.actions.clearAll.text = this.getTranslation("edit_toolbar_actions_clearAll_text", "Clear all"), L$2.drawLocal.edit.handlers.edit.tooltip.text = this.getTranslation("edit_handlers_edit_tooltip_text", "Drag handles to edit geometry."), L$2.drawLocal.edit.handlers.edit.tooltip.subtext = this.getTranslation("edit_handlers_edit_tooltip_subtext", "Click cancel to undo changes."), L$2.drawLocal.edit.handlers.remove.tooltip.text = this.getTranslation("edit_handlers_remove_tooltip_text", "Click a feature to remove it.");
+  }
+  /**
+   * Configura event handlers base
+   * Callbacks podem ser passados para personalizar comportamento
+   */
+  setupEventHandlers(z = {}) {
+    z.onMapLoad && z.onMapLoad(), Alpine.raw(this.map).on("click", (B) => {
+      if (this.isDrawing) return;
+      const Z = B.latlng;
+      z.onMapClick && z.onMapClick(Z.lat, Z.lng);
+    }), Alpine.raw(this.map).on("draw:drawstart", () => {
+      this.isDrawing = !0;
+    }), Alpine.raw(this.map).on("draw:drawstop", () => {
+      this.isDrawing = !1;
+    }), Alpine.raw(this.map).on("draw:canceled", () => {
+      this.isDrawing = !1;
+    }), Alpine.raw(this.map).on("draw:editstart", () => {
+      this.isDrawing = !0;
+    }), Alpine.raw(this.map).on("draw:editstop", () => {
+      this.isDrawing = !1;
+    }), Alpine.raw(this.map).on("draw:deletestart", () => {
+      this.isDrawing = !0;
+    }), Alpine.raw(this.map).on("draw:deletestop", () => {
+      this.isDrawing = !1;
+    }), Alpine.raw(this.map).on("draw:created", (B) => {
+      B.layer.addTo(Alpine.raw(this.editableLayers));
+    });
+  }
+  /**
+   * Atualiza os dados do mapa
+   */
+  updateMapData(z, B = {}) {
+    this.config = z, Object.keys(this.config.geoJsonData)?.length && (this.setupInfoControl(), this.loadGeoJson()), this.clearLayers(), this.addLayerGroups(), this.addLayers(B), this.setupLayerControl();
+  }
+  /**
+   * Limpa todas as camadas do mapa
+   */
+  clearLayers() {
+    this.layers.forEach((z) => {
+      z.options.group ? Alpine.raw(this.layerGroups[z.options.group].layer).removeLayer(Alpine.raw(z)) : Alpine.raw(this.map).removeLayer(Alpine.raw(z));
+    }), this.layers = [], Object.values(this.layerGroups).forEach(({ layer: z }) => {
+      Alpine.raw(this.map).removeLayer(Alpine.raw(z));
+    }), this.layerGroups = {}, this.layerControl && (Alpine.raw(this.map).removeControl(this.layerControl), this.layerControl = null);
+  }
+  /**
+   * Destrói o mapa e limpa recursos
+   */
+  destroy() {
+    this.map && (this.clearLayers(), Alpine.raw(this.map).remove(), this.map = null);
+  }
+}
+document.addEventListener("livewire:init", () => {
+  const z = (B, Z) => ({
+    mapCore: null,
+    config: Z,
+    $wire: B,
+    state: void 0,
+    pickMarker: null,
+    init() {
+      this.mapCore = new LeafletMapCore(
+        this.config,
+        "/vendor/filament-leaflet/images"
+      ), this.config.field && (this.state = this.getState()), this.mapCore.init(), this.setupEventHandlers(), this.setupLivewireListeners(), this.config.field && this.watchState();
     },
-    setupFullscreenControl() {
-      new FullScreen({
-        title: this.getTranslation("full_screen", ""),
-        titleCancel: this.getTranslation("exit_full_screen", ""),
-        forceSeparateButton: !0
-      }).addTo(Alpine.raw(this.map));
+    /**
+     * Obtém o estado atual do field
+     */
+    getState() {
+      if (!this.config.field) return;
+      const F = this.$wire.get(this.config.field.statePath);
+      return {
+        lat: F ? F[this.config.field.latitudeFieldName] : 0,
+        lng: F ? F[this.config.field.longitudeFieldName] : 0
+      };
     },
-    setupDrawControl() {
-      const z = new L$2.Control.Draw({
-        draw: {
-          marker: {
-            icon: this.createIcon({
-              color: "blue"
-            })
+    /**
+     * Define o estado do field
+     */
+    setState(F, T) {
+      this.config.field && this.$wire.set(this.config.field.statePath, {
+        [this.config.field.latitudeFieldName]: F,
+        [this.config.field.longitudeFieldName]: T
+      });
+    },
+    /**
+     * Observa mudanças no estado do field
+     */
+    watchState() {
+      this.config.field && this.$watch("state", (F) => {
+        this.setState(F);
+      });
+    },
+    updatePickMarker(F, T) {
+      this.pickMarker && Alpine.raw(this.pickMarker).removeFrom(Alpine.raw(this.mapCore.map));
+      let C = this.config.field.pickMarker;
+      C.lat = F, C.lng = T, this.pickMarker = this.mapCore.createMarker(C), Alpine.raw(this.pickMarker).addTo(Alpine.raw(this.mapCore.map));
+    },
+    /**
+     * Configura event handlers específicos para integração com Filament/Livewire
+     */
+    setupEventHandlers() {
+      const F = {
+        onMapLoad: () => {
+          if (this.config.field) {
+            const T = this.getState();
+            this.updatePickMarker(T.lat, T.lng);
           }
         },
-        edit: {
-          featureGroup: Alpine.raw(this.editableLayers),
-          poly: {
-            allowIntersection: !1
-          }
+        onMapClick: (T, C) => {
+          this.config.field ? (this.updatePickMarker(T, C), this.setState(T, C), this.$wire.callSchemaComponentMethod(
+            this.config.field.key,
+            "handleMapClick",
+            {
+              latitude: T,
+              longitude: C
+            }
+          )) : this.$wire.call("handleMapClick", T, C);
+        },
+        onLayerClick: (T) => {
+          this.config.field ? this.$wire.callSchemaComponentMethod(
+            this.config.field.key,
+            "handleLayerClick",
+            { layerId: T }
+          ) : this.$wire.call("handleLayerClick", [T]);
         }
-      });
-      L$2.drawLocal.draw.toolbar.buttons.marker = this.getTranslation("draw_marker", "Marker"), L$2.drawLocal.draw.toolbar.buttons.polygon = this.getTranslation("draw_polygon", "Polygon"), L$2.drawLocal.draw.toolbar.buttons.polyline = this.getTranslation("draw_polyline", "Polyline"), L$2.drawLocal.draw.toolbar.buttons.rectangle = this.getTranslation("draw_rectangle", "Rectangle"), L$2.drawLocal.draw.toolbar.buttons.circle = this.getTranslation("draw_circle", "Circle"), L$2.drawLocal.draw.toolbar.buttons.circlemarker = this.getTranslation("draw_circlemarker", "Circlemarker"), L$2.drawLocal.draw.handlers.circle.tooltip.start = this.getTranslation("draw_handlers_circle_tooltip_start", "Click and drag to draw a circle."), L$2.drawLocal.draw.handlers.circlemarker.tooltip.start = this.getTranslation("draw_handlers_circlemarker_tooltip_start", "Click map to place circle marker."), L$2.drawLocal.draw.handlers.marker.tooltip.start = this.getTranslation("draw_handlers_marker_tooltip_start", "Click map to place marker."), L$2.drawLocal.draw.handlers.polygon.tooltip.start = this.getTranslation("draw_handlers_polygon_tooltip_start", "Click to start drawing polygon."), L$2.drawLocal.draw.handlers.polygon.tooltip.cont = this.getTranslation("draw_handlers_polygon_tooltip_cont", "Click to continue drawing polygon."), L$2.drawLocal.draw.handlers.polygon.tooltip.end = this.getTranslation("draw_handlers_polygon_tooltip_end", "Click first point to close polygon."), L$2.drawLocal.draw.handlers.polyline.error = this.getTranslation("draw_handlers_polyline_error", "Line intersects itself."), L$2.drawLocal.draw.handlers.polyline.tooltip.start = this.getTranslation("draw_handlers_polyline_tooltip_start", "Click to start drawing polyline."), L$2.drawLocal.draw.handlers.polyline.tooltip.cont = this.getTranslation("draw_handlers_polyline_tooltip_cont", "Click to continue drawing polyline."), L$2.drawLocal.draw.handlers.polyline.tooltip.end = this.getTranslation("draw_handlers_polyline_tooltip_end", "Click last point to finish polyline."), L$2.drawLocal.draw.handlers.rectangle.tooltip.start = this.getTranslation("draw_handlers_rectangle_tooltip_start", "Click and drag to draw rectangle."), L$2.drawLocal.draw.handlers.simpleshape.tooltip.end = this.getTranslation("draw_handlers_simpleshape_tooltip_end", "Release mouse to finish drawing."), L$2.drawLocal.draw.toolbar.actions.title = this.getTranslation("draw_toolbar_actions_title", "Cancel drawing"), L$2.drawLocal.draw.toolbar.actions.text = this.getTranslation("draw_toolbar_actions_text", "Cancel"), L$2.drawLocal.draw.toolbar.finish.title = this.getTranslation("draw_toolbar_finish_title", "Finish drawing"), L$2.drawLocal.draw.toolbar.finish.text = this.getTranslation("draw_toolbar_finish_text", "Finish"), L$2.drawLocal.draw.toolbar.undo.title = this.getTranslation("draw_toolbar_undo_title", "Delete last point drawn"), L$2.drawLocal.draw.toolbar.undo.text = this.getTranslation("draw_toolbar_undo_text", "Delete last point"), L$2.drawLocal.edit.toolbar.buttons.edit = this.getTranslation("edit_toolbar_buttons_edit", "Edit layers"), L$2.drawLocal.edit.toolbar.buttons.editDisabled = this.getTranslation("edit_toolbar_buttons_editdisabled", "No layers to edit"), L$2.drawLocal.edit.toolbar.buttons.remove = this.getTranslation("edit_toolbar_buttons_remove", "Delete layers"), L$2.drawLocal.edit.toolbar.buttons.removeDisabled = this.getTranslation("edit_toolbar_buttons_removedisabled", "No layers to remove"), L$2.drawLocal.edit.toolbar.actions.save.title = this.getTranslation("edit_toolbar_actions_save_title", "Save changes"), L$2.drawLocal.edit.toolbar.actions.save.text = this.getTranslation("edit_toolbar_actions_save_text", "Save"), L$2.drawLocal.edit.toolbar.actions.cancel.title = this.getTranslation("edit_toolbar_actions_cancel_title", "Cancel changes"), L$2.drawLocal.edit.toolbar.actions.cancel.text = this.getTranslation("edit_toolbar_actions_cancel_text", "Cancel"), L$2.drawLocal.edit.toolbar.actions.clearAll.title = this.getTranslation("edit_toolbar_actions_clearAll_title", "Clear all"), L$2.drawLocal.edit.toolbar.actions.clearAll.text = this.getTranslation("edit_toolbar_actions_clearAll_text", "Clear all"), L$2.drawLocal.edit.handlers.edit.tooltip.text = this.getTranslation("edit_handlers_edit_tooltip_text", "Drag handles to edit geometry."), L$2.drawLocal.edit.handlers.edit.tooltip.subtext = this.getTranslation("edit_handlers_edit_tooltip_subtext", "Click cancel to undo changes."), L$2.drawLocal.edit.handlers.remove.tooltip.text = this.getTranslation("edit_handlers_remove_tooltip_text", "Click a feature to remove it."), z.addTo(Alpine.raw(this.map));
+      };
+      this.mapCore.setupEventHandlers(F);
     },
-    setupEventHandlers() {
-      Alpine.raw(this.map).on("click", (z) => {
-        if (this.isDrawing) return;
-        const B = z.latlng;
-        componentKey ? (this.pickMarker && this.pickMarker.removeFrom(Alpine.raw(this.map)), this.pickMarker = this.createMarker({
-          lat: B.lat,
-          lng: B.lng
-        }), this.pickMarker.addTo(Alpine.raw(this.map)), $wire.callSchemaComponentMethod(
-          componentKey,
-          "handleMapClick",
-          {
-            latitude: B.lat,
-            longitude: B.lng
-          }
-        )) : $wire.call(
-          "handleMapClick",
-          B.lat,
-          B.lng
-        );
-      }), Alpine.raw(this.map).on("draw:drawstart", () => {
-        this.isDrawing = !0;
-      }), Alpine.raw(this.map).on("draw:drawstop", () => {
-        this.isDrawing = !1;
-      }), Alpine.raw(this.map).on("draw:canceled", () => {
-        this.isDrawing = !1;
-      }), Alpine.raw(this.map).on("draw:editstart", () => {
-        this.isDrawing = !0;
-      }), Alpine.raw(this.map).on("draw:editstop", () => {
-        this.isDrawing = !1;
-      }), Alpine.raw(this.map).on("draw:deletestart", () => {
-        this.isDrawing = !0;
-      }), Alpine.raw(this.map).on("draw:deletestop", () => {
-        this.isDrawing = !1;
-      }), Alpine.raw(this.map).on("draw:created", (z) => {
-        Alpine.raw(this.editableLayers).addLayer(z.layer);
-      });
-    },
+    /**
+     * Configura listeners específicos do Livewire
+     */
     setupLivewireListeners() {
-      window.addEventListener(`update-leaflet-${this.config.mapId}`, (z) => {
-        this.updateMapData(z.detail.config);
+      window.addEventListener(`update-leaflet-${this.config.mapId}`, (F) => {
+        this.updateMapData(F.detail.config);
       });
     },
-    updateMapData(z) {
-      this.config = z, Object.keys(this.config.geoJsonData)?.length && (this.setupInfoControl(), this.loadGeoJson()), this.clearLayers(), this.addLayerGroups(), this.addLayers(), this.setupLayerControl();
-    },
-    clearLayers() {
-      this.layers.forEach((z) => {
-        z.options.group ? Alpine.raw(this.layerGroups[data.group].layer).removeLayer(Alpine.raw(z)) : Alpine.raw(this.map).removeLayer(Alpine.raw(z));
-      }), this.layers = [], Object.values(this.layerGroups).forEach(({ layer: z }) => {
-        Alpine.raw(this.map).removeLayer(Alpine.raw(z));
-      }), this.layerGroups = {}, this.layerControl && (Alpine.raw(this.map).removeControl(this.layerControl), this.layerControl = null);
+    /**
+     * Atualiza os dados do mapa
+     */
+    updateMapData(F) {
+      this.config = F;
+      const T = {
+        onLayerClick: (C) => {
+          this.config.field ? this.$wire.callSchemaComponentMethod(
+            this.config.field.key,
+            "handleLayerClick",
+            { layerId: C }
+          ) : this.$wire.call("handleLayerClick", [C]);
+        }
+      };
+      this.mapCore.updateMapData(F, T);
     }
   });
-  window.leafletMap = leafletMap;
+  window.leafletMap = z;
 });
