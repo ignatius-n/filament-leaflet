@@ -1,18 +1,24 @@
 @props([
     'config',
-    'statePath' => null
+    'widget',
+    'entry',
+    'field'
 ])
 
 @php
     use Illuminate\Support\Js;
+    $mapClass = match(true) {
+        isset($field) => 'leafletMapField',
+        isset($entry) => 'leafletMapEntry',
+        isset($widget) => 'leafletMapWidget',
+    };
 @endphp
 
 <div
     wire:ignore
-    x-data="leafletMap(
+    x-data="{{ $mapClass }}(
         $wire, 
         {{ Js::from($config) }},
-        {{ Js::from($statePath) }}
     )"
     style="height: {{ $config['mapHeight'] }}px"
 >

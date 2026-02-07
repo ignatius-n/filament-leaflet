@@ -6,15 +6,17 @@ use EduardoRibeiroDev\FilamentLeaflet\Enums\Color;
 
 trait HasColor
 {
-    protected string $color = 'blue';
+    protected ?string $color = null;
 
     public function color(null|string|Color $color): static
     {
-        if (is_null($color)) return $this;
-
-        $this->color = $color instanceof Color
-            ? $color->value
-            : Color::from($color)->value;
+        if ($color === null) {
+            $this->color = null;
+        } else {
+            $this->color = $color instanceof Color
+                ? $color->value
+                : Color::from($color)->value;
+        }
 
         return $this;
     }
@@ -83,13 +85,14 @@ trait HasColor
     |--------------------------------------------------------------------------
     */
 
-    public function getColor(): string
+    public function getColor(): ?string
     {
         return $this->color;
     }
 
-    public function getHexColor(): string
+    public function getHexColor(): ?string
     {
+        if (!$this->color) return null;
         return Color::from($this->color)->hex();
     }
 }

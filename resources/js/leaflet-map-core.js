@@ -23,6 +23,7 @@ export class LeafletMapCore {
         this.layerControl = null;
         this.editableLayers = null;
         this.isDrawing = false;
+        this.callbacks = {};
     }
 
     /**
@@ -181,7 +182,7 @@ export class LeafletMapCore {
      * Adiciona camadas ao mapa
      * Callback onLayerClick pode ser passado para personalizar o comportamento
      */
-    addLayers(callbacks = {}) {
+    addLayers() {
         const layers = this.config.layers;
         if (!layers?.length) return;
 
@@ -225,9 +226,9 @@ export class LeafletMapCore {
                 this.bindTooltip(layer, layerData.tooltip);
             }
 
-            if (layerData.clickAction && callbacks.onLayerClick) {
+            if (layerData.clickAction && this.callbacks.onLayerClick) {
                 layer.on('click', () => {
-                    callbacks.onLayerClick(layer.options.layerId);
+                    this.callbacks.onLayerClick(layer.options.layerId);
                 });
             }
 
@@ -605,8 +606,10 @@ export class LeafletMapCore {
      * Callbacks podem ser passados para personalizar comportamento
      */
     setupEventHandlers(callbacks = {}) {
-        if (callbacks.onMapLoad) {
-            callbacks.onMapLoad();
+        this.callbacks = callbacks;
+
+        if (this.callbacks.onMapLoad) {
+            this.callbacks.onMapLoad();
         }
 
         Alpine.raw(this.map).on('click', (e) => {
@@ -614,8 +617,8 @@ export class LeafletMapCore {
 
             const coords = e.latlng;
 
-            if (callbacks.onMapClick) {
-                callbacks.onMapClick(coords.lat, coords.lng);
+            if (this.callbacks.onMapClick) {
+                this.callbacks.onMapClick(coords.lat, coords.lng);
             }
         });
 
@@ -655,7 +658,7 @@ export class LeafletMapCore {
     /**
      * Atualiza os dados do mapa
      */
-    updateMapData(newConfig, callbacks = {}) {
+    updateMapData(newConfig) {
         this.config = newConfig;
 
         if (Object.keys(this.config.geoJsonData)?.length) {
@@ -665,7 +668,7 @@ export class LeafletMapCore {
 
         this.clearLayers();
         this.addLayerGroups();
-        this.addLayers(callbacks);
+        this.addLayers();
         this.setupLayerControl();
     }
 

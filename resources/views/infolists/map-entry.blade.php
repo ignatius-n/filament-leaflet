@@ -3,12 +3,12 @@
 @endphp
 
 <x-dynamic-component
-    :component="$getFieldWrapperView()"
-    :field="$field"
+    :component="$getEntryWrapperView()"
+    :entry="$entry"
 >
     <x-filament-leaflet::map
         :config="$config"
-        field
+        entry
     />
 
 </x-dynamic-component>

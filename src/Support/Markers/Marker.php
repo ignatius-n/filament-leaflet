@@ -27,7 +27,7 @@ class Marker extends BaseLayer
     protected ?Closure $mapRecordCallback = null;
 
 
-    final public function __construct(float $latitude, float $longitude)
+    final public function __construct(float $latitude = 0, float $longitude = 0)
     {
         $this->latitude = $latitude;
         $this->longitude = $longitude;

@@ -13,6 +13,7 @@
 
         <x-filament-leaflet::map
             :config="$config"
+            widget
         />
 
     </x-filament::section>
