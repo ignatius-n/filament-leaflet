@@ -17,6 +17,8 @@ A powerful and elegant Leaflet integration for Filament PHP that makes creating 
 ## What's New
 
 - 🧩 **Form Field: MapPicker** — a brand new Filament form field that lets you pick coordinates directly inside a form. It supports methods like `center()`, `height()`, `zoom()`, `tileLayersUrl()`, `geoJsonData()`, `markers()` and automatically syncs latitude/longitude values with the form state.
+- 📊 **Table Column: MapColumn** — display maps in Filament table columns showing record locations. Supports all map configuration methods and includes a `circular()` method for displaying maps in circular containers. Perfect for at-a-glance location visualization in data tables.
+- 📋 **Infolist Entry: MapEntry** — display maps in Filament infolists for read-only location visualization. Automatically handles both separate coordinate fields and JSON-stored coordinates.
 - 🧭 **Model GeoJSON Files** — new `HasGeoJsonFile` trait and `getGeoJsonUrl()` on models. When a record exposes a GeoJSON file/attribute, `MapPicker` will automatically load it (including temporary URLs when using storage disks). Configure attribute name, disk and expiration via `getExpirationTime()` method.
 - 🔗 **Filament Schemas Integration** — when the map is used inside a schema/component (e.g., fields, components) the frontend will call the Livewire methods `handleMapClick` and `handleLayerClick` on the component. This makes handling map and layer clicks easy from the parent component.
 - 🗂️ **Layer Group Improvements** — `FeatureGroup` now automatically generates a `Polygon` that envelopes the group's points (useful for visualizing areas). New style helpers: `weight()`, `opacity()`, `fillOpacity()`, `dashArray()`.
@@ -26,6 +28,8 @@ A powerful and elegant Leaflet integration for Filament PHP that makes creating 
 - 🎨 **Centralized Styles** — map styles were moved to `resources/css/index.css` and are automatically loaded by the JS component.
 - 🏗️ **Refactored JavaScript Architecture** — new `LeafletMapCore` class provides core map functionality, while `leaflet-map.js` handles Filament/Livewire integration. This separation improves maintainability and extensibility.
 - 💾 **Enhanced JSON Storage** — new `storeAsJson()` method on `MapPicker` for storing coordinates as JSON in a single database column instead of separate fields.
+- 🔄 **Enhanced Shape Factory Methods** — all shape classes now support `fromRecord()` factory methods for easier creation from Eloquent models. Shapes like `Circle`, `Polygon`, `Polyline`, `Rectangle`, and `CircleMarker` can now be instantiated directly from database records.
+- 📌 **Dynamic Icon Configuration** — marker icons now support dynamic sizing with automatic anchor point calculation. Icons properly scale across different sizes with `iconUrl()`, `iconSize()`, and the new `icon()` method that accepts closures.
 
 See the sections below for usage examples.
 
@@ -48,6 +52,8 @@ This will publish the Leaflet assets used by the package — the distribution no
 - [Getting Started](#getting-started)
   - [Quick Start](#quick-start)
   - [Form Field: MapPicker](#form-field-mappicker)
+  - [Table Column: MapColumn](#table-column-mapcolumn)
+  - [Infolist Entry: MapEntry](#infolist-entry-mapentry)
   - [Map Widget Configuration](#map-widget-configuration)
 - [Map Elements](#map-elements)
   - [Working with Markers](#working-with-markers)
@@ -209,6 +215,63 @@ MapPicker::make('location')
             default => null,
         }
     );
+```
+
+#### Table Column: MapColumn
+
+Display maps directly in Filament table columns to show record locations at a glance:
+
+```php
+use EduardoRibeiroDev\FilamentLeaflet\Tables\MapColumn;
+use EduardoRibeiroDev\FilamentLeaflet\Support\Markers\Marker;
+use Filament\Tables\Columns\Column;
+
+// In your Filament resource's table
+MapColumn::make('location')
+    ->height(72)
+    ->width(108)
+    ->zoom(5)
+    ->pickMarker(fn(Marker $marker) => $marker->icon(size: [14, 25]))
+    ->circular()  // Optional: display in a circular container
+```
+
+The `MapColumn` supports all the configuration methods from `MapPicker` and `MapWidget`, including `markers()`, `shapes()`, `geoJsonData()`, etc. The `circular()` method is particularly useful for displaying maps in circular avatars or containers.
+
+Features of `MapColumn`:
+- Automatically reads latitude/longitude from your record
+- Supports both separate field storage and JSON columns
+- Small, optimized map display perfect for tables
+- Optional circular display mode
+- All standard map configuration options
+
+#### Infolist Entry: MapEntry
+
+Display read-only maps in Filament infolists to show location information for records:
+
+```php
+use EduardoRibeiroDev\FilamentLeaflet\Infolists\MapEntry;
+use EduardoRibeiroDev\FilamentLeaflet\Support\Markers\Marker;
+
+// In your Filament resource's infolist
+MapEntry::make('location')
+    ->height(284)
+    ->zoom(10)
+    ->markers([
+        Marker::make($record->latitude, $record->longitude)->blue(),
+    ])
+```
+
+The `MapEntry` component is similar to `MapPicker` and `MapColumn` but read-only, ideal for displaying location information in resource detail views. It automatically handles:
+- Separate latitude/longitude fields
+- JSON-stored coordinates
+- Custom field name mapping
+
+```php
+// With JSON-stored coordinates
+MapEntry::make('location')
+    ->storeAsJson()
+    ->latitudeFieldName('lat')
+    ->longitudeFieldName('lng')
 ```
 
 ### Map Widget Configuration
@@ -393,6 +456,51 @@ Marker::make($lat, $lng)
 // Or use the Color enum
 Marker::make($lat, $lng)
     ->color(Color::Blue);
+```
+
+#### Marker Icons
+
+Customize marker icons with multiple options:
+
+```php
+use EduardoRibeiroDev\FilamentLeaflet\Support\Markers\Marker;
+
+// Static icon with custom size
+Marker::make(-23.5505, -46.6333)
+    ->icon('https://example.com/icon.png', [32, 41])
+    ->title('Custom Marker');
+
+// Using separate methods
+Marker::make(-23.5505, -46.6333)
+    ->iconUrl('https://example.com/icon.png')
+    ->iconSize([32, 41])
+    ->title('Store Location');
+
+// Dynamic icon sizing with closures
+Marker::make(-23.5505, -46.6333)
+    ->icon(
+        url: fn() => auth()->user()?->preferredIconUrl ?? '/icons/default.png',
+        size: fn() => [24, 24]
+    );
+
+// Dynamic sizing based on marker data
+Marker::fromRecord($store)
+    ->iconUrl(fn($record) => $record->custom_icon_url)
+    ->iconSize(fn($record) => $record->is_premium ? [48, 60] : [32, 41]);
+```
+
+**Icon Configuration Details:**
+- Icon anchor points are automatically calculated based on icon size
+- Popup anchors adjust based on icon height for optimal positioning
+- Shadow sizes scale proportionally with icon dimensions
+- This automatic adjustment ensures popups display correctly regardless of icon size
+
+```php
+// The anchor points automatically adjust:
+Marker::make($lat, $lng)->iconSize([14, 25])  // Small icon - adjusted anchors
+Marker::make($lat, $lng)->iconSize([25, 41])  // Medium icon - adjusted anchors
+Marker::make($lat, $lng)->iconSize([48, 60])  // Large icon - adjusted anchors
+Marker::make($lat, $lng)->iconSize([64, 80])  // Extra large - adjusted anchors
 ```
 
 #### Markers from Eloquent Models
@@ -927,6 +1035,99 @@ Rectangle::makeFromCoordinates(
     -23.5525, -46.6353     // Northeast lat, lng
 )
 ->red();
+```
+
+#### Shapes from Eloquent Models
+
+All shape classes support `fromRecord()` factory methods for easy creation from database records:
+
+```php
+use App\Models\DeliveryZone;
+use EduardoRibeiroDev\FilamentLeaflet\Support\Shapes\Circle;
+use EduardoRibeiroDev\FilamentLeaflet\Support\Shapes\Polygon;
+use EduardoRibeiroDev\FilamentLeaflet\Support\Shapes\Polyline;
+use EduardoRibeiroDev\FilamentLeaflet\Support\Shapes\Rectangle;
+use EduardoRibeiroDev\FilamentLeaflet\Support\Shapes\CircleMarker;
+
+protected function getShapes(): array
+{
+    return DeliveryZone::all()->map(function ($zone) {
+        // Circle from record
+        return Circle::fromRecord(
+            record: $zone,
+            latColumn: 'latitude',
+            lngColumn: 'longitude',
+            titleColumn: 'name',
+            descriptionColumn: 'description',
+            popupFieldsColumns: ['address', 'radius'],
+        );
+    })->toArray();
+}
+```
+
+Each shape type supports the `fromRecord()` method with common parameters:
+- `record`: The Eloquent model instance
+- `latColumn`/`lngColumn`: Column names for coordinates (for Circle, CircleMarker)
+- `pointsColumn`: Column name for points array (for Polygon, Polyline)
+- `boundsColumn`: Column name for bounds array (for Rectangle)
+- `titleColumn`: Column name for the shape title
+- `descriptionColumn`: Column name for the popup content
+- `popupFieldsColumns`: Array of column names to include in popup
+- `color`: Default color for the shape
+- `mapRecordCallback`: Closure to customize the shape based on the record
+
+##### Circle from Record
+
+```php
+Circle::fromRecord(
+    record: $zone,
+    latColumn: 'center_lat',
+    lngColumn: 'center_lng',
+    titleColumn: 'zone_name',
+    descriptionColumn: 'zone_description',
+    mapRecordCallback: fn(Circle $circle, $record) => 
+        $circle->radiusInKilometers($record->coverage_radius_km)
+);
+```
+
+##### Polygon from Record
+
+```php
+// Assumes database structure: points => [[lat, lng], [lat, lng], ...]
+Polygon::fromRecord(
+    record: $zone,
+    pointsColumn: 'boundary_points',
+    titleColumn: 'zone_name',
+    popupFieldsColumns: ['area_sqkm', 'population'],
+);
+```
+
+##### Polyline from Record
+
+```php
+// Store route as JSON array of [lat, lng] coordinates
+Polyline::fromRecord(
+    record: $deliveryRoute,
+    pointsColumn: 'route_path',
+    titleColumn: 'route_name',
+    descriptionColumn: 'destination',
+    mapRecordCallback: fn(Polyline $line, $record) =>
+        $record->is_completed 
+            ? $line->green()->weight(2)
+            : $line->red()->weight(3)
+);
+```
+
+##### Rectangle from Record
+
+```php
+// Assumes database structure: bounds => [[lat1, lng1], [lat2, lng2]]
+Rectangle::fromRecord(
+    record: $territory,
+    boundsColumn: 'service_bounds',
+    titleColumn: 'territory_name',
+    popupFieldsColumns: ['region', 'sales_person'],
+);
 ```
 
 #### Shape Styling

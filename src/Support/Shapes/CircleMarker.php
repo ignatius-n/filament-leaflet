@@ -2,6 +2,10 @@
 
 namespace EduardoRibeiroDev\FilamentLeaflet\Support\Shapes;
 
+use Closure;
+use EduardoRibeiroDev\FilamentLeaflet\Enums\Color;
+use Illuminate\Database\Eloquent\Model;
+
 class CircleMarker extends Shape
 {
     protected array $center;
@@ -15,6 +19,49 @@ class CircleMarker extends Shape
     public static function make(float $latitude, float $longitude): static
     {
         return new static($latitude, $longitude);
+    }
+
+    public static function fromRecord(
+        Model $record,
+        string $latColumn = 'latitude',
+        string $lngColumn = 'longitude',
+        ?string $jsonColumn = null,
+        ?string $titleColumn = 'title',
+        ?string $descriptionColumn = 'description',
+        ?array $popupFieldsColumns = null,
+        null|string|Color $color = null,
+        ?Closure $mapRecordCallback = null
+    ): static {
+        $lat = 0;
+        $lng = 0;
+
+        if ($jsonColumn) {
+            $coords = $record->{$jsonColumn};
+            $coords = is_string($coords) ? json_decode($coords, true) : $coords;
+
+            $lat = $coords[$latColumn] ?? 0;
+            $lng = $coords[$lngColumn] ?? 0;
+        } else {
+            $lat = $record->{$latColumn} ?? 0;
+            $lng = $record->{$lngColumn} ?? 0;
+        }
+
+        return (new static($lat, $lng))
+            ->record($record)
+            ->title($record->{$titleColumn} ?? null)
+            ->popupContent($record->{$descriptionColumn} ?? null)
+            ->popupFields(is_array($popupFieldsColumns) ? $record->only($popupFieldsColumns) : $record->except([
+                'id',
+                $latColumn,
+                $lngColumn,
+                $jsonColumn,
+                $titleColumn,
+                $descriptionColumn,
+                'created_at',
+                'updated_at',
+            ]))
+            ->color($color)
+            ->mapRecordUsing($mapRecordCallback);
     }
 
     /**

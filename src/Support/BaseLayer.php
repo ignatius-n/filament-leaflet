@@ -3,8 +3,10 @@
 namespace EduardoRibeiroDev\FilamentLeaflet\Support;
 
 use Closure;
+use Filament\Support\Concerns\EvaluatesClosures;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 
@@ -12,6 +14,7 @@ abstract class BaseLayer implements Arrayable, Jsonable
 {
     use Conditionable;
     use Macroable;
+    use EvaluatesClosures;
 
     protected ?string $id = null;
     protected null|string|BaseLayerGroup $group = null;
@@ -27,6 +30,10 @@ abstract class BaseLayer implements Arrayable, Jsonable
     protected ?Closure $clickAction = null;
     protected ?string $onMouseOverScript = null;
     protected ?string $onMouseOutScript = null;
+
+    // Record Binding
+    protected ?Model $record = null;
+    protected ?Closure $mapRecordCallback = null;
 
     public function __construct(?string $id = null)
     {
@@ -249,15 +256,42 @@ abstract class BaseLayer implements Arrayable, Jsonable
     {
         if (!isset($this->clickAction)) return;
 
-        CallbackResolver::from($this->clickAction)
-            ->parameter($this->getType(), $this)
-            ->parameters($this->getClickActionParameters())
-            ->resolve();
+        $this->evaluate($this->clickAction);
     }
 
-    protected function getClickActionParameters(): array
+    /*
+    |--------------------------------------------------------------------------
+    | Record Binding
+    |--------------------------------------------------------------------------
+    */
+
+    public function record(Model $record, ?Closure $mapRecordCallback = null): static
     {
-        return [];
+        $this->record = $record;
+        return $this->mapRecordUsing($mapRecordCallback);
+    }
+
+    public function getRecord(): ?Model
+    {
+        return $this->record;
+    }
+
+    public function mapRecordUsing(?Closure $callback): static
+    {
+        $this->mapRecordCallback = $callback;
+        return $this->evaluate($this->mapRecordCallback) ?? $this;
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    protected function resolveDefaultClosureDependencyForEvaluationByName(string $parameterName): array
+    {
+        return match ($parameterName) {
+            'record' => [$this->getRecord()],
+            $this->getType(), 'layer' => [$this],
+            default => []
+        };
     }
 
     /*

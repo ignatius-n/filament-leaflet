@@ -2,6 +2,10 @@
 
 namespace EduardoRibeiroDev\FilamentLeaflet\Support\Shapes;
 
+use Closure;
+use EduardoRibeiroDev\FilamentLeaflet\Enums\Color;
+use Illuminate\Database\Eloquent\Model;
+
 class Rectangle extends Shape
 {
     protected array $bounds;
@@ -26,6 +30,41 @@ class Rectangle extends Shape
     public static function makeFromCoordinates(float $lat1, float $lng1, float $lat2, float $lng2): static
     {
         return new static([$lat1, $lng1], [$lat2, $lng2]);
+    }
+
+    public static function fromRecord(
+        Model $record,
+        string $boundsColumn = 'bounds',
+        ?string $titleColumn = 'title',
+        ?string $descriptionColumn = 'description',
+        ?array $popupFieldsColumns = null,
+        null|string|Color $color = null,
+        ?Closure $mapRecordCallback = null
+    ): static {
+        $bounds = [[0, 0], [0, 0]];
+
+        if ($record->hasAttribute($boundsColumn)) {
+            $value = $record->{$boundsColumn};
+            $parsed = is_string($value) ? json_decode($value, true) : $value;
+            if (is_array($parsed) && count($parsed) === 2) {
+                $bounds = $parsed;
+            }
+        }
+
+        return (new static($bounds[0], $bounds[1]))
+            ->record($record)
+            ->title($record->{$titleColumn} ?? null)
+            ->popupContent($record->{$descriptionColumn} ?? null)
+            ->popupFields(is_array($popupFieldsColumns) ? $record->only($popupFieldsColumns) : $record->except([
+                'id',
+                $boundsColumn,
+                $titleColumn,
+                $descriptionColumn,
+                'created_at',
+                'updated_at',
+            ]))
+            ->color($color)
+            ->mapRecordUsing($mapRecordCallback);
     }
 
     public function getType(): string

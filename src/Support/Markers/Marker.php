@@ -5,7 +5,6 @@ namespace EduardoRibeiroDev\FilamentLeaflet\Support\Markers;
 use Closure;
 use EduardoRibeiroDev\FilamentLeaflet\Enums\Color;
 use EduardoRibeiroDev\FilamentLeaflet\Support\BaseLayer;
-use EduardoRibeiroDev\FilamentLeaflet\Support\CallbackResolver;
 use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasColor;
 use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
@@ -21,10 +20,6 @@ class Marker extends BaseLayer
     // Configurações de Ícone
     protected ?string $iconUrl = null;
     protected array $iconSize = [25, 41];
-
-    // Record Binding
-    protected ?Model $record = null;
-    protected ?Closure $mapRecordCallback = null;
 
 
     final public function __construct(float $latitude = 0, float $longitude = 0)
@@ -103,7 +98,6 @@ class Marker extends BaseLayer
             'icon' => $this->iconUrl,
             'iconSize' => $this->iconSize,
             'draggable' => $this->isDraggable,
-            'record' => $this->record,
         ];
     }
 
@@ -111,11 +105,6 @@ class Marker extends BaseLayer
     {
         return $this->latitude >= -90 && $this->latitude <= 90 &&
             $this->longitude >= -180 && $this->longitude <= 180;
-    }
-
-    protected function getClickActionParameters(): array
-    {
-        return ['record' => $this->record];
     }
 
     protected function getDeterministicIdData(): string
@@ -133,48 +122,38 @@ class Marker extends BaseLayer
     |--------------------------------------------------------------------------
     */
 
-    public function icon(?string $url, array $size = [25, 41]): static
+    public function iconUrl(null|Closure|string $url = null): static
     {
-        $this->iconUrl = $url;
-        $this->iconSize = $size;
+        $this->iconUrl = $this->evaluate($url);
         return $this;
     }
 
-    public function draggable(bool $condition = true): static
+    public function iconSize(Closure|array $size = [25, 41]): static
     {
-        $this->isDraggable = $condition;
+        $this->iconSize = (array) $this->evaluate($size);
         return $this;
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Vínculo com Record
-    |--------------------------------------------------------------------------
-    */
-
-    public function record(Model $record, ?Closure $mapRecordCallback = null): static
+    public function icon(null|Closure|string $url = null, Closure|array $size = [25, 41]): static
     {
-        $this->record = $record;
-        return $this->mapRecordUsing($mapRecordCallback);
+        $this->iconUrl($url);
+        $this->iconSize($size);
+        return $this;
     }
 
-    public function getRecord(): ?Model
+    public function getIconUrl()
     {
-        return $this->record;
+        return $this->iconUrl;
     }
 
-    public function mapRecordUsing(?Closure $callback): static
+    public function getIconSize()
     {
-        $this->mapRecordCallback = $callback;
+        return $this->iconSize;
+    }
 
-        if ($this->record && $this->mapRecordCallback) {
-            CallbackResolver::from($this->mapRecordCallback)
-                ->resolve([
-                    'marker' => $this,
-                    'record' => $this->record
-                ]);
-        }
-
+    public function draggable(Closure|bool $condition = true): static
+    {
+        $this->isDraggable = (bool) $this->evaluate($condition);
         return $this;
     }
 

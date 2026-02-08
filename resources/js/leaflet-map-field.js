@@ -14,7 +14,6 @@ document.addEventListener('livewire:init', () => {
                 this.state = this.getState();
                 this.mapCore.init();
                 this.setupEventHandlers();
-                this.setupLivewireListeners();
                 this.watchState();
             },
 
@@ -24,7 +23,7 @@ document.addEventListener('livewire:init', () => {
             getState() {
                 if (!this.config.state) return undefined;
 
-                const state = this.config.state.state || this.$wire.get(this.config.state.statePath);
+                const state = this.$wire.get(this.config.state.statePath);
                 return {
                     lat: state ? state[this.config.state.latitudeFieldName] : 0,
                     lng: state ? state[this.config.state.longitudeFieldName] : 0
@@ -91,7 +90,7 @@ document.addEventListener('livewire:init', () => {
 
                         // Notify the field component
                         this.$wire.callSchemaComponentMethod(
-                            this.config.state.key,
+                            this.config.state.statePath,
                             'handleMapClick',
                             {
                                 latitude: lat,
@@ -102,7 +101,7 @@ document.addEventListener('livewire:init', () => {
 
                     onLayerClick: (layerId) => {
                         this.$wire.callSchemaComponentMethod(
-                            this.config.state.key,
+                            this.config.state.statePath,
                             'handleLayerClick',
                             { layerId: layerId }
                         );

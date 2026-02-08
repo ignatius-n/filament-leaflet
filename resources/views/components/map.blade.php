@@ -2,7 +2,8 @@
     'config',
     'widget',
     'entry',
-    'field'
+    'field',
+    'column',
 ])
 
 @php
@@ -11,6 +12,7 @@
         isset($field) => 'leafletMapField',
         isset($entry) => 'leafletMapEntry',
         isset($widget) => 'leafletMapWidget',
+        isset($column) => 'leafletMapColumn',
     };
 @endphp
 
@@ -20,7 +22,7 @@
         $wire, 
         {{ Js::from($config) }},
     )"
-    style="height: {{ $config['mapHeight'] }}px"
+    style="height: {{ $config['mapHeight'] }}px; width: 100%"
 >
     <div id="{{ $config['mapId'] }}"></div>
 </div>

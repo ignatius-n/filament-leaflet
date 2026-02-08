@@ -183,7 +183,7 @@ trait HasMapState
     public function pickMarker(Marker|Closure|null $marker)
     {
         $this->pickMarker = $this->evaluate($marker, [
-            'marker' => $this->pickMarker
+            'marker' => $this->pickMarker ?? new Marker
         ]);
 
         return $this;
@@ -247,10 +247,18 @@ trait HasMapState
     #[ExposedLivewireMethod]
     public function handleLayerClick(string $layerId): void {}
 
+    public function getStatePath(bool $isAbsolute = true): ?string
+    {
+        if (method_exists(parent::class, 'getStatePath')) {
+            return parent::getStatePath($isAbsolute);
+        }
+
+        return null;
+    }
+
     private function getMapFieldData(): array
     {
         return [
-            'key'                => $this->getKey(),
             'pickMarker'         => $this->getPickMarkerData(),
             'latitudeFieldName'  => $this->latitudeFieldName,
             'longitudeFieldName' => $this->longitudeFieldName,

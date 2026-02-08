@@ -1,7 +1,7 @@
 import { LeafletMapCore } from './leaflet-map-core';
 
 document.addEventListener('livewire:init', () => {
-    const leafletMapEntry = ($wire, config) => {
+    const leafletMapColumn = ($wire, config) => {
         return {
             mapCore: null,
             config,
@@ -32,7 +32,7 @@ document.addEventListener('livewire:init', () => {
             /**
              * Update the pick marker position
              */
-            setupPickMarker(lat, lng) {
+            updatePickMarker(lat, lng) {
                 if (this.pickMarker) {
                     Alpine.raw(this.pickMarker).removeFrom(Alpine.raw(this.mapCore.map));
                 }
@@ -53,28 +53,8 @@ document.addEventListener('livewire:init', () => {
                 const callbacks = {
                     onMapLoad: () => {
                         const coords = this.getState();
-                        this.setupPickMarker(coords.lat, coords.lng);
-                    },
-
-                    onMapClick: (lat, lng) => {
-                        // Notify the field component
-                        this.$wire.callSchemaComponentMethod(
-                            this.config.state.statePath,
-                            'handleMapClick',
-                            {
-                                latitude: lat,
-                                longitude: lng
-                            }
-                        );
-                    },
-
-                    onLayerClick: (layerId) => {
-                        this.$wire.callSchemaComponentMethod(
-                            this.config.state.statePath,
-                            'handleLayerClick',
-                            { layerId: layerId }
-                        );
-                    },
+                        this.updatePickMarker(coords.lat, coords.lng);
+                    }
                 };
 
                 this.mapCore.setupEventHandlers(callbacks);
@@ -82,5 +62,5 @@ document.addEventListener('livewire:init', () => {
         }
     }
 
-    window.leafletMapEntry = leafletMapEntry;
+    window.leafletMapColumn = leafletMapColumn;
 });

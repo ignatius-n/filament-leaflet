@@ -1,6 +1,5 @@
 @php
     $config = $this->getMapData();
-    $height = $this->getMapHeight();
 @endphp
 
 

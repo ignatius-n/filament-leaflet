@@ -62,7 +62,7 @@ export class LeafletMapCore {
             if (!this.map) {
                 return;
             }
-            
+
             Alpine.raw(this.map).invalidateSize();
         });
 
@@ -353,9 +353,9 @@ export class LeafletMapCore {
     createIcon(marker) {
         const options = {
             iconSize: marker.iconSize || [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
+            iconAnchor: marker.iconSize ? [marker.iconSize[0] / 2, marker.iconSize[1]] : [12, 41],
+            popupAnchor: marker.iconSize ? [1, marker.iconSize[1] / 1.5] : [1, -34],
+            shadowSize: marker.iconSize ? [Math.max(...marker.iconSize), Math.max(...marker.iconSize)] : [41, 41]
         };
 
         if (marker.icon) {
