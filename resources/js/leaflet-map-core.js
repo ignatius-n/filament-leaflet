@@ -297,7 +297,7 @@ export class LeafletMapCore {
      * Cria um marcador
      */
     createMarker(data) {
-        if (!data.lat || !data.lng) return null;
+        if (data.lat == undefined || data.lng == undefined) return null;
 
         const marker = L.marker([data.lat, data.lng], {
             icon: this.createIcon(data),
@@ -354,7 +354,7 @@ export class LeafletMapCore {
         const options = {
             iconSize: marker.iconSize || [25, 41],
             iconAnchor: marker.iconSize ? [marker.iconSize[0] / 2, marker.iconSize[1]] : [12, 41],
-            popupAnchor: marker.iconSize ? [1, marker.iconSize[1] / 1.5] : [1, -34],
+            popupAnchor: marker.iconSize ? [1, (marker.iconSize[1] / 1.25) * -1] : [1, -34],
             shadowSize: marker.iconSize ? [Math.max(...marker.iconSize), Math.max(...marker.iconSize)] : [41, 41]
         };
 

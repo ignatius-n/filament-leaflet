@@ -14,24 +14,17 @@ A powerful and elegant Leaflet integration for Filament PHP that makes creating 
 - 💾 **CRUD Operations** - Create markers directly from map clicks
 - 🎭 **Customizable** - Extensive configuration options for every element
 
-## What's New
+### Latest Features
 
-- 🧩 **Form Field: MapPicker** — a brand new Filament form field that lets you pick coordinates directly inside a form. It supports methods like `center()`, `height()`, `zoom()`, `tileLayersUrl()`, `geoJsonData()`, `markers()` and automatically syncs latitude/longitude values with the form state.
-- 📊 **Table Column: MapColumn** — display maps in Filament table columns showing record locations. Supports all map configuration methods and includes a `circular()` method for displaying maps in circular containers. Perfect for at-a-glance location visualization in data tables.
-- 📋 **Infolist Entry: MapEntry** — display maps in Filament infolists for read-only location visualization. Automatically handles both separate coordinate fields and JSON-stored coordinates.
-- 🧭 **Model GeoJSON Files** — new `HasGeoJsonFile` trait and `getGeoJsonUrl()` on models. When a record exposes a GeoJSON file/attribute, `MapPicker` will automatically load it (including temporary URLs when using storage disks). Configure attribute name, disk and expiration via `getExpirationTime()` method.
-- 🔗 **Filament Schemas Integration** — when the map is used inside a schema/component (e.g., fields, components) the frontend will call the Livewire methods `handleMapClick` and `handleLayerClick` on the component. This makes handling map and layer clicks easy from the parent component.
-- 🗂️ **Layer Group Improvements** — `FeatureGroup` now automatically generates a `Polygon` that envelopes the group's points (useful for visualizing areas). New style helpers: `weight()`, `opacity()`, `fillOpacity()`, `dashArray()`.
-- ✏️ **Editable Layers & Draw Control** — improvements to the draw control and consistent support for editable layers (editable groups are now managed correctly on the frontend).
-- 🎨 **Better Color & Options Control** — the `HasColor`, `HasFillColor` and `HasOptions` concerns unify the API for colors, fills and visual options (`->blue()`, `->fillBlue()`, `->option()`, etc.).
-- 🧭 **UX: Pick Marker** — when clicking the map inside a form, a temporary marker is shown to give visual feedback for the selected point. Use `pickMarker()` to customize it.
-- 🎨 **Centralized Styles** — map styles were moved to `resources/css/index.css` and are automatically loaded by the JS component.
-- 🏗️ **Refactored JavaScript Architecture** — new `LeafletMapCore` class provides core map functionality, while `leaflet-map.js` handles Filament/Livewire integration. This separation improves maintainability and extensibility.
-- 💾 **Enhanced JSON Storage** — new `storeAsJson()` method on `MapPicker` for storing coordinates as JSON in a single database column instead of separate fields.
-- 🔄 **Enhanced Shape Factory Methods** — all shape classes now support `fromRecord()` factory methods for easier creation from Eloquent models. Shapes like `Circle`, `Polygon`, `Polyline`, `Rectangle`, and `CircleMarker` can now be instantiated directly from database records.
-- 📌 **Dynamic Icon Configuration** — marker icons now support dynamic sizing with automatic anchor point calculation. Icons properly scale across different sizes with `iconUrl()`, `iconSize()`, and the new `icon()` method that accepts closures.
-
-See the sections below for usage examples.
+- **Form Field (MapPicker)** - Pick coordinates directly in forms with automatic latitude/longitude sync or JSON storage
+- **Table Column (MapColumn)** - Display maps in Filament table columns for at-a-glance location visualization
+- **Infolist Entry (MapEntry)** - Display read-only maps in Filament infolists
+- **Model GeoJSON Files** - Automatic GeoJSON loading from models with `HasGeoJsonFile` trait
+- **Layer Groups** - Organize markers and shapes with automatic coverage area calculation
+- **Editable Layers & Draw Control** - Edit markers and shapes directly on the map
+- **Dynamic Icons** - Marker icons with automatic sizing and anchor point calculation
+- **Enhanced Shapes** - Factory methods (`fromRecord()`) for all shape classes
+- **JSON Storage** - Store coordinates as JSON in single database column
 
 ## Installation
 
@@ -49,34 +42,29 @@ This will publish the Leaflet assets used by the package — the distribution no
 
 ## Table of Contents
 
-- [Getting Started](#getting-started)
-  - [Quick Start](#quick-start)
-  - [Form Field: MapPicker](#form-field-mappicker)
-  - [Table Column: MapColumn](#table-column-mapcolumn)
-  - [Infolist Entry: MapEntry](#infolist-entry-mapentry)
-  - [Map Widget Configuration](#map-widget-configuration)
+- [Installation](#installation)
+- [Core Components](#core-components)
+  - [Map Widget](#map-widget)
+  - [MapPicker (Form Field)](#mappicker-form-field)
+  - [MapColumn (Table Column)](#mapcolumn-table-column)
+  - [MapEntry (Infolist)](#mapentry-infolist)
 - [Map Elements](#map-elements)
-  - [Working with Markers](#working-with-markers)
+  - [Markers](#markers)
   - [Layer Groups](#layer-groups)
   - [Shapes](#shapes)
   - [Editable Layers](#editable-layers)
-- [User Interaction](#user-interaction)
-  - [Popups and Tooltips](#popups-and-tooltips)
-  - [Click Actions](#click-actions)
+- [User Interactions](#user-interactions)
 - [Advanced Features](#advanced-features)
-  - [Model Integration](#model-integration)
-  - [GeoJSON Density Maps](#geojson-density-maps)
-  - [Advanced Configuration](#advanced-configuration)
-  - [Multi-Language Support](#multi-language-support)
-- [API Reference](#api-reference)
 - [Best Practices](#best-practices)
+- [Real-World Example](#real-world-example)
+- [Configuration Reference](#configuration-reference)
 - [Troubleshooting](#troubleshooting)
 
-## Getting Started
+## Core Components
 
-### Quick Start
+### Map Widget
 
-Create your first map widget:
+Create your first interactive map widget:
 
 ```php
 namespace App\Filament\Widgets;
@@ -86,10 +74,10 @@ use EduardoRibeiroDev\FilamentLeaflet\Support\Markers\Marker;
 
 class MyMapWidget extends MapWidget
 {
-    protected static ?string $heading = 'My Locations';
-    
-    protected static array $mapCenter = [-23.5505, -46.6333]; // São Paulo
-    protected static int $defaultZoom = 12;
+    protected ?string $heading = 'My Locations';
+    protected array $mapCenter = [-23.5505, -46.6333];
+    protected int $defaultZoom = 12;
+    protected int $mapHeight = 600;
     
     protected function getMarkers(): array
     {
@@ -102,253 +90,59 @@ class MyMapWidget extends MapWidget
 }
 ```
 
-#### Form Field: MapPicker
+![Widget Example](images/widget.png)
 
-Use the `MapPicker` field to add an interactive map inside Filament forms. It syncs map clicks to the form state (latitude/longitude fields) and supports configuration options similar to `MapWidget`.
-
-```php
-use EduardoRibeiroDev\FilamentLeaflet\Fields\MapPicker;
-use EduardoRibeiroDev\FilamentLeaflet\Support\Markers\Marker;
-use EduardoRibeiroDev\FilamentLeaflet\Enums\TileLayer;
-
-MapPicker::make('location')
-    ->height(300)
-    ->center(-23.5505, -46.6333)
-    ->zoom(11)
-    ->tileLayersUrl(TileLayer::OpenStreetMap)
-    ->markers([
-        Marker::make(-23.5505, -46.6333)->title('Store 1'),
-    ])
-    ->geoJsonData(['SP' => 166.23])
-    ->geoJsonTooltip('<h4>{state}</h4><b>Density: {density}</b>')
-```
-
-By default, `MapPicker` updates the form's `latitude` and `longitude` fields. Customize the field names with `latitudeFieldName()` and `longitudeFieldName()`. For storing coordinates as JSON in a single column, use `storeAsJson()`:
-
-```php
-MapPicker::make('location')
-    ->storeAsJson()  // Store as JSON: { "latitude": -23.5505, "longitude": -46.6333 }
-    ->latitudeFieldName('lat')
-    ->longitudeFieldName('lng')
-```
-
-Loading GeoJSON from model files
-
-If your model exposes a GeoJSON file or URL (for example by using the provided `HasGeoJsonFile` concern or by implementing a `getGeoJsonUrl()` method), `MapPicker` will automatically call `getGeoJsonUrl()` on the record and load the GeoJSON into the map when the field is mounted. The `HasGeoJsonFile` trait helps with common patterns (attribute name, storage disk and temporary URL expiration).
-
-Example model using the trait:
-
-```php
-use DateTime;
-use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasGeoJsonFile;
-
-class DeliveryZone extends Model
-{
-    use HasGeoJsonFile;
-
-    // Optional: override defaults
-    public function getGeoJsonFileAttributeName(): string
-    {
-        return 'geojson_file';
-    }
-
-    public function getGeoJsonFileDisk(): ?string
-    {
-        return 's3';
-    }
-
-    public function getExpirationTime(): ?DateTime
-    {
-        return now()->addHour();
-    }
-}
-```
-
-Note: Many `MapPicker` setter methods accept `Closure`s for dynamic evaluation (e.g., `->center(fn() => [$lat, $lng])`, `->geoJsonUrl(fn() => $someUrl)`).
-
-#### Using Closures for Dynamic Configuration
-
-The `MapPicker` field supports `Closure`s in most configuration methods. These are evaluated by Filament's `evaluate()` method, allowing you to access the current record and other context dynamically:
-
-```php
-use EduardoRibeiroDev\FilamentLeaflet\Fields\MapPicker;
-use EduardoRibeiroDev\FilamentLeaflet\Support\Markers\Marker;
-use EduardoRibeiroDev\FilamentLeaflet\Enums\TileLayer;
-
-MapPicker::make('location')
-    // Dynamic height based on screen or state
-    ->height(fn($record) => $record?->is_large_zone ? 500 : 300)
-    
-    // Center on the record's existing coordinates
-    ->center(fn($record) => [
-        $record?->latitude ?? -23.5505,
-        $record?->longitude ?? -46.6333
-    ])
-    
-    // Dynamic zoom based on record properties
-    ->zoom(fn($record) => $record?->coverage_type === 'city' ? 11 : 6)
-    
-    // Load tile layer based on user preference
-    ->tileLayersUrl(fn() => auth()->user()?->map_tile_preference ?? TileLayer::OpenStreetMap)
-    
-    // Load markers based on record relationships
-    ->markers(fn($record) => 
-        $record?->warehouses->map(fn($warehouse) => 
-            Marker::make($warehouse->latitude, $warehouse->longitude)
-                ->title($warehouse->name)
-                ->blue()
-        )->toArray() ?? []
-    )
-
-    // Load shapes conditionally based on user permissions
-    ->shapes(fn($record) => 
-        auth()->user()?->can('view_restricted_zones')
-            ? $record?->getRestrictedZones()
-            : $record?->getPublicZones() ?? []
-    );
-
-    // Dynamic GeoJSON URL based on region type
-    ->geoJsonUrl(fn($get) => 
-        match($get('region_type')) {
-            'states' => 'https://cdn.example.com/states.geojson',
-            'cities' => 'https://cdn.example.com/cities.geojson',
-            default => null,
-        }
-    );
-```
-
-#### Table Column: MapColumn
-
-Display maps directly in Filament table columns to show record locations at a glance:
-
-```php
-use EduardoRibeiroDev\FilamentLeaflet\Tables\MapColumn;
-use EduardoRibeiroDev\FilamentLeaflet\Support\Markers\Marker;
-use Filament\Tables\Columns\Column;
-
-// In your Filament resource's table
-MapColumn::make('location')
-    ->height(72)
-    ->width(108)
-    ->zoom(5)
-    ->pickMarker(fn(Marker $marker) => $marker->icon(size: [14, 25]))
-    ->circular()  // Optional: display in a circular container
-```
-
-The `MapColumn` supports all the configuration methods from `MapPicker` and `MapWidget`, including `markers()`, `shapes()`, `geoJsonData()`, etc. The `circular()` method is particularly useful for displaying maps in circular avatars or containers.
-
-Features of `MapColumn`:
-- Automatically reads latitude/longitude from your record
-- Supports both separate field storage and JSON columns
-- Small, optimized map display perfect for tables
-- Optional circular display mode
-- All standard map configuration options
-
-#### Infolist Entry: MapEntry
-
-Display read-only maps in Filament infolists to show location information for records:
-
-```php
-use EduardoRibeiroDev\FilamentLeaflet\Infolists\MapEntry;
-use EduardoRibeiroDev\FilamentLeaflet\Support\Markers\Marker;
-
-// In your Filament resource's infolist
-MapEntry::make('location')
-    ->height(284)
-    ->zoom(10)
-    ->markers([
-        Marker::make($record->latitude, $record->longitude)->blue(),
-    ])
-```
-
-The `MapEntry` component is similar to `MapPicker` and `MapColumn` but read-only, ideal for displaying location information in resource detail views. It automatically handles:
-- Separate latitude/longitude fields
-- JSON-stored coordinates
-- Custom field name mapping
-
-```php
-// With JSON-stored coordinates
-MapEntry::make('location')
-    ->storeAsJson()
-    ->latitudeFieldName('lat')
-    ->longitudeFieldName('lng')
-```
-
-### Map Widget Configuration
-
-#### Basic Settings
-
-Configure your map's initial state and behavior:
+#### Basic Configuration
 
 ```php
 class MyMapWidget extends MapWidget
 {
-    // Map heading
-    protected static ?string $heading = 'Store Locations';
+    // Display
+    protected ?string $heading = 'Store Locations';
+    protected int $mapHeight = 600;
     
-    // Center coordinates [latitude, longitude]
-    protected static array $mapCenter = [-14.235, -51.9253];
-    
-    // Initial zoom level (1-18)
-    protected static int $defaultZoom = 4;
-    
-    // Map height in pixels
-    protected static int $mapHeight = 600;
-    
-    // Zoom configuration
-    protected static int $maxZoom = 18;
-    protected static int $minZoom = 2;
+    // Map center and zoom
+    protected array $mapCenter = [-14.235, -51.9253];
+    protected int $defaultZoom = 4;
+    protected int $maxZoom = 18;
+    protected int $minZoom = 2;
 }
 ```
 
-### Map Controls
+#### Controls
 
-You can enable or disable UI controls individually using the widget flags. Use the provided toggles to show controls:
-
-- `hasAttributionControl`: show/hide the attribution control
-- `hasScaleControl`: show/hide the scale control
-- `hasZoomControl`: show/hide the zoom control
-- `hasFullscreenControl`: show/hide the fullscreen control
-- `hasSearchControl`: show/hide the search control
- - `hasDrawControl`: enable/disable the draw toolbar control
-
-Examples
-
-- Enable controls from the widget class:
+Enable/disable map controls:
 
 ```php
 class MyMapWidget extends MapWidget
 {
-    protected static bool $hasAttributionControl = false;
-    protected static bool $hasScaleControl = true;
-    protected static bool $hasZoomControl = true;
-    protected static bool $hasFullscreenControl = true;
-    protected static bool $hasDrawControl = true;
-    protected static bool $hasSearchControl = true;
+    protected bool $hasAttributionControl = false;
+    protected bool $hasScaleControl = true;
+    protected bool $hasZoomControl = true;
+    protected bool $hasFullscreenControl = true;
+    protected bool $hasDrawControl = true;
+    protected bool $hasSearchControl = true;
 }
 ```
 
-- Conditionally toggle controls per runtime using `getMapControls()` override. This is useful when you want control visibility to depend on user permissions or widget state:
+![Map Controls Example](images/map-controls.png)
+
+Conditionally show controls at runtime:
 
 ```php
-public static function getMapControls(): array
+public function getMapControls(): array
 {
     $controls = parent::getMapControls();
-
-    // Example: hide fullscreen for non-admins
     if (!auth()?->user()?->is_admin) {
         $controls['fullscreenControl'] = false;
     }
-
     return $controls;
 }
 ```
 
-### Tile Layers
+#### Tile Layers
 
-Tile layers can be provided as a single `TileLayer` enum, a plain URL string, or an array of layers. When using an associative array you may provide custom labels for the layer selector. If a `TileLayer` enum is used the widget will also include the provider attribution automatically.
-
-Choose from multiple tile layer providers or add your own:
+Choose from multiple providers or add custom layers:
 
 ```php
 use EduardoRibeiroDev\FilamentLeaflet\Enums\TileLayer;
@@ -356,48 +150,139 @@ use EduardoRibeiroDev\FilamentLeaflet\Enums\TileLayer;
 class MyMapWidget extends MapWidget
 {
     // Single layer
-    protected static TileLayer|string|array $tileLayersUrl = TileLayer::OpenStreetMap;
+    protected TileLayer|string|array $tileLayersUrl = TileLayer::OpenStreetMap;
     
     // Multiple layers
-    protected static TileLayer|string|array $tileLayersUrl = [
-        TileLayer::OpenStreetMap,
-        TileLayer::GoogleSatellite,
-        TileLayer::EsriNatGeo,
-    ];
-    
-    // Multiple layers with custom names
-    protected static TileLayer|string|array $tileLayersUrl = [
+    protected TileLayer|string|array $tileLayersUrl = [
         'Street Map' => TileLayer::OpenStreetMap,
-        'Satellite' => TileLayer::EsriWorldStreetMap,
-        'Terrain' => TileLayer::GoogleTerrain,
-    ];
-    
-    // Custom tile server
-    protected static TileLayer|string|array $tileLayersUrl = [
+        'Satellite' => TileLayer::GoogleSatellite,
         'Custom' => 'https://{s}.tile.custom.com/{z}/{x}/{y}.png',
     ];
 }
 ```
 
-Available tile layers:
-- `TileLayer::OpenStreetMap`
-- `TileLayer::GoogleStreets`
-- `TileLayer::GoogleSatellite`
-- `TileLayer::GoogleHybrid`
-- `TileLayer::GoogleTerrain`
-- `TileLayer::EsriWorldImagery`
-- `TileLayer::EsriWorldStreetMap`
-- `TileLayer::EsriNatGeo`
-- `TileLayer::CartoPositron`
-- `TileLayer::CartoDarkMatter`
+**Available providers:** `OpenStreetMap`, `GoogleStreets`, `GoogleSatellite`, `GoogleHybrid`, `GoogleTerrain`, `EsriWorldImagery`, `EsriWorldStreetMap`, `EsriNatGeo`, `CartoPositron`, `CartoDarkMatter`
+
+#### Map Options
+
+Fine-tune Leaflet behavior:
+
+```php
+public function getMapOptions(): array
+{
+    return [
+        'scrollWheelZoom' => true,
+        'doubleClickZoom' => true,
+        'dragging' => true,
+        'touchZoom' => true,
+        'keyboard' => true,
+    ];
+}
+```
+
+### MapPicker (Form Field)
+
+Add an interactive map inside Filament forms. It syncs map clicks to form fields and supports all MapWidget configuration methods.
+
+```php
+use EduardoRibeiroDev\FilamentLeaflet\Fields\MapPicker;
+use EduardoRibeiroDev\FilamentLeaflet\Enums\TileLayer;
+
+MapPicker::make('location')
+    ->height(300)
+    ->center(-23.5505, -46.6333)
+    ->zoom(11)
+    ->tileLayersUrl(TileLayer::OpenStreetMap)
+    ->columnSpanFull()
+```
+
+![Form Field Example](images/form-field.png)
+
+**Default behavior:** Updates form's `latitude` and `longitude` fields. Customize with:
+
+```php
+MapPicker::make('location')
+    ->latitudeFieldName('lat')
+    ->longitudeFieldName('lng')
+```
+
+**Store as JSON:** Keep coordinates in a single column:
+
+```php
+MapPicker::make('location')
+    ->storeAsJson()  // Stores: { "latitude": -23.5505, "longitude": -46.6333 }
+```
+
+**Load GeoJSON:** Automatically loads from models with `HasGeoJsonFile` trait or `getGeoJsonUrl()` method:
+
+```php
+use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasGeoJsonFile;
+
+class DeliveryZone extends Model
+{
+    use HasGeoJsonFile;
+    
+    public function getGeoJsonFileAttributeName(): string { return 'geojson_file'; }
+    public function getGeoJsonFileDisk(): ?string { return 's3'; }
+    public function getExpirationTime(): ?DateTime { return now()->addHour(); }
+}
+```
+
+**Customize pick marker:** Visual feedback when clicking the map:
+
+```php
+MapPicker::make('location')
+    ->pickMarker(fn(Marker $marker) => $marker->blue()->title('Selected'))
+```
+
+**Dynamic configuration:** Most methods accept closures:
+
+```php
+MapPicker::make('location')
+    ->center(fn() => [$lat, $lng])
+    ->height(fn($record) => 300)
+    ->zoom(fn($record) => $record->zoom_level)
+```
+
+### MapColumn (Table Column)
+
+Display maps directly in Filament table columns:
+
+```php
+use EduardoRibeiroDev\FilamentLeaflet\Tables\MapColumn;
+use EduardoRibeiroDev\FilamentLeaflet\Support\Markers\Marker;
+
+MapColumn::make('location')
+    ->height(72)
+    ->zoom(5)
+    ->pickMarker(fn(Marker $marker) => $marker->icon(size: [14, 25]))
+    ->circular()  // Optional: circular display
+```
+
+![Table Column Example](images/table-column.png)
+
+### MapEntry (Infolist)
+
+Display read-only maps in Filament infolists:
+
+```php
+use EduardoRibeiroDev\FilamentLeaflet\Infolists\MapEntry;
+use EduardoRibeiroDev\FilamentLeaflet\Support\Markers\Marker;
+
+MapEntry::make('location')
+    ->height(284)
+    ->zoom(10)
+    ->pickMarker(fn(Marker $marker) => $marker->red())
+    ->columnSpanFull()
+```
+
+![Infolist Entry Example](images/infolist-entry.png)
 
 ## Map Elements
 
-### Working with Markers
+### Markers
 
-#### Basic Markers
-
-Create markers with various configurations:
+#### Creating Markers
 
 ```php
 use EduardoRibeiroDev\FilamentLeaflet\Support\Markers\Marker;
@@ -406,166 +291,44 @@ use EduardoRibeiroDev\FilamentLeaflet\Enums\Color;
 protected function getMarkers(): array
 {
     return [
-        // Simple marker
-        Marker::make(-23.5505, -46.6333),
-        
-        // Marker with title (shows as tooltip and popup title)
-        Marker::make(-23.5505, -46.6333)
-            ->title('São Paulo'),
-        
-        // Colored marker
-        Marker::make(-23.5505, -46.6333)
-            ->blue(), // or ->color(Color::Blue)
-        
-        // Custom icon
-        Marker::make(-23.5505, -46.6333)
-            ->icon('https://example.com/icon.png', [32, 32]),
-        
-        // Draggable marker
-        Marker::make(-23.5505, -46.6333)
-            ->draggable(),
-        
-        // Complete marker
-        Marker::make(-23.5505, -46.6333)
-            ->id('sao-paulo')
-            ->title('São Paulo')
-            ->red()
-            ->popupContent('The largest city in Brazil')
-            ->group('cities'),
+        Marker::make(-23.5505, -46.6333)->title('Simple marker'),
+        Marker::make(-23.5505, -46.6333)->blue()->title('Colored marker'),
+        Marker::make(-23.5505, -46.6333)->icon('url.png', [32, 32]),
+        Marker::make(-23.5505, -46.6333)->draggable()->editable(),
     ];
 }
 ```
 
 #### Marker Colors
 
-Use the built-in color system:
+Available: `blue()`, `red()`, `green()`, `orange()`, `yellow()`, `violet()`, `grey()`, `black()`, `gold()`, `randomColor()`, or `color(Color::Blue)`
+
+#### From Eloquent Models
 
 ```php
-Marker::make($lat, $lng)
-    ->blue()      // Blue marker
-    ->red()       // Red marker
-    ->green()     // Green marker
-    ->orange()    // Orange marker
-    ->yellow()    // Yellow marker
-    ->violet()    // Violet marker
-    ->grey()      // Grey marker
-    ->black()     // Black marker
-    ->gold()      // Gold marker
-    ->randomColor(); // Random color
-
-// Or use the Color enum
-Marker::make($lat, $lng)
-    ->color(Color::Blue);
-```
-
-#### Marker Icons
-
-Customize marker icons with multiple options:
-
-```php
-use EduardoRibeiroDev\FilamentLeaflet\Support\Markers\Marker;
-
-// Static icon with custom size
-Marker::make(-23.5505, -46.6333)
-    ->icon('https://example.com/icon.png', [32, 41])
-    ->title('Custom Marker');
-
-// Using separate methods
-Marker::make(-23.5505, -46.6333)
-    ->iconUrl('https://example.com/icon.png')
-    ->iconSize([32, 41])
-    ->title('Store Location');
-
-// Dynamic icon sizing with closures
-Marker::make(-23.5505, -46.6333)
-    ->icon(
-        url: fn() => auth()->user()?->preferredIconUrl ?? '/icons/default.png',
-        size: fn() => [24, 24]
-    );
-
-// Dynamic sizing based on marker data
-Marker::fromRecord($store)
-    ->iconUrl(fn($record) => $record->custom_icon_url)
-    ->iconSize(fn($record) => $record->is_premium ? [48, 60] : [32, 41]);
-```
-
-**Icon Configuration Details:**
-- Icon anchor points are automatically calculated based on icon size
-- Popup anchors adjust based on icon height for optimal positioning
-- Shadow sizes scale proportionally with icon dimensions
-- This automatic adjustment ensures popups display correctly regardless of icon size
-
-```php
-// The anchor points automatically adjust:
-Marker::make($lat, $lng)->iconSize([14, 25])  // Small icon - adjusted anchors
-Marker::make($lat, $lng)->iconSize([25, 41])  // Medium icon - adjusted anchors
-Marker::make($lat, $lng)->iconSize([48, 60])  // Large icon - adjusted anchors
-Marker::make($lat, $lng)->iconSize([64, 80])  // Extra large - adjusted anchors
-```
-
-#### Markers from Eloquent Models
-
-Automatically create markers from your database records:
-
-```php
-use App\Models\Store;
-
-protected function getMarkers(): array
-{
-    return Store::all()->map(function ($store) {
-        return Marker::fromRecord(
-            record: $store,
-            latColumn: 'latitude',
-            lngColumn: 'longitude',
-            titleColumn: 'name',
-            descriptionColumn: 'description',
-            popupFieldsColumns: ['address', 'phone', 'email'],
-            color: Color::Blue,
-        );
-    })->toArray();
-}
-```
-
-##### JSON Coordinate Storage
-
-If your coordinates are stored as JSON:
-
-```php
-// Database structure: coordinates => {"lat": -23.5505, "lng": -46.6333}
-
-Marker::fromRecord(
-    record: $store,
-    jsonColumn: 'coordinates',      // Column containing JSON
-    latColumn: 'lat',               // Key in JSON object
-    lngColumn: 'lng',               // Key in JSON object
-    titleColumn: 'name',
-);
-```
-
-##### Customizing Markers from Records
-
-Use the `mapRecordCallback` to customize each marker:
-
-```php
+// Basic usage
 Marker::fromRecord(
     record: $store,
     latColumn: 'latitude',
     lngColumn: 'longitude',
+    titleColumn: 'name',
+    popupFieldsColumns: ['address', 'phone'],
+    color: Color::Blue,
+);
+
+// With JSON coordinates
+Marker::fromRecord(
+    record: $store,
+    jsonColumn: 'coordinates',
+    latColumn: 'lat',
+    lngColumn: 'lng',
+);
+
+// With custom callback
+Marker::fromRecord(
+    record: $store,
     mapRecordCallback: function (Marker $marker, Model $record) {
-        // Customize based on record data
-        if ($record->is_featured) {
-            $marker->gold();
-        }
-        
-        if ($record->status === 'closed') {
-            $marker->grey();
-        }
-        
-        // Add custom popup fields
-        $marker->popupFields([
-            'opening_hours' => $record->hours,
-            'rating' => $record->rating . ' ⭐',
-        ]);
+        $marker->gold()->popupFields(['hours' => $record->hours]);
     }
 );
 ```
@@ -807,83 +570,33 @@ MarkerCluster::make($markers)
 
 #### Combining Multiple Layer Groups
 
-You can combine different layer groups in the same map to create complex, multi-layered visualizations:
+You can combine different layer groups in the same map:
 
 ```php
 use App\Models\Store;
 use App\Models\Warehouse;
-use App\Models\Partner;
 
 protected function getLayers(): array
 {
     return [
-        // Group 1: Stores with clustering
-        MarkerCluster::fromModel(
-            model: Store::class,
-            latColumn: 'latitude',
-            lngColumn: 'longitude',
-            titleColumn: 'name',
-            color: Color::Blue,
-        )
-        ->name('Retail Stores')
-        ->maxClusterRadius(80),
+        // Stores with clustering
+        MarkerCluster::fromModel(Store::class)->name('Retail Stores'),
         
-        // Group 2: Warehouses with feature group
+        // Warehouses with feature group
         FeatureGroup::make([
             Warehouse::all()->map(fn($w) => 
-                Marker::make($w->latitude, $w->longitude)
-                    ->title($w->name)
-                    ->red()
+                Marker::make($w->latitude, $w->longitude)->title($w->name)->red()
             )->all()
-        ])
-        ->name('Warehouses')
-        ->orange()
-        ->fillOpacity(0.1),
+        ])->name('Warehouses')->orange()->fillOpacity(0.1),
         
-        // Group 3: Partners as simple layer group
+        // Service areas with shapes
         LayerGroup::make([
-            Partner::active()->get()->map(fn($p) => 
-                Marker::make($p->latitude, $p->longitude)
-                    ->title($p->company_name)
-                    ->green()
-                    ->popupFields([
-                        'contact' => $p->contact_name,
-                        'phone' => $p->phone,
-                    ])
-            )->all()
-        ])
-        ->name('Partner Locations')
-        ->id('partners-group'),
-        
-        // Group 4: Service areas with shapes
-        LayerGroup::make([
-            Circle::make(-23.5505, -46.6333)
-                ->radiusInKilometers(25)
-                ->blue()
-                ->fillBlue()
-                ->fillOpacity(0.05)
-                ->popupContent('Primary service area'),
-            
-            Circle::make(-23.5505, -46.6333)
-                ->radiusInKilometers(50)
-                ->blue()
-                ->dashArray('5, 5')
-                ->fillOpacity(0)
-                ->popupContent('Extended service area'),
-        ])
-        ->name('Service Areas')
-        ->id('service-areas'),
+            Circle::make(-23.5505, -46.6333)->radiusInKilometers(25)->blue(),
+            Circle::make(-23.5505, -46.6333)->radiusInKilometers(50)->dashArray('5, 5'),
+        ])->name('Service Areas'),
     ];
 }
 ```
-
-This example demonstrates:
-- **Clustering** for high-volume data (stores)
-- **Feature groups** for geographic boundaries (warehouse coverage)
-- **Simple groups** for categorical data (partners)
-- **Shape combinations** for visualizing service areas
-
-**Toggling visibility in the UI:**
 
 Layer groups automatically appear in the Leaflet controls when a name is set, allowing users to toggle them on/off from the map interface.
 
@@ -901,6 +614,12 @@ use EduardoRibeiroDev\FilamentLeaflet\Support\Shapes\Circle;
 protected function getShapes(): array
 {
     return [
+        Circle::make(-23.5505, -46.6333)
+            ->radiusInMeters(5000)
+            ->blue()
+            ->fillBlue()
+            ->fillOpacity(0.2)
+            ->title('Service Area'),
         // Radius in meters (default)
         Circle::make(-23.5505, -46.6333)
             ->radius(5000)
@@ -938,6 +657,8 @@ protected function getShapes(): array
 }
 ```
 
+![Circles Example](images/circle.png)
+
 #### Circle Markers
 
 Small circles with pixel-based radius (like markers but circular):
@@ -946,12 +667,14 @@ Small circles with pixel-based radius (like markers but circular):
 use EduardoRibeiroDev\FilamentLeaflet\Support\Shapes\CircleMarker;
 
 CircleMarker::make(-23.5505, -46.6333)
-    ->radius(15)           // Radius in pixels
+    ->radius(45)           // Radius in pixels
     ->red()
     ->fillRed()
     ->weight(2)
     ->title('Point of Interest');
 ```
+
+![Circle Markers Example](images/circle-marker.png)
 
 #### Polygons
 
@@ -981,6 +704,8 @@ Polygon::make()
     ->addPoint(-23.5505, -46.6333)
     ->blue();
 ```
+
+![Polygons Example](images/polygon.png)
 
 #### Polylines
 
@@ -1012,6 +737,8 @@ Polyline::make()
     ->weight(3);
 ```
 
+![Polylines Example](images/polyline.png)
+
 #### Rectangles
 
 Draw rectangular bounds:
@@ -1035,6 +762,9 @@ Rectangle::makeFromCoordinates(
     -23.5525, -46.6353     // Northeast lat, lng
 )
 ->red();
+```
+
+![Rectangles Example](images/rectangle.png)
 ```
 
 #### Shapes from Eloquent Models
@@ -1159,7 +889,7 @@ Make markers and shapes editable directly on the map by enabling the draw contro
 ```php
 class MyMapWidget extends MapWidget
 {
-    protected static bool $hasDrawControl = true;
+    protected bool $hasDrawControl = true;
     
     protected function getMarkers(): array
     {
@@ -1188,104 +918,57 @@ LayerGroup::make([
 ->editable(),  // All markers in the group are now editable
 ```
 
-## User Interaction
+## User Interactions
 
 ### Popups and Tooltips
 
-### Tooltips
-
-Tooltips appear on hover:
+#### Tooltips (appear on hover)
 
 ```php
 Marker::make(-23.5505, -46.6333)
     ->tooltip(
         content: 'São Paulo City',
-        permanent: false,           // Always visible
-        direction: 'top',           // 'top', 'bottom', 'left', 'right', 'auto'
-        options: [
-            'offset' => [0, -20],
-            'className' => 'custom-tooltip',
-        ]
+        permanent: false,
+        direction: 'top',
+        options: ['offset' => [0, -20]]
     );
 
-// Or use individual methods
+// Or using individual methods
 Marker::make(-23.5505, -46.6333)
     ->tooltipContent('São Paulo')
     ->tooltipPermanent(true)
-    ->tooltipDirection('top')
-    ->tooltipOptions(['opacity' => 0.9]);
+    ->tooltipDirection('top');
 ```
 
-#### Popups
-
-Popups appear on click and support rich content:
+#### Popups (appear on click)
 
 ```php
 Marker::make(-23.5505, -46.6333)
     ->popupTitle('Store Location')
-    ->popupContent('Visit our main store in downtown São Paulo')
+    ->popupContent('Visit our main store')
     ->popupFields([
         'address' => '123 Main Street',
         'phone' => '+55 11 1234-5678',
         'email' => 'contact@store.com',
-        'opening_hours' => 'Mon-Fri: 9AM-6PM',
     ])
-    ->popupOptions([
-        'maxWidth' => 300,
-        'className' => 'custom-popup',
-    ]);
+    ->popupOptions(['maxWidth' => 300]);
 
-// Or use the shorthand
+// Or use shorthand
 Marker::make(-23.5505, -46.6333)
     ->popup(
         content: 'Store description',
-        fields: [
-            'address' => '123 Main Street',
-            'phone' => '+55 11 1234-5678',
-        ],
+        fields: ['address' => '123 Main St', 'phone' => '+55 11 1234-5678'],
         options: ['maxWidth' => 300]
     );
 ```
 
-#### How Popup Fields Work
+**How popup fields work:** Keys are automatically converted to title case, underscores replaced with spaces, and translated using Laravel's `__()` helper. Both keys and values support translation keys.
 
-The `popupFields()` method automatically formats your data into a clean, structured display:
-
-```php
-Marker::make(-23.5505, -46.6333)
-    ->popupFields([
-        'store' => 'Pizza Palace',
-        'phone_number' => '+55 11 1234-5678',
-        'opening_hours' => '10AM - 10PM',
-    ]);
-```
-
-This generates HTML like:
-```html
-<p><span class="field-label">Store:</span> Pizza Palace</p>
-<p><span class="field-label">Phone Number:</span> +55 11 1234-5678</p>
-<p><span class="field-label">Opening Hours:</span> 10AM - 10PM</p>
-```
-
-The keys are automatically:
-- Converted to title case
-- Underscores replaced with spaces
-- Translated using Laravel's `__()` helper
-
-Both keys and values are translated, so you can use translation keys:
-
-```php
-->popupFields([
-    'store.name' => $store->name,
-    'store.contact' => $store->phone,
-])
-```
-
-#### Combining Title, Tooltip, and Popup
+#### Combined Usage
 
 ```php
 Marker::make(-23.5505, -46.6333)
-    ->title('Pizza Palace')              // Sets both tooltip and popup title
+    ->title('Pizza Palace')
     ->popupContent('Best pizza in town')
     ->popupFields([
         'address' => '123 Main St',
@@ -1296,31 +979,22 @@ Marker::make(-23.5505, -46.6333)
 
 ### Click Actions
 
-Handle user interactions with layers:
-
-### Marker Click Actions
+#### Marker Click Handler
 
 ```php
 use Filament\Notifications\Notification;
 
 Marker::make(-23.5505, -46.6333)
     ->title('Interactive Marker')
-    ->onClick(function (Marker $marker) {
+    ->action(function (Marker $marker) {
         Notification::make()
             ->title('Marker Clicked!')
-            ->body('You clicked on: ' . $marker->getId())
-            ->success()
+            ->body('ID: ' . $marker->getId())
             ->send();
-    });
-
-// Or use the action() method
-Marker::make(-23.5505, -46.6333)
-    ->action(function (Marker $marker) {
-        // Handle click
     });
 ```
 
-### Shape Click Actions
+#### Shape Click Handler
 
 ```php
 Circle::make(-23.5505, -46.6333)
@@ -1330,16 +1004,9 @@ Circle::make(-23.5505, -46.6333)
             ->title('Circle clicked')
             ->send();
     });
-
-Polygon::make($coordinates)
-    ->action(function (Polygon $polygon) {
-        // Handle polygon click
-    });
 ```
 
-### Access Record in Click Actions
-
-When using markers from models, access the record in click actions:
+#### From Model Records
 
 ```php
 protected function getMarkers(): array
@@ -1355,14 +1022,13 @@ protected function getMarkers(): array
                 ->body("Address: {$record->address}")
                 ->send();
             
-            // You can also redirect
             return redirect()->route('stores.show', $record);
         });
     })->toArray();
 }
 ```
 
-### Map Click Handler
+#### Map Click Handler
 
 Handle clicks on the map itself:
 
@@ -1373,37 +1039,43 @@ public function handleMapClick(float $latitude, float $longitude): void
         ->title('Map clicked')
         ->body("Coordinates: {$latitude}, {$longitude}")
         ->send();
-
-    // Or create a new marker dynamically via the widget create flow
-    parent::handleMapClick($latitude, $longitude);
 }
+```
+
+#### Field/Entry/Column Click Handlers
+
+Handle map clicks in form fields, infolists, or table columns:
+
+```php
+use EduardoRibeiroDev\FilamentLeaflet\Fields\MapPicker;
+use Filament\Notifications\Notification;
+
+MapPicker::make('location')
+    ->height(300)
+    ->onMapClick(function (float $latitude, float $longitude) {
+        Notification::make()
+            ->title('Location Selected')
+            ->body("Lat: {$latitude}, Lng: {$longitude}")
+            ->send();
+    });
+```
+
+Handle layer (marker/shape) clicks:
+
+```php
+MapPicker::make('location')
+    ->height(300)
+    ->onLayerClick(function (array $layer) {
+        Notification::make()
+            ->title('Layer Clicked')
+            ->body("Layer ID: {$layer['id']}")
+            ->send();
+    });
 ```
 
 ## Advanced Features
 
-### JavaScript Architecture
-
-The package uses a two-layer JavaScript architecture for flexibility and maintainability:
-
-**LeafletMapCore** (`leaflet-map-core.js`)
-- Core Leaflet functionality (map creation, layers, controls, interactions)
-- Independent of Filament/Livewire - can be used standalone
-- Accepts callbacks for custom event handling
-- Methods: `init()`, `addLayers()`, `setupEventHandlers()`, `updateMapData()`, etc.
-
-**leaflet-map** (`leaflet-map.js`)
-- Wrapper for Filament/Livewire integration
-- Initializes `LeafletMapCore` with appropriate callbacks
-- Handles state synchronization for `MapPicker` fields
-- Manages Livewire method calls and event dispatching
-
-This separation allows you to extend the core map functionality or create custom implementations without modifying the package.
-
-### Model Integration
-
-> Tip: To expose GeoJSON files from your models (for widgets or the `MapPicker` field), you can use the `HasGeoJsonFile` concern or implement a `getGeoJsonUrl()` method on the model. The concern helps with attribute name, storage disk and temporary URL expiration via the `getExpirationTime()` method.
-
-#### CRUD Operations
+### Model Integration & CRUD Operations
 
 Enable creating markers directly from map clicks:
 
@@ -1412,59 +1084,37 @@ use App\Models\Location;
 
 class LocationMapWidget extends MapWidget
 {
-    protected static ?string $markerModel = Location::class;
+    protected ?string $markerModel = Location::class;
+    protected string $latitudeColumnName = 'latitude';
+    protected string $longitudeColumnName = 'longitude';
+    protected ?string $jsonCoordinatesColumnName = 'coordinates'; // For JSON storage
     
-    // Column names in your database
-    protected static string $latitudeColumnName = 'latitude';
-    protected static string $longitudeColumnName = 'longitude';
-    
-    // For JSON storage
-    protected static ?string $jsonCoordinatesColumnName = 'coordinates';
-    
-    // Form configuration
-    protected static int $formColumns = 2;
-    
-    protected static function getFormComponents(): array
+    protected function getFormComponents(): array
     {
         return [
-            TextInput::make('name')
-                ->required(),
-            
-            Select::make('color')
-                ->options(Color::class),
-            
-            Textarea::make('description')
-                ->columnSpanFull(),
+            TextInput::make('name')->required(),
+            Select::make('color')->options(Color::class),
+            Textarea::make('description')->columnSpanFull(),
         ];
     }
 }
 ```
 
-Notes:
+When users click the map, a form modal opens to create a new marker. If coordinates are stored as JSON, the widget automatically converts latitude/longitude into the configured JSON column.
 
-- You can set `protected static ?string $markerResource = YourResource::class;` to reuse an existing Filament Resource form instead of the widget's default form. The widget will call the resource's form builder when building the create modal.
-- If the widget form schema doesn't include your latitude/longitude fields, the widget will automatically add them as `Hidden` fields so the create flow still receives coordinates from map clicks.
-- If you store coordinates as a JSON column, set `protected static ?string $jsonCoordinatesColumnName = 'coordinates';` and the widget will convert the latitude/longitude into the configured JSON column before creating the record.
-
-Now when users click the map, a form modal opens to create a new location!
-
-##### Using a Resource Form
-
-Integrate with existing Filament resources:
+**Using a Resource Form:**
 
 ```php
 use App\Filament\Resources\Locations\LocationResource;
 
 class LocationMapWidget extends MapWidget
 {
-    protected static ?string $markerModel = Location::class;
-    protected static ?string $markerResource = LocationResource::class;
-    
-    // The resource's form will be used automatically
+    protected ?string $markerModel = Location::class;
+    protected ?string $markerResource = LocationResource::class;
 }
 ```
 
-##### After Create Hook
+**Hooks:**
 
 ```php
 protected function afterMarkerCreated(Model $record): void
@@ -1474,29 +1124,17 @@ protected function afterMarkerCreated(Model $record): void
         ->body("Created: {$record->name}")
         ->success()
         ->send();
-    
-    // Send email, log activity, etc.
 }
-```
 
-##### Mutate Form Data
-
-Transform data before saving:
-
-```php
 protected function mutateFormDataBeforeCreate(array $data): array
 {
     $data['user_id'] = auth()->id();
     $data['status'] = 'active';
-    
-    // Convert coordinates to JSON if needed
     return parent::mutateFormDataBeforeCreate($data);
 }
 ```
 
-##### Table Integration
-
-Refresh the map when table actions are performed:
+**Keep Maps in Sync with Tables:**
 
 ```php
 use EduardoRibeiroDev\FilamentLeaflet\Concerns\InteractsWithMap;
@@ -1504,14 +1142,10 @@ use EduardoRibeiroDev\FilamentLeaflet\Concerns\InteractsWithMap;
 class ManageLocations extends ManageRecords
 {
     use InteractsWithMap;
-    
-    // Your resource code...
 }
 ```
 
-This automatically:
-- Refreshes the map after create/edit/delete actions
-- Keeps the map in sync with your table
+This automatically refreshes the map after create/edit/delete actions.
 
 ### GeoJSON Density Maps
 
@@ -1520,30 +1154,23 @@ Display choropleth maps with custom density data:
 ```php
 class BrazilDensityWidget extends MapWidget
 {
-    protected static ?string $geoJsonUrl = 'https://example.com/brazil-states.json';
+    protected ?string $geoJsonUrl = 'https://example.com/brazil-states.json';
     
-    protected static array $geoJsonColors = [
-        '#FED976',  // Lightest
-        '#FEB24C',
-        '#FD8D3C',
-        '#FC4E2A',
-        '#E31A1C',
-        '#BD0026',
-        '#800026',  // Darkest
+    protected array $geoJsonColors = [
+        '#FED976', '#FEB24C', '#FD8D3C', '#FC4E2A', 
+        '#E31A1C', '#BD0026', '#800026',
     ];
     
     public function getGeoJsonData(): array
     {
-        // Return density data for each region
         return [
             'SP' => 166.23,  // São Paulo
             'RJ' => 365.23,  // Rio de Janeiro
             'MG' => 33.41,   // Minas Gerais
-            // ... more states
         ];
     }
     
-    public static function getGeoJsonTooltip(): string
+    public function getGeoJsonTooltip(): string
     {
         return <<<HTML
             <h4>{state}</h4>
@@ -1553,11 +1180,253 @@ class BrazilDensityWidget extends MapWidget
 }
 ```
 
-The colors are automatically applied based on data distribution, creating a beautiful density visualization.
+Colors are automatically applied based on data distribution.
 
-### Advanced Configuration
+### Multi-Language Support
 
-### Advanced Configuration
+The package includes built-in support for: English (en), Portuguese (pt_BR, pt_PT), Spanish (es), French (fr), German (de), Italian (it).
+
+All draw control labels, tooltips, and messages are automatically translated based on your application's locale.
+
+To customize translations:
+
+```bash
+php artisan vendor:publish --tag=filament-leaflet-translations
+```
+
+Then edit files in `resources/lang/`.
+
+## Best Practices
+
+### Performance Optimization
+
+1. **Use Marker Clusters** for large datasets:
+```php
+// Bad: 1000 individual markers
+protected function getMarkers(): array
+{
+    return Store::all()->map(fn($s) => Marker::fromRecord($s))->toArray();
+}
+
+// Good: Clustered markers
+protected function getMarkers(): array
+{
+    return [
+        MarkerCluster::fromModel(Store::class)
+            ->maxClusterRadius(80)
+    ];
+}
+```
+
+2. **Limit data** with query modifications:
+```php
+MarkerCluster::fromModel(
+    model: Store::class,
+    modifyQueryCallback: fn($q) => $q->limit(100)->latest()
+)
+```
+
+3. **Use appropriate zoom levels**:
+```php
+protected int $defaultZoom = 12;  // City level
+protected int $maxZoom = 18;      // Street level
+protected int $minZoom = 3;       // Country level
+```
+
+### User Experience
+
+1. **Provide context** with popups:
+```php
+Marker::make($lat, $lng)
+    ->title('Store Name')
+    ->popupContent('Visit our location')
+    ->popupFields([
+        'address' => '123 Main St',
+        'hours' => '9AM-6PM',
+    ]);
+```
+
+2. **Use status-based coloring**:
+```php
+$marker->color(match($store->status) {
+    'open' => Color::Green,
+    'busy' => Color::Orange,
+    'closed' => Color::Red,
+    default => Color::Grey,
+});
+```
+
+3. **Extract complex logic**:
+```php
+protected function getMarkers(): array
+{
+    return [
+        $this->getStoreMarkers(),
+        $this->getWarehouseMarkers(),
+    ];
+}
+
+private function getStoreMarkers(): MarkerCluster
+{
+    return MarkerCluster::fromModel(Store::class)
+        ->blue()
+        ->mapRecordUsing($this->configureStoreMarker(...));
+}
+```
+
+### Debugging
+
+Enable logging for map interactions:
+
+```php
+public function handleMapClick(float $latitude, float $longitude): void
+{
+    logger("Map clicked", compact('latitude', 'longitude'));
+}
+```
+
+## Real-World Example
+
+Here's a comprehensive example combining multiple features:
+
+```php
+namespace App\Filament\Widgets;
+
+use App\Models\Store;
+use EduardoRibeiroDev\FilamentLeaflet\Widgets\MapWidget;
+use EduardoRibeiroDev\FilamentLeaflet\Support\Markers\Marker;
+use EduardoRibeiroDev\FilamentLeaflet\Support\Groups\MarkerCluster;
+use EduardoRibeiroDev\FilamentLeaflet\Support\Shapes\Circle;
+use EduardoRibeiroDev\FilamentLeaflet\Support\Shapes\Polygon;
+use EduardoRibeiroDev\FilamentLeaflet\Enums\Color;
+use EduardoRibeiroDev\FilamentLeaflet\Enums\TileLayer;
+use Filament\Notifications\Notification;
+
+class StoreMapWidget extends MapWidget
+{
+    protected ?string $heading = 'Store Network';
+    protected array $mapCenter = [-23.5505, -46.6333];
+    protected int $defaultZoom = 11;
+    protected int $mapHeight = 700;
+    
+    protected array $tileLayersUrl = [
+        'Street' => TileLayer::OpenStreetMap,
+        'Satellite' => TileLayer::GoogleSatellite,
+    ];
+    
+    protected ?string $markerModel = Store::class;
+    protected string $latitudeColumnName = 'latitude';
+    protected string $longitudeColumnName = 'longitude';
+    
+    protected function getMarkers(): array
+    {
+        return [
+            MarkerCluster::fromModel(
+                model: Store::class,
+                latColumn: 'latitude',
+                lngColumn: 'longitude',
+                titleColumn: 'name',
+                descriptionColumn: 'description',
+                popupFieldsColumns: ['address', 'phone', 'manager'],
+                color: Color::Blue,
+                modifyQueryCallback: fn($q) => $q->where('status', 'active'),
+                mapRecordCallback: function (Marker $marker, $record) {
+                    if ($record->is_flagship) {
+                        $marker->gold()->icon('/images/flagship-icon.png');
+                    }
+                    
+                    $marker->action(function (Marker $m, $r) {
+                        Notification::make()
+                            ->title("Store: {$r->name}")
+                            ->success()
+                            ->send();
+                    });
+                }
+            )
+            ->maxClusterRadius(60)
+            ->spiderfyOnMaxZoom(),
+            
+            Marker::make(-23.5505, -46.6333)
+                ->title('Headquarters')
+                ->red()
+                ->icon('/images/hq-icon.png', [40, 40])
+                ->popupContent('Our main office')
+                ->popupFields([
+                    'address' => 'Av. Paulista, 1000',
+                    'phone' => '+55 11 1234-5678',
+                ]),
+        ];
+    }
+    
+    protected function getShapes(): array
+    {
+        return [
+            Circle::make(-23.5505, -46.6333)
+                ->radiusInKilometers(5)
+                ->blue()
+                ->fillBlue()
+                ->fillOpacity(0.1)
+                ->weight(2)
+                ->popupContent('5km delivery radius'),
+            
+            Polygon::make([
+                [-23.5505, -46.6333],
+                [-23.5605, -46.6433],
+                [-23.5705, -46.6333],
+                [-23.5505, -46.6333],
+            ])
+            ->green()
+            ->fillGreen()
+            ->fillOpacity(0.2)
+            ->popupContent('VIP delivery zone'),
+        ];
+    }
+    
+    protected function getFormComponents(): array
+    {
+        return [
+            TextInput::make('name')->required()->maxLength(255),
+            Select::make('type')->options([
+                'retail' => 'Retail Store',
+                'warehouse' => 'Warehouse',
+                'office' => 'Office',
+            ])->required(),
+            Select::make('color')->options(Color::class),
+            TextInput::make('phone')->tel(),
+            Textarea::make('description')->columnSpanFull()->maxLength(500),
+        ];
+    }
+    
+    protected function afterMarkerCreated(Model $record): void
+    {
+        Notification::make()
+            ->title('Store Created!')
+            ->body("New store '{$record->name}' added to the map")
+            ->success()
+            ->send();
+    }
+}
+```
+
+## Configuration Reference
+
+### JavaScript Architecture
+
+The package uses a two-layer architecture for flexibility:
+
+**LeafletMapCore** (`leaflet-map-core.js`)
+- Core Leaflet functionality (map creation, layers, controls, interactions)
+- Independent of Filament/Livewire - can be used standalone
+- Methods: `init()`, `addLayers()`, `setupEventHandlers()`, `updateMapData()`, etc.
+
+**leaflet-map** (`leaflet-map.js`)
+- Wrapper for Filament/Livewire integration
+- Handles state synchronization for `MapPicker` fields
+- Manages Livewire method calls and event dispatching
+
+This separation allows you to extend core functionality or create custom implementations.
+
+### Customization
 
 #### Custom Styles
 
@@ -1586,7 +1455,6 @@ Execute JavaScript after map initialization:
 public function getAdditionalScripts(): string
 {
     return <<<JS
-        // Additional JavaScript code
         function customFunction() {
             // Your code
         }
@@ -1594,222 +1462,9 @@ public function getAdditionalScripts(): string
 }
 ```
 
-#### Map Options
+### Method Reference
 
-Fine-tune Leaflet behavior:
-
-```php
-public static function getMapOptions(): array
-{
-    return [
-        'scrollWheelZoom' => true,
-        'doubleClickZoom' => true,
-        'dragging' => true,
-        'zoomControl' => false,
-        'attributionControl' => false,
-        'touchZoom' => true,
-        'boxZoom' => true,
-        'keyboard' => true,
-    ];
-}
-```
-
-Notes:
-
-- Please, keep the `zoomControl` and `attributionControl` set as `false`. It is managed in the [Map Controls](#map-controls) section.
-
-### Multi-Language Support
-
-The package includes built-in support for multiple languages including:
-
-- English (en)
-- Portuguese (pt_BR, pt_PT)
-- Spanish (es)
-- French (fr)
-- German (de)
-- Italian (it)
-
-All draw control labels, tooltips, and messages are automatically translated based on your application's locale. The package uses Laravel's translation system, so you can customize translations in your `resources/lang` directory:
-
-```
-resources/lang/
-├── en/
-│   └── filament-leaflet.php
-├── pt_BR/
-│   └── filament-leaflet.php
-├── de/
-│   └── filament-leaflet.php
-└── ...
-```
-
-To customize translations, publish the language files:
-
-```bash
-php artisan vendor:publish --tag=filament-leaflet-translations
-```
-
-Then edit the translation files in `public/vendor/filament-leaflet/lang`.
-
-#### Complete Example
-
-Here's a comprehensive example combining multiple features:
-
-```php
-namespace App\Filament\Widgets;
-
-use App\Models\Store;
-use EduardoRibeiroDev\FilamentLeaflet\Widgets\MapWidget;
-use EduardoRibeiroDev\FilamentLeaflet\Support\Markers\Marker;
-use EduardoRibeiroDev\FilamentLeaflet\Support\Groups\MarkerCluster;
-use EduardoRibeiroDev\FilamentLeaflet\Support\Shapes\Circle;
-use EduardoRibeiroDev\FilamentLeaflet\Support\Shapes\Polygon;
-use EduardoRibeiroDev\FilamentLeaflet\Enums\Color;
-use EduardoRibeiroDev\FilamentLeaflet\Enums\TileLayer;
-use Filament\Notifications\Notification;
-
-class StoreMapWidget extends MapWidget
-{
-    protected static ?string $heading = 'Store Network';
-    protected static array $mapCenter = [-23.5505, -46.6333];
-    protected static int $defaultZoom = 11;
-    protected static int $mapHeight = 700;
-    
-    protected static array $tileLayersUrl = [
-        'Street' => TileLayer::OpenStreetMap,
-        'Satellite' => TileLayer::GoogleSatellite,
-    ];
-    
-    // Enable marker creation
-    protected static ?string $markerModel = Store::class;
-    protected static string $latitudeColumnName = 'latitude';
-    protected static string $longitudeColumnName = 'longitude';
-    
-    protected function getMarkers(): array
-    {
-        return [
-            // Clustered stores
-            MarkerCluster::fromModel(
-                model: Store::class,
-                latColumn: 'latitude',
-                lngColumn: 'longitude',
-                titleColumn: 'name',
-                descriptionColumn: 'description',
-                popupFieldsColumns: ['address', 'phone', 'manager'],
-                color: Color::Blue,
-                modifyQueryCallback: fn($q) => $q->where('status', 'active'),
-                mapRecordCallback: function (Marker $marker, $record) {
-                    if ($record->is_flagship) {
-                        $marker->gold()->icon('/images/flagship-icon.png');
-                    }
-                    
-                    $marker->action(function (Marker $m, $r) {
-                        Notification::make()
-                            ->title("Store: {$r->name}")
-                            ->success()
-                            ->send();
-                    });
-                }
-            )
-            ->maxClusterRadius(60)
-            ->spiderfyOnMaxZoom(),
-            
-            // Featured location
-            Marker::make(-23.5505, -46.6333)
-                ->title('Headquarters')
-                ->red()
-                ->icon('/images/hq-icon.png', [40, 40])
-                ->popupContent('Our main office')
-                ->popupFields([
-                    'address' => 'Av. Paulista, 1000',
-                    'phone' => '+55 11 1234-5678',
-                    'opening_hours' => 'Mon-Fri: 9AM-6PM',
-                ]),
-        ];
-    }
-    
-    protected function getShapes(): array
-    {
-        return [
-            // Delivery radius
-            Circle::make(-23.5505, -46.6333)
-                ->radiusInKilometers(5)
-                ->blue()
-                ->fillBlue()
-                ->fillOpacity(0.1)
-                ->weight(2)
-                ->dashArray('5, 5')
-                ->popupContent('5km delivery radius'),
-            
-            // Exclusive zone
-            Polygon::make([
-                [-23.5505, -46.6333],
-                [-23.5605, -46.6433],
-                [-23.5705, -46.6333],
-                [-23.5505, -46.6333],
-            ])
-            ->green()
-            ->fillGreen()
-            ->fillOpacity(0.2)
-            ->popupContent('VIP delivery zone')
-            ->action(function () {
-                Notification::make()
-                    ->title('VIP Zone')
-                    ->body('Exclusive delivery area')
-                    ->send();
-            }),
-        ];
-    }
-    
-    protected static function getFormComponents(): array
-    {
-        return [
-            TextInput::make('name')
-                ->required()
-                ->maxLength(255),
-            
-            Select::make('type')
-                ->options([
-                    'retail' => 'Retail Store',
-                    'warehouse' => 'Warehouse',
-                    'office' => 'Office',
-                ])
-                ->required(),
-            
-            Select::make('color')
-                ->options(Color::class),
-            
-            TextInput::make('phone')
-                ->tel(),
-            
-            Textarea::make('description')
-                ->columnSpanFull()
-                ->maxLength(500),
-        ];
-    }
-    
-    protected function afterMarkerCreated(Model $record): void
-    {
-        Notification::make()
-            ->title('Store Created!')
-            ->body("New store '{$record->name}' added to the map")
-            ->success()
-            ->duration(5000)
-            ->send();
-    }
-    
-    public function onMapClick(float $latitude, float $longitude): void
-    {
-        // Custom logic before opening create form
-        logger("Map clicked at: {$latitude}, {$longitude}");
-        
-        parent::onMapClick($latitude, $longitude);
-    }
-}
-```
-
-## API Reference
-
-### MapWidget Methods
+#### MapWidget
 
 | Method | Description |
 |--------|-------------|
@@ -1823,7 +1478,7 @@ class StoreMapWidget extends MapWidget
 | `afterMarkerCreated($record)` | Hook after marker creation |
 | `mutateFormDataBeforeCreate($data)` | Transform form data before save |
 
-### MapPicker Methods
+#### MapPicker
 
 | Method | Description |
 |--------|-------------|
@@ -1841,11 +1496,55 @@ class StoreMapWidget extends MapWidget
 | `longitudeFieldName($name)` | Customize longitude field name |
 | `storeAsJson($bool)` | Store coordinates as JSON in single column |
 | `pickMarker($marker)` | Customize the temporary marker shown on click |
+| `onMapClick($callback)` | Handle map click events with closure callback |
+| `onLayerClick($callback)` | Handle layer click events with closure callback |
 | `handleMapClick($lat, $lng)` | Exposed Livewire method for map clicks |
 | `handleLayerClick($layerId)` | Exposed Livewire method for layer clicks |
 
+#### MapEntry
+
 | Method | Description |
 |--------|-------------|
+| `make($name)` | Create a new MapEntry entry |
+| `center($lat, $lng)` | Set map center coordinates |
+| `zoom($level)` | Set initial zoom level |
+| `height($pixels)` | Set map height |
+| `tileLayersUrl($layers)` | Set tile layer(s) |
+| `markers($array)` | Set initial markers |
+| `shapes($array)` | Set initial shapes |
+| `geoJsonUrl($url)` | Set GeoJSON URL |
+| `geoJsonData($data)` | Set GeoJSON density data |
+| `geoJsonTooltip($tooltip)` | Set GeoJSON tooltip template |
+| `latitudeFieldName($name)` | Customize latitude field name |
+| `longitudeFieldName($name)` | Customize longitude field name |
+| `storeAsJson($bool)` | Store coordinates as JSON in single column |
+| `pickMarker($marker)` | Customize the temporary marker shown on click |
+| `onMapClick($callback)` | Handle map click events with closure callback |
+| `onLayerClick($callback)` | Handle layer click events with closure callback |
+
+#### MapColumn
+
+| Method | Description |
+|--------|-------------|
+| `make($name)` | Create a new MapColumn column |
+| `center($lat, $lng)` | Set map center coordinates |
+| `zoom($level)` | Set initial zoom level |
+| `height($pixels)` | Set map height |
+| `circular($value)` | Display map as circular container |
+| `tileLayersUrl($layers)` | Set tile layer(s) |
+| `markers($array)` | Set initial markers |
+| `shapes($array)` | Set initial shapes |
+| `geoJsonUrl($url)` | Set GeoJSON URL |
+| `geoJsonData($data)` | Set GeoJSON density data |
+| `geoJsonTooltip($tooltip)` | Set GeoJSON tooltip template |
+| `latitudeFieldName($name)` | Customize latitude field name |
+| `longitudeFieldName($name)` | Customize longitude field name |
+| `storeAsJson($bool)` | Store coordinates as JSON in single column |
+| `pickMarker($marker)` | Customize the temporary marker shown on click |
+| `onMapClick($callback)` | Handle map click events with closure callback |
+| `onLayerClick($callback)` | Handle layer click events with closure callback |
+
+#### Marker
 | `make($lat, $lng)` | Create a new marker |
 | `fromRecord()` | Create marker from Eloquent model |
 | `id($id)` | Set marker ID |
@@ -1861,7 +1560,7 @@ class StoreMapWidget extends MapWidget
 | `distanceTo($marker)` | Calculate distance to another marker |
 | `validate()` | Validate coordinates |
 
-### Shape Methods (All Shapes)
+#### Shape (All Shapes)
 
 | Method | Description |
 |--------|-------------|
@@ -1879,7 +1578,7 @@ class StoreMapWidget extends MapWidget
 | `group($group)` | Assign to group (string or BaseLayerGroup) |
 | `getCoordinates()` | Get center coordinates of the shape |
 
-### Circle Specific Methods
+#### Circle
 
 | Method | Description |
 |--------|-------------|
@@ -1890,34 +1589,34 @@ class StoreMapWidget extends MapWidget
 | `radiusInMiles($miles)` | Set radius in miles |
 | `radiusInFeet($feet)` | Set radius in feet |
 
-### CircleMarker Specific Methods
+#### CircleMarker
 
 | Method | Description |
 |--------|-------------|
 | `make($lat, $lng)` | Create circle marker |
 | `radius($pixels)` | Set radius in pixels |
 
-### Polygon/Polyline Specific Methods
+#### Polygon & Polyline
 
 | Method | Description |
 |--------|-------------|
 | `make($coordinates)` | Create with coordinates |
 | `addPoint($lat, $lng)` | Add vertex/point |
 
-### Polyline Specific Methods
+#### Polyline
 
 | Method | Description |
 |--------|-------------|
 | `smoothFactor($factor)` | Set line smoothing |
 
-### Rectangle Specific Methods
+#### Rectangle
 
 | Method | Description |
 |--------|-------------|
 | `make($corner1, $corner2)` | Create with corners |
 | `makeFromCoordinates($lat1, $lng1, $lat2, $lng2)` | Create with coordinates |
 
-### BaseLayerGroup Methods (All Layer Groups)
+#### Layer Group (Base)
 
 | Method | Description |
 |--------|-------------|
@@ -1928,7 +1627,7 @@ class StoreMapWidget extends MapWidget
 | `options($array)` | Set multiple group options |
 | `getLayers()` | Get all layers in the group |
 
-### LayerGroup Methods
+#### LayerGroup
 
 | Method | Description |
 |--------|-------------|
@@ -1937,7 +1636,7 @@ class StoreMapWidget extends MapWidget
 | `id($id)` | Set group ID for controls |
 | `editable($bool)` | Make all layers in group editable |
 
-### FeatureGroup Methods
+#### FeatureGroup
 
 | Method | Description |
 |--------|-------------|
@@ -1949,7 +1648,7 @@ class StoreMapWidget extends MapWidget
 | `weight($pixels)` | Set border width |
 | `editable($bool)` | Make all layers in group editable |
 
-### MarkerCluster Methods
+#### MarkerCluster
 
 | Method | Description |
 |--------|-------------|
@@ -1993,162 +1692,6 @@ Available colors for markers and shapes:
 | `getExpirationTime()` | Returns DateTime for temporary URL expiration (default: null = permanent) |
 | `getGeoJsonUrl()` | Returns the accessible URL for the GeoJSON file |
 
-## Best Practices
-
-### Performance Optimization
-
-1. **Use Marker Clusters** for large datasets:
-```php
-// Bad: 1000 individual markers
-protected function getMarkers(): array
-{
-    return Store::all()->map(fn($s) => Marker::fromRecord($s))->toArray();
-}
-
-// Good: Clustered markers
-protected function getMarkers(): array
-{
-    return [
-        MarkerCluster::fromModel(Store::class)
-            ->maxClusterRadius(80)
-    ];
-}
-```
-
-2. **Limit data** with query modifications:
-```php
-MarkerCluster::fromModel(
-    model: Store::class,
-    modifyQueryCallback: fn($q) => $q->limit(100)->latest()
-)
-```
-
-3. **Use appropriate zoom levels**:
-```php
-protected static int $defaultZoom = 12; // City level
-protected static int $maxZoom = 18;     // Street level
-protected static int $minZoom = 3;      // Country level
-```
-
-### User Experience
-
-1. **Provide context** with popups:
-```php
-Marker::make($lat, $lng)
-    ->title('Store Name')
-    ->popupContent('Visit our location')
-    ->popupFields([
-        'address' => '123 Main St',
-        'hours' => '9AM-6PM',
-        'phone' => '+55 11 1234-5678',
-    ]);
-```
-
-2. **Use appropriate colors**:
-```php
-// Status-based coloring
-$marker->color(match($store->status) {
-    'open' => Color::Green,
-    'busy' => Color::Orange,
-    'closed' => Color::Red,
-    default => Color::Grey,
-});
-```
-
-3. **Add visual feedback**:
-```php
-Circle::make($lat, $lng)
-    ->radiusInKilometers(5)
-    ->blue()
-    ->fillBlue()
-    ->onMouseOver("this.setStyle({fillOpacity: 0.6})")
-    ->onMouseOut("this.setStyle({fillOpacity: 0.3})")
-    ->fillOpacity(0.1)  // Subtle fill
-    ->dashArray('5, 5'); // Dashed border
-```
-
-### Code Organization
-
-1. **Extract complex logic**:
-```php
-protected function getMarkers(): array
-{
-    return [
-        $this->getStoreMarkers(),
-        $this->getWarehouseMarkers(),
-    ];
-}
-
-private function getStoreMarkers(): MarkerCluster
-{
-    return MarkerCluster::fromModel(Store::class)
-        ->blue()
-        ->mapRecordUsing($this->configureStoreMarker(...));
-}
-
-private function configureStoreMarker(Marker $marker, Model $store): void
-{
-    if ($store->is_flagship) {
-        $marker->gold()->icon('/images/flagship.png');
-    }
-    
-    $marker->popupFields($store->only(['address', 'phone']));
-}
-```
-
-2. **Use dedicated widget classes**:
-```php
-// Good structure
-app/Filament/Widgets/
-├── Maps/
-│   ├── StoreMapWidget.php
-│   ├── DeliveryMapWidget.php
-│   └── AnalyticsMapWidget.php
-```
-
-### Debugging
-
-Enable logging for map interactions:
-
-```php
-public function onLayerClick(string $layerId): void
-{
-    logger("Layer clicked: {$layerId}");
-    parent::onLayerClick($layerId);
-}
-
-public function onMapClick(float $latitude, float $longitude): void
-{
-    logger("Map clicked", compact('latitude', 'longitude'));
-    parent::onMapClick($latitude, $longitude);
-}
-```
-
-### Enabling Draw Control
-
-The draw control is disabled by default for better performance. To enable it:
-
-```php
-class MyMapWidget extends MapWidget
-{
-    protected static bool $hasDrawControl = true;
-    
-    protected function getMarkers(): array
-    {
-        return [
-            // Your markers...
-        ];
-    }
-}
-```
-
-Once enabled, users can:
-- Draw new markers, shapes (circles, polygons, polylines, rectangles)
-- Edit existing editable layers
-- Delete layers by clicking the delete tool
-
-Note: Only layers marked with `->editable()` can be edited on the map.
-
 ## Troubleshooting
 
 ### Markers not appearing
@@ -2160,13 +1703,13 @@ Marker::make($lat, $lng)->validate(); // Throws exception if invalid
 
 2. Verify zoom level:
 ```php
-protected static int $defaultZoom = 12; // Try different values
+protected int $defaultZoom = 12; // Try different values
 ```
 
 3. Check marker is in bounds:
 ```php
 // Ensure coordinates are visible in your map center/zoom
-protected static array $mapCenter = [$your_marker_lat, $your_marker_lng];
+protected array $mapCenter = [$your_marker_lat, $your_marker_lng];
 ```
 
 ### Popups not showing
@@ -2195,13 +1738,13 @@ MarkerCluster::make($markers)
 
 1. Verify model is set:
 ```php
-protected static ?string $markerModel = YourModel::class;
+protected ?string $markerModel = YourModel::class;
 ```
 
 2. Check column names match:
 ```php
-protected static string $latitudeColumnName = 'latitude'; // Must match DB
-protected static string $longitudeColumnName = 'longitude';
+protected string $latitudeColumnName = 'latitude'; // Must match DB
+protected string $longitudeColumnName = 'longitude';
 ```
 
 ## License

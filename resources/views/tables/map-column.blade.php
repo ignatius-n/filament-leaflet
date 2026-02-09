@@ -15,7 +15,7 @@
     @if ($isCircular)
         @push('styles')
             <style>
-                .leaflet-container {
+                .fi-ta-col .leaflet-container {
                     border-radius: 50%;
                 }
             </style>

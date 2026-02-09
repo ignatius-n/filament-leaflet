@@ -24,15 +24,15 @@ document.addEventListener('livewire:init', () => {
 
                 const state = this.config.state.state;
                 return {
-                    lat: state ? state[this.config.state.latitudeFieldName] : 0,
-                    lng: state ? state[this.config.state.longitudeFieldName] : 0
+                    lat: state ? state[this.config.state.latitudeFieldName] : this.config.defaultCoord[0],
+                    lng: state ? state[this.config.state.longitudeFieldName] : this.config.defaultCoord[1]
                 }
             },
 
             /**
              * Update the pick marker position
              */
-            updatePickMarker(lat, lng) {
+            setupPickMarker(lat, lng) {
                 if (this.pickMarker) {
                     Alpine.raw(this.pickMarker).removeFrom(Alpine.raw(this.mapCore.map));
                 }
@@ -53,11 +53,26 @@ document.addEventListener('livewire:init', () => {
                 const callbacks = {
                     onMapLoad: () => {
                         const coords = this.getState();
-                        this.updatePickMarker(coords.lat, coords.lng);
-                    }
+                        this.setupPickMarker(coords.lat, coords.lng);
+                    },
+
+                    onMapClick: (lat, lng) => {
+                        this.callColumnMethod('handleMapClick', { latitude: lat, longitude: lng });
+                    },
+
+                    onLayerClick: (layerId) => {
+                        this.callColumnMethod('handleLayerClick', { layerId: layerId });
+                    },
                 };
 
                 this.mapCore.setupEventHandlers(callbacks);
+            },
+
+            /**
+             * Call a method on the Livewire component for this column
+             */
+            callColumnMethod(name, parameters) {
+                this.$wire.callTableColumnMethod(config.state.name, config.state.recordKey, name, parameters);
             }
         }
     }

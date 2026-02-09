@@ -29,7 +29,7 @@ export default defineConfig({
                     dest: 'images'
                 },
                 {
-                    src: 'images/*.png',
+                    src: 'resources/images/*.png',
                     dest: 'images'
                 },
             ]

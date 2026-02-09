@@ -11,6 +11,7 @@ class MapColumn extends Column
 {
     use HasMapState {
         getMapHeight as getParentMapHeight;
+        getMapCenter as getParentMapCenter;
     }
 
     protected string $view = 'filament-leaflet::tables.map-column';
@@ -40,13 +41,11 @@ class MapColumn extends Column
 
     protected function getMapCenter(): array
     {
-        $state = $this->getState();
+        $center = $this->getParentMapCenter();
         $pickMarkerSize = $this->pickMarker->getIconSize();
 
-        return [
-            $state[$this->latitudeFieldName] + $pickMarkerSize[1] / 45, // compensa a altura do ícone do $pickMarker
-            $state[$this->longitudeFieldName]
-        ];
+        $center[0] += $pickMarkerSize[1] / 45; // compensa a altura do ícone do $pickMarker
+        return $center;
     }
 
     public function getState(): mixed
@@ -78,8 +77,8 @@ class MapColumn extends Column
 
     protected function getMapHeight(): int
     {
-        $parentWidth = $this->evaluate($this->width);
-        $parentHeight = $this->getParentMapHeight() + 10; // por algum motivo para a proporção 1:1 a largura precisa ser 10px maior que a altura
+        $parentWidth = $this->evaluate($this->width) - 10; // por algum motivo para a proporção 1:1 a largura precisa ser 10px maior que a altura
+        $parentHeight = $this->getParentMapHeight();
 
         if ($this->isCircular && $parentWidth < $parentHeight) {
             $this->height($parentWidth);

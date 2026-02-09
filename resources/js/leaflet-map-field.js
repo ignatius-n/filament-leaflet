@@ -25,8 +25,8 @@ document.addEventListener('livewire:init', () => {
 
                 const state = this.$wire.get(this.config.state.statePath);
                 return {
-                    lat: state ? state[this.config.state.latitudeFieldName] : 0,
-                    lng: state ? state[this.config.state.longitudeFieldName] : 0
+                    lat: state ? state[this.config.state.latitudeFieldName] : this.config.defaultCoord[0],
+                    lng: state ? state[this.config.state.longitudeFieldName] : this.config.defaultCoord[1]
                 }
             },
 
@@ -88,27 +88,22 @@ document.addEventListener('livewire:init', () => {
                             this.setState(lat, lng);
                         }
 
-                        // Notify the field component
-                        this.$wire.callSchemaComponentMethod(
-                            this.config.state.statePath,
-                            'handleMapClick',
-                            {
-                                latitude: lat,
-                                longitude: lng
-                            }
-                        );
+                        this.callFieldMethod('handleMapClick', { latitude: lat, longitude: lng });
                     },
 
                     onLayerClick: (layerId) => {
-                        this.$wire.callSchemaComponentMethod(
-                            this.config.state.statePath,
-                            'handleLayerClick',
-                            { layerId: layerId }
-                        );
+                        this.callFieldMethod('handleLayerClick', { layerId: layerId });
                     },
                 };
 
                 this.mapCore.setupEventHandlers(callbacks);
+            },
+
+            /**
+             * Call a method on the Livewire component for this field
+             */
+            callFieldMethod(name, parameters) {
+                this.$wire.callSchemaComponentMethod(config.state.key, name, parameters);
             }
         }
     }

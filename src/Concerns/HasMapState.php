@@ -19,10 +19,14 @@ trait HasMapState
     protected ?string $geoJsonTooltip = null;
     protected array $markers = [];
     protected array $shapes = [];
+
     protected ?string $latitudeFieldName = 'latitude';
     protected ?string $longitudeFieldName = 'longitude';
     protected bool $storeAsJson = false;
+
     protected ?Marker $pickMarker = null;
+    protected ?Closure $onMapClickCallback = null;
+    protected ?Closure $onLayerClickCallback = null;
 
     public function center(float|array|Closure $latitudeOrCoordinates, float|Closure $longitude): static
     {
@@ -189,6 +193,20 @@ trait HasMapState
         return $this;
     }
 
+    public function onMapClick(?Closure $callback): static
+    {
+        $this->onMapClickCallback = $callback;
+
+        return $this;
+    }
+
+    public function onLayerClick(?Closure $callback): static
+    {
+        $this->onLayerClickCallback = $callback;
+
+        return $this;
+    }
+
     /** ---------- GETTERS ---------- */
 
     function getPickMarkerData(): array
@@ -206,6 +224,20 @@ trait HasMapState
         }
 
         return $pickMarker->toArray();
+    }
+
+    protected function getMapCenter(): array
+    {
+        $state = $this->getState();
+
+        if (!$state) {
+            return $this->mapCenter;
+        }
+        
+        return [
+            $state[$this->latitudeFieldName],
+            $state[$this->longitudeFieldName]
+        ];
     }
 
     protected function getMarkers(): array
@@ -242,15 +274,47 @@ trait HasMapState
     }
 
     #[ExposedLivewireMethod]
-    public function handleMapClick(float $latitude, float $longitude): void {}
+    public function handleMapClick(float $latitude, float $longitude): void
+    {
+        $this->evaluate($this->onMapClickCallback, [
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'coordinates' => [$latitude, $longitude]
+        ]);
+    }
 
     #[ExposedLivewireMethod]
-    public function handleLayerClick(string $layerId): void {}
+    public function handleLayerClick(string $layerId): void
+    {
+        $layer = $this->getLayerById($layerId);
+
+        $this->evaluate($this->onLayerClickCallback, [
+            'layer' => $layer
+        ]);
+    }
 
     public function getStatePath(bool $isAbsolute = true): ?string
     {
         if (method_exists(parent::class, 'getStatePath')) {
             return parent::getStatePath($isAbsolute);
+        }
+
+        return null;
+    }
+
+    public function getKey(bool $isAbsolute = true): ?string
+    {
+        if (method_exists(parent::class, 'getKey')) {
+            return parent::getKey($isAbsolute);
+        }
+
+        return null;
+    }
+
+    public function getRecordKey(): ?string
+    {
+        if (($record = $this->getRecord())) {
+            return $record->getKey();
         }
 
         return null;
@@ -264,7 +328,10 @@ trait HasMapState
             'longitudeFieldName' => $this->longitudeFieldName,
             'statePath'          => $this->getStatePath(),
             'state'              => $this->getState(),
-            'disabled'           => $this->isDisabled()
+            'name'               => $this->getName(),
+            'recordKey'          => $this->getRecordKey(),
+            'disabled'           => $this->isDisabled(),
+            'key'                => $this->getKey(),
         ];
     }
 

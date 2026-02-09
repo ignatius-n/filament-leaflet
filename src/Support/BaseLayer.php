@@ -7,6 +7,7 @@ use Filament\Support\Concerns\EvaluatesClosures;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 
@@ -163,16 +164,20 @@ abstract class BaseLayer implements Arrayable, Jsonable
     /**
      * Define opções adicionais para o popup.
      */
-    public function popupFields(array $fields): static
+    public function popupFields(array|Collection $fields): static
     {
-        $fields = collect($fields)
-            ->mapWithKeys(fn($value, $key) => [
-                __(str($key)->title()->replace('_', ' ')->toString()) => __($value)
-            ])->toArray();
+        $collectedFields = is_array($fields) ? collect($fields) : $fields;
+
+        $mappedFields = $collectedFields->mapWithKeys(function($value, $key) {
+            $label = str($key)->replace(['-', '_'], ' ')->title()->toString();
+            $content = (string) $value;
+            
+            return [__($label) => __($content) ?: '--'];
+        })->toArray();
 
         $this->popupData['fields'] = array_merge(
             $this->popupData['fields'] ?? [],
-            $fields
+            $mappedFields
         );
 
         return $this;
