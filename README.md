@@ -59,12 +59,9 @@ This will publish the Leaflet assets used by the package — the distribution no
 - [User Interactions](#user-interactions)
 - [Advanced Features](#advanced-features)
 - [Best Practices](#best-practices)
-- [Real-World Example](#real-world-example)
 - [Configuration Reference](#configuration-reference)
-  - [Map Interaction Control](#map-interaction-control)
   - [Method Reference](#method-reference)
   - [Concern Methods Reference](#map-configuration-properties--concern-methods-reference)
-- [Troubleshooting](#troubleshooting)
 
 ## Core Components
 
@@ -331,7 +328,6 @@ MapEntry::make('location')
 **Auto-recenter:** Maps automatically recenter after 3 seconds when users pan around. This provides a guided viewing experience while allowing temporary exploration:
 
 ```php
-MapEntry::make('location')
     ->recenterTimeout(5000)  // Recenter after 5 seconds (null to disable)
 ```
 
@@ -1177,47 +1173,6 @@ protected int $maxZoom = 18;      // Street level
 protected int $minZoom = 3;       // Country level
 ```
 
-### User Experience
-
-1. **Provide context** with popups:
-```php
-Marker::make($lat, $lng)
-    ->title('Store Name')
-    ->popupContent('Visit our location')
-    ->popupFields([
-        'address' => '123 Main St',
-        'hours' => '9AM-6PM',
-    ]);
-```
-
-2. **Use status-based coloring**:
-```php
-$marker->color(match($store->status) {
-    'open' => Color::Green,
-    'busy' => Color::Orange,
-    'closed' => Color::Red,
-    default => Color::Grey,
-});
-```
-
-3. **Extract complex logic**:
-```php
-protected function getMarkers(): array
-{
-    return [
-        $this->getStoreMarkers(),
-        $this->getWarehouseMarkers(),
-    ];
-}
-
-private function getStoreMarkers(): MarkerCluster
-{
-    return MarkerCluster::fromModel(Store::class)
-        ->blue()
-        ->mapRecordUsing($this->configureStoreMarker(...));
-}
-```
-
 ### Debugging
 
 Enable logging for map interactions:
@@ -1229,150 +1184,7 @@ public function handleMapClick(float $latitude, float $longitude): void
 }
 ```
 
-## Real-World Example
-
-Here's a comprehensive example combining multiple features:
-
-```php
-namespace App\Filament\Widgets;
-
-use App\Models\Store;
-use EduardoRibeiroDev\FilamentLeaflet\Widgets\MapWidget;
-use EduardoRibeiroDev\FilamentLeaflet\Support\Markers\Marker;
-use EduardoRibeiroDev\FilamentLeaflet\Support\Groups\MarkerCluster;
-use EduardoRibeiroDev\FilamentLeaflet\Support\Shapes\Circle;
-use EduardoRibeiroDev\FilamentLeaflet\Support\Shapes\Polygon;
-use EduardoRibeiroDev\FilamentLeaflet\Enums\Color;
-use EduardoRibeiroDev\FilamentLeaflet\Enums\TileLayer;
-use Filament\Notifications\Notification;
-
-class StoreMapWidget extends MapWidget
-{
-    protected ?string $heading = 'Store Network';
-    protected array $mapCenter = [-23.5505, -46.6333];
-    protected int $defaultZoom = 11;
-    protected int $mapHeight = 700;
-    
-    protected array $tileLayersUrl = [
-        'Street' => TileLayer::OpenStreetMap,
-        'Satellite' => TileLayer::GoogleSatellite,
-    ];
-    
-    protected ?string $markerModel = Store::class;
-    protected string $latitudeColumnName = 'latitude';
-    protected string $longitudeColumnName = 'longitude';
-    
-    protected function getMarkers(): array
-    {
-        return [
-            MarkerCluster::fromModel(
-                model: Store::class,
-                latColumn: 'latitude',
-                lngColumn: 'longitude',
-                titleColumn: 'name',
-                descriptionColumn: 'description',
-                popupFieldsColumns: ['address', 'phone', 'manager'],
-                color: Color::Blue,
-                modifyQueryCallback: fn($q) => $q->where('status', 'active'),
-                mapRecordCallback: function (Marker $marker, $record) {
-                    if ($record->is_flagship) {
-                        $marker->gold()->icon('/images/flagship-icon.png');
-                    }
-                    
-                    $marker->action(function (Marker $m, $r) {
-                        Notification::make()
-                            ->title("Store: {$r->name}")
-                            ->success()
-                            ->send();
-                    });
-                }
-            )
-            ->maxClusterRadius(60)
-            ->spiderfyOnMaxZoom(),
-            
-            Marker::make(-23.5505, -46.6333)
-                ->title('Headquarters')
-                ->red()
-                ->icon('/images/hq-icon.png', [40, 40])
-                ->popupContent('Our main office')
-                ->popupFields([
-                    'address' => 'Av. Paulista, 1000',
-                    'phone' => '+55 11 1234-5678',
-                ]),
-        ];
-    }
-    
-    protected function getShapes(): array
-    {
-        return [
-            Circle::make(-23.5505, -46.6333)
-                ->radiusInKilometers(5)
-                ->blue()
-                ->fillBlue()
-                ->fillOpacity(0.1)
-                ->weight(2)
-                ->popupContent('5km delivery radius'),
-            
-            Polygon::make([
-                [-23.5505, -46.6333],
-                [-23.5605, -46.6433],
-                [-23.5705, -46.6333],
-                [-23.5505, -46.6333],
-            ])
-            ->green()
-            ->fillGreen()
-            ->fillOpacity(0.2)
-            ->popupContent('VIP delivery zone'),
-        ];
-    }
-    
-    protected function getFormComponents(): array
-    {
-        return [
-            TextInput::make('name')->required()->maxLength(255),
-            Select::make('type')->options([
-                'retail' => 'Retail Store',
-                'warehouse' => 'Warehouse',
-                'office' => 'Office',
-            ])->required(),
-            Select::make('color')->options(Color::class),
-            TextInput::make('phone')->tel(),
-            Textarea::make('description')->columnSpanFull()->maxLength(500),
-        ];
-    }
-    
-    protected function afterMarkerCreated(Model $record): void
-    {
-        Notification::make()
-            ->title('Store Created!')
-            ->body("New store '{$record->name}' added to the map")
-            ->success()
-            ->send();
-    }
-}
-```
-
 ## Configuration Reference
-
-### Map Interaction Configuration
-
-Control how users interact with maps at a granular level:
-
-```php
-// Disable all user interactions (read-only maps)
-MapEntry::make('location')
-    ->static()  // Shorthand - disables both dragging and zooming
-
-// Or individually
-MapPicker::make('location')
-    ->mapDraggable(false)           // Prevent map panning
-    ->mapZoomable(true);            // Allow zoom only
-
-// Auto-recenter after user explores
-MapColumn::make('location')
-    ->recenterTimeout(3000)         // Recenter after 3 seconds of inactivity
-    ->center(-23.5505, -46.6333)   // Default center position
-```
 
 ### Customization
 
@@ -1505,6 +1317,8 @@ public function getAdditionalScripts(): string
 | `onLayerClick($callback)` | Handle layer click events with closure callback |
 
 #### Marker
+| Method | Description |
+|--------|-------------|
 | `make($lat, $lng)` | Create a new marker |
 | `fromRecord()` | Create marker from Eloquent model |
 | `id($id)` | Set marker ID |
