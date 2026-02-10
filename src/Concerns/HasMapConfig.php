@@ -14,7 +14,7 @@ trait HasMapConfig
     // Configurações padrão do mapa
     protected array $mapCenter = [-14.235, -51.9253]; // Centro do Brasil
     protected int $defaultZoom = 4;
-    protected int $mapHeight = 504;
+    protected int $mapHeight = 598;
     protected ?int $recenterMapTimeout = null;
     protected bool $mapDraggable = true;
     protected bool $mapZoomable = true;
@@ -25,7 +25,20 @@ trait HasMapConfig
     protected bool $hasSearchControl = false;
     protected bool $hasScaleControl = false;
     protected bool $hasZoomControl = true;
-    protected bool $hasDrawControl = false;
+
+    // Controles do Geoman
+    protected bool $hasDrawMarkerControl = false;
+    protected bool $hasDrawCircleMarkerControl = false;
+    protected bool $hasDrawCircleControl = false;
+    protected bool $hasDrawPolylineControl = false;
+    protected bool $hasDrawRectangleControl = false;
+    protected bool $hasDrawPolygonControl = false;
+    protected bool $hasDrawTextControl = false;
+    protected bool $hasEditLayersControl = false;
+    protected bool $hasDragLayersControl = false;
+    protected bool $hasRemoveLayersControl = false;
+    protected bool $hasRotateLayersControl = false;
+    protected bool $hasCutPolygonControl = false;
 
     protected int $maxZoom = 18;
     protected int $minZoom = 2;
@@ -71,7 +84,7 @@ trait HasMapConfig
     {
         return $this->mapHeight;
     }
-    
+
     /**
      * Define se o mapa pode ser arrastado.
      */
@@ -113,7 +126,7 @@ trait HasMapConfig
     }
 
     /**
-     * Define se o controle de zoom deve ser exibido.
+     * Define se o controle de escala deve ser exibido.
      */
     protected function hasScaleControl(): bool
     {
@@ -129,11 +142,99 @@ trait HasMapConfig
     }
 
     /**
-     * Define se o controle de desenho deve ser exibido.
+     * Define se o controle de desenhar marcadores deve ser exibido.
      */
-    protected function hasDrawControl(): bool
+    protected function hasDrawMarkerControl(): bool
     {
-        return $this->hasDrawControl;
+        return $this->hasDrawMarkerControl;
+    }
+
+    /**
+     * Define se o controle de desenhar marcadores de círculo deve ser exibido.
+     */
+    protected function hasDrawCircleMarkerControl(): bool
+    {
+        return $this->hasDrawCircleMarkerControl;
+    }
+
+    /**
+     * Define se o controle de desenhar círculos deve ser exibido.
+     */
+    protected function hasDrawCircleControl(): bool
+    {
+        return $this->hasDrawCircleControl;
+    }
+
+    /**
+     * Define se o controle de desenhar polilinhas deve ser exibido.
+     */
+    protected function hasDrawPolylineControl(): bool
+    {
+        return $this->hasDrawPolylineControl;
+    }
+
+    /**
+     * Define se o controle de desenhar retângulos deve ser exibido.
+     */
+    protected function hasDrawRectangleControl(): bool
+    {
+        return $this->hasDrawRectangleControl;
+    }
+
+    /**
+     * Define se o controle de desenhar polígonos deve ser exibido.
+     */
+    protected function hasDrawPolygonControl(): bool
+    {
+        return $this->hasDrawPolygonControl;
+    }
+
+    /**
+     * Define se o controle de desenhar texto deve ser exibido.
+     */
+    protected function hasDrawTextControl(): bool
+    {
+        return $this->hasDrawTextControl;
+    }
+
+    /**
+     * Define se o modo de edição deve ser habilitado.
+     */
+    protected function hasEditLayersControl(): bool
+    {
+        return $this->hasEditLayersControl;
+    }
+
+    /**
+     * Define se o modo de arrastar deve ser habilitado.
+     */
+    protected function hasDragLayersControl(): bool
+    {
+        return $this->hasDragLayersControl;
+    }
+
+    /**
+     * Define se o modo de remover deve ser habilitado.
+     */
+    protected function hasRemoveLayersControl(): bool
+    {
+        return $this->hasRemoveLayersControl;
+    }
+
+    /**
+     * Define se o modo de rotação deve ser habilitado.
+     */
+    protected function hasRotateLayersControl(): bool
+    {
+        return $this->hasRotateLayersControl;
+    }
+
+    /**
+     * Define se o controle de cortar polígonos deve ser exibido.
+     */
+    protected function hasCutPolygonControl(): bool
+    {
+        return $this->hasCutPolygonControl;
     }
 
     /**
@@ -187,9 +288,30 @@ trait HasMapConfig
             'attributionControl' => $this->hasAttributionControl(),
             'scaleControl'       => $this->hasScaleControl(),
             'zoomControl'        => $this->hasZoomControl(),
-            'drawControl'        => $this->hasDrawControl(),
+            'drawControls'       => $this->getDrawControls(),
             'fullscreenControl'  => $this->hasFullscreenControl(),
             'searchControl'      => $this->hasSearchControl(),
+        ];
+    }
+
+    /**
+     * Retorna as configurações dos controles de desenho do Geoman.
+     */
+    protected function getDrawControls(): array
+    {
+        return [
+            'drawMarker'       => $this->hasDrawMarkerControl(),
+            'drawCircleMarker' => $this->hasDrawCircleMarkerControl(),
+            'drawCircle'       => $this->hasDrawCircleControl(),
+            'drawPolyline'     => $this->hasDrawPolylineControl(),
+            'drawRectangle'    => $this->hasDrawRectangleControl(),
+            'drawPolygon'      => $this->hasDrawPolygonControl(),
+            'drawText'         => $this->hasDrawTextControl(),
+            'editMode'         => $this->hasEditLayersControl(),
+            'dragMode'         => $this->hasDragLayersControl(),
+            'removalMode'      => $this->hasRemoveLayersControl(),
+            'rotateMode'       => $this->hasRotateLayersControl(),
+            'cutPolygon'       => $this->hasCutPolygonControl(),
         ];
     }
 

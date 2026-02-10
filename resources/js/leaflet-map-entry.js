@@ -14,6 +14,7 @@ document.addEventListener('livewire:init', () => {
                 this.state = this.getState();
                 this.mapCore.init();
                 this.setupEventHandlers();
+                this.setupPickMarker();
             },
 
             /**
@@ -32,14 +33,16 @@ document.addEventListener('livewire:init', () => {
             /**
              * Update the pick marker position
              */
-            setupPickMarker(lat, lng) {
+            setupPickMarker() {
+                const coords = this.getState();
+
                 if (this.pickMarker) {
                     Alpine.raw(this.pickMarker).removeFrom(Alpine.raw(this.mapCore.map));
                 }
 
                 let markerOptions = this.config.state.pickMarker;
-                markerOptions.lat = lat;
-                markerOptions.lng = lng;
+                markerOptions.lat = coords.lat;
+                markerOptions.lng = coords.lng;
 
                 this.pickMarker = this.mapCore.createMarker(markerOptions);
 
@@ -51,11 +54,6 @@ document.addEventListener('livewire:init', () => {
              */
             setupEventHandlers() {
                 const callbacks = {
-                    onMapLoad: () => {
-                        const coords = this.getState();
-                        this.setupPickMarker(coords.lat, coords.lng);
-                    },
-
                     onMapClick: (lat, lng) => {
                         this.callFieldMethod('handleMapClick', { latitude: lat, longitude: lng });
                     },

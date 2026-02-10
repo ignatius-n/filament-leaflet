@@ -38,7 +38,7 @@ composer require eduardoribeirodev/filament-leaflet
 Publish the assets:
 
 ```bash
-php artisan filament:assets
+php artisan vendor:publish --tag=filament-leaflet
 ```
 
 This will publish the Leaflet assets used by the package — the distribution now includes draw toolbar, marker cluster control, fullscreen control and geosearch toolbar assets.
@@ -109,11 +109,6 @@ class MyMapWidget extends MapWidget
     protected int $defaultZoom = 4;
     protected int $maxZoom = 18;
     protected int $minZoom = 2;
-    
-    // Interaction controls
-    protected bool $mapDraggable = true;
-    protected bool $mapZoomable = true;
-    protected ?int $recenterMapTimeout = null;  // Auto-recenter after X milliseconds
 }
 ```
 
@@ -154,8 +149,20 @@ class MyMapWidget extends MapWidget
     protected bool $hasScaleControl = true;
     protected bool $hasZoomControl = true;
     protected bool $hasFullscreenControl = true;
-    protected bool $hasDrawControl = true;
     protected bool $hasSearchControl = true;
+
+    protected bool $hasDrawMarkerControl = false;
+    protected bool $hasDrawCircleMarkerControl = false;
+    protected bool $hasDrawCircleControl = false;
+    protected bool $hasDrawPolylineControl = false;
+    protected bool $hasDrawRectangleControl = false;
+    protected bool $hasDrawPolygonControl = false;
+    protected bool $hasDrawTextControl = false;
+    protected bool $hasEditLayersControl = false;
+    protected bool $hasDragLayersControl = false;
+    protected bool $hasRemoveLayersControl = false;
+    protected bool $hasRotateLayersControl = false;
+    protected bool $hasCutPolygonControl = false;
 }
 ```
 
@@ -194,6 +201,8 @@ class MyMapWidget extends MapWidget
     ];
 }
 ```
+
+![Widget With Custom Tile Layers Example](images/tile-layers.png)
 
 **Available providers:** `OpenStreetMap`, `GoogleStreets`, `GoogleSatellite`, `GoogleHybrid`, `GoogleTerrain`, `EsriWorldImagery`, `EsriWorldStreetMap`, `EsriNatGeo`, `CartoPositron`, `CartoDarkMatter`
 
@@ -347,9 +356,8 @@ protected function getMarkers(): array
 {
     return [
         Marker::make(-23.5505, -46.6333)->title('Simple marker'),
-        Marker::make(-23.5505, -46.6333)->blue()->title('Colored marker'),
-        Marker::make(-23.5505, -46.6333)->icon('url.png', [32, 32]),
-        Marker::make(-23.5505, -46.6333)->draggable()->editable(),
+        Marker::make(-23.5212, -46.4243)->green()->title('Colored marker'),
+        Marker::make(-23.5266, -46.5412)->icon('https://leafletjs.com/examples/custom-icons/leaf-red.png', [32, 72]),
     ];
 }
 ```
@@ -441,6 +449,8 @@ protected function getMarkers(): array
 }
 ```
 
+![Layer Group Example](images/layer-group.png)
+
 #### Feature Group
 
 Creates a polygon envelope around all layers in the group. This is useful for visualizing the coverage area or boundary of a set of points:
@@ -456,15 +466,17 @@ protected function getMarkers(): array
             Marker::make(-23.5515, -46.6343)->title('Point 2'),
             Marker::make(-23.5525, -46.6323)->title('Point 3'),
         ])
-        ->name('Delivery Zone')
-        ->blue()
-        ->fillBlue()
-        ->fillOpacity(0.2)
-        ->weight(2)
-        ->dashArray('5, 10'),
+            ->name('Delivery Zone')
+            ->blue()
+            ->fillBlue()
+            ->fillOpacity(0.3)
+            ->weight(3)
+            ->dashArray('5, 10'),
     ];
 }
 ```
+
+![Feature Group Example](images/feature-group.png)
 
 #### Marker Cluster
 
@@ -488,6 +500,8 @@ protected function getMarkers(): array
     ];
 }
 ```
+
+![Marker Cluster Example](images/marker-cluster.png)
 
 **Cluster from Model:**
 
@@ -829,7 +843,7 @@ Make markers and shapes editable directly on the map by enabling the draw contro
 ```php
 class MyMapWidget extends MapWidget
 {
-    protected bool $hasDrawControl = true;
+    protected bool $hasEditLayersControl = true;
     
     protected function getMarkers(): array
     {
@@ -1480,7 +1494,18 @@ These properties control core map behavior:
 | `$recenterMapTimeout` | ?int | null | Auto-recenter after X milliseconds of panning |
 | `$maxZoom` | int | 18 | Maximum zoom level allowed |
 | `$minZoom` | int | 2 | Minimum zoom level allowed |
-| `$hasDrawControl` | bool | false | Show draw/edit toolbar |
+| `$hasDrawMarkerControl` | bool | false | Show draw marker control |
+| `$hasDrawCircleMarkerControl` | bool | false | Show draw circle marker toolbar |
+| `$hasDrawCircleControl` | bool | false | Show draw circle toolbar |
+| `$hasDrawPolylineControl` | bool | false | Show draw polyline toolbar |
+| `$hasDrawRectangleControl` | bool | false | Show draw rectangle toolbar |
+| `$hasDrawPolygonControl` | bool | false | Show draw polygon toolbar |
+| `$hasDrawTextControl` | bool | false | Show draw text toolbar |
+| `$hasEditLayersControl` | bool | false | Show edit layers toolbar |
+| `$hasDragLayersControl` | bool | false | Show drag layers toolbar |
+| `$hasRemoveLayersControl` | bool | false | Show remove layers toolbar |
+| `$hasRotateLayersControl` | bool | false | Show rotate layers toolbar |
+| `$hasCutPolygonControl` | bool | false | Show cut polygon toolbar |
 | `$hasFullscreenControl` | bool | false | Show fullscreen button |
 | `$hasSearchControl` | bool | false | Show address search |
 | `$hasScaleControl` | bool | false | Show distance scale |

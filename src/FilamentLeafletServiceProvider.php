@@ -8,6 +8,7 @@ use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Assets\Css;
 use Filament\Support\Assets\Asset;
 use Filament\Support\Assets\Js;
+use Illuminate\Support\Facades\Lang;
 
 class FilamentLeafletServiceProvider extends PackageServiceProvider
 {
@@ -27,7 +28,8 @@ class FilamentLeafletServiceProvider extends PackageServiceProvider
         ], 'filament-leaflet-translations');
 
         FilamentAsset::registerScriptData([
-            'translations' => trans('filament-leaflet::filament-leaflet')
+            'translations' => Lang::get('filament-leaflet::filament-leaflet'),
+            'language' => Lang::getLocale(),
         ]);
 
         FilamentAsset::register(

@@ -377,13 +377,13 @@ abstract class BaseLayer implements Arrayable, Jsonable
     protected function getBaseData(): array
     {
         $data = [
-            'id' => $this->getId(),
-            'type' => $this->getType(),
-            'group' => $this->group instanceof BaseLayerGroup ? $this->group->getId() : $this->group,
-            'clickAction' => isset($this->clickAction),
-            'onMouseOver' => $this->onMouseOverScript,
-            'onMouseOut' => $this->onMouseOutScript,
-            'editable' => $this->isEditable,
+            'id'           => $this->getId(),
+            'type'         => $this->getType(),
+            'group'        => $this->group instanceof BaseLayerGroup ? $this->group->getId() : $this->group,
+            'clickAction'  => isset($this->clickAction),
+            'onMouseOver'  => $this->onMouseOverScript,
+            'onMouseOut'   => $this->onMouseOutScript,
+            'pmIgnore'     => !$this->isEditable,
         ];
 
         if (array_filter($this->tooltipData)) {

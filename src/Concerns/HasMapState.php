@@ -123,9 +123,86 @@ trait HasMapState
         return $this;
     }
 
-    public function drawControl(bool|Closure $enabled = true): static
+    public function drawMarkerControl(bool|Closure $enabled = true): static
     {
-        $this->hasDrawControl = $this->evaluate($enabled);
+        $this->hasDrawMarkerControl = $this->evaluate($enabled);
+
+        return $this;
+    }
+
+    public function drawCircleMarkerControl(bool|Closure $enabled = true): static
+    {
+        $this->hasDrawCircleMarkerControl = $this->evaluate($enabled);
+
+        return $this;
+    }
+
+    public function drawCircleControl(bool|Closure $enabled = true): static
+    {
+        $this->hasDrawCircleControl = $this->evaluate($enabled);
+
+        return $this;
+    }
+
+    public function drawPolylineControl(bool|Closure $enabled = true): static
+    {
+        $this->hasDrawPolylineControl = $this->evaluate($enabled);
+
+        return $this;
+    }
+
+    public function drawRectangleControl(bool|Closure $enabled = true): static
+    {
+        $this->hasDrawRectangleControl = $this->evaluate($enabled);
+
+        return $this;
+    }
+
+    public function drawPolygonControl(bool|Closure $enabled = true): static
+    {
+        $this->hasDrawPolygonControl = $this->evaluate($enabled);
+
+        return $this;
+    }
+
+    public function drawTextControl(bool|Closure $enabled = true): static
+    {
+        $this->hasDrawTextControl = $this->evaluate($enabled);
+
+        return $this;
+    }
+
+    public function editLayersControl(bool|Closure $enabled = true): static
+    {
+        $this->hasEditLayersControl = $this->evaluate($enabled);
+
+        return $this;
+    }
+
+    public function dragLayersControl(bool|Closure $enabled = true): static
+    {
+        $this->hasDragLayersControl = $this->evaluate($enabled);
+
+        return $this;
+    }
+
+    public function removeLayersControl(bool|Closure $enabled = true): static
+    {
+        $this->hasRemoveLayersControl = $this->evaluate($enabled);
+
+        return $this;
+    }
+
+    public function rotateLayersControl(bool|Closure $enabled = true): static
+    {
+        $this->hasRotateLayersControl = $this->evaluate($enabled);
+
+        return $this;
+    }
+
+    public function cutPolygonControl(bool|Closure $enabled = true): static
+    {
+        $this->hasCutPolygonControl = $this->evaluate($enabled);
 
         return $this;
     }
@@ -263,7 +340,7 @@ trait HasMapState
         if (!$state) {
             return $this->mapCenter;
         }
-        
+
         return [
             $state[$this->latitudeFieldName],
             $state[$this->longitudeFieldName]

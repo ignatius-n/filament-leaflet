@@ -130,9 +130,9 @@ abstract class BaseLayerGroup implements Arrayable, Jsonable
     protected function getLayerGroupData(): array
     {
         return [
-            'type' => $this->getType(),
-            'options' => $this->getOptions(),
-            'name' => $this->getName(),
+            'type'     => $this->getType(),
+            'options'  => $this->getOptions(),
+            'name'     => $this->getName(),
         ];
     }
 
