@@ -61,7 +61,7 @@ This will publish the Leaflet assets used by the package — the distribution no
 - [Best Practices](#best-practices)
 - [Configuration Reference](#configuration-reference)
   - [Method Reference](#method-reference)
-  - [Concern Methods Reference](#map-configuration-properties--concern-methods-reference)
+  - [Concern Methods Reference](#concern-methods-reference)
 
 ## Core Components
 
