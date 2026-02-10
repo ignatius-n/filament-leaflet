@@ -15,6 +15,9 @@ trait HasMapConfig
     protected array $mapCenter = [-14.235, -51.9253]; // Centro do Brasil
     protected int $defaultZoom = 4;
     protected int $mapHeight = 504;
+    protected ?int $recenterMapTimeout = null;
+    protected bool $mapDraggable = true;
+    protected bool $mapZoomable = true;
 
     // Configurações de controles
     protected bool $hasAttributionControl = false;
@@ -68,6 +71,22 @@ trait HasMapConfig
     {
         return $this->mapHeight;
     }
+    
+    /**
+     * Define se o mapa pode ser arrastado.
+     */
+    public function getMapDraggable(): bool
+    {
+        return $this->mapDraggable;
+    }
+
+    /**
+     * Define se o mapa pode ser ampliado/reduzido.
+     */
+    public function getMapZoomable(): bool
+    {
+        return $this->mapZoomable;
+    }
 
     /**
      * Define se o controle de atribuição deve ser exibido.
@@ -118,6 +137,14 @@ trait HasMapConfig
     }
 
     /**
+     * Define um timeout para recentralizar o mapa após ele ser descentalizado.
+     */
+    public function getRecenterMapTimeout(): ?int
+    {
+        return $this->recenterMapTimeout;
+    }
+
+    /**
      * Retorna as URLs das camadas de tiles
      */
     protected function getTileLayersUrl(): TileLayer|string|array
@@ -142,11 +169,12 @@ trait HasMapConfig
     protected function getMapOptions(): array
     {
         return [
-            'scrollWheelZoom' => true,
-            'doubleClickZoom' => true,
-            'dragging' => true,
-            'zoomControl' => false,
-            'attributionControl' => false,
+            'zoomControl'        => false, // Definido em getMapControls
+            'attributionControl' => false, // Definido em getMapControls
+            'scrollWheelZoom'    => $this->getMapZoomable(),
+            'doubleClickZoom'    => $this->getMapZoomable(),
+            'dragging'           => $this->getMapDraggable(),
+            'recenterMapTimeout' => $this->getRecenterMapTimeout()
         ];
     }
 
@@ -416,12 +444,14 @@ trait HasMapConfig
             'mapConfig'     => $this->getMapOptions(),
             'mapControls'   => $this->getMapControls(),
             'geoJsonUrl'    => $this->getGeoJsonUrl(),
+            'customStyles'  => $this->getCustomStyles(),
+            'customScripts' => $this->getCustomScripts(),
         ];
     }
 
     // === ACCESSORS ===
 
-    public function getAdditionalScripts(): string
+    public function getCustomScripts(): string
     {
         return '';
     }

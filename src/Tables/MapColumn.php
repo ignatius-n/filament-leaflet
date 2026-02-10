@@ -12,6 +12,7 @@ class MapColumn extends Column
     use HasMapState {
         getMapHeight as getParentMapHeight;
         getMapCenter as getParentMapCenter;
+        getCustomStyles as getParentCustomStyles;
     }
 
     protected string $view = 'filament-leaflet::tables.map-column';
@@ -87,12 +88,25 @@ class MapColumn extends Column
         return $this->getParentMapHeight();
     }
 
+    public function getCustomStyles(): string
+    {
+        $styles = $this->getParentCustomStyles();
+
+        if ($this->isCircular) {
+            $styles .= ".fi-ta-col .leaflet-container { border-radius: 50%; }";
+        }
+
+        return $styles;
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->height(72);
         $this->width(108);
         $this->zoom(5);
+        $this->recenterTimeout(3000);
+        $this->minZoom(0);
         $this->pickMarker(fn(Marker $marker) => $marker->icon(size: [14, 25]));
     }
 }

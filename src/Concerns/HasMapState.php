@@ -51,6 +51,36 @@ trait HasMapState
         return $this;
     }
 
+    public function mapDraggable(bool|Closure $draggable = true): static
+    {
+        $this->mapDraggable = $this->evaluate($draggable);
+
+        return $this;
+    }
+
+    public function mapZoomable(bool|Closure $zoomable = true): static
+    {
+        $this->mapZoomable = $this->evaluate($zoomable);
+
+        return $this;
+    }
+
+    public function static(bool|Closure $isStatic = true): static
+    {
+        $isStatic = $this->evaluate($isStatic);
+        $this->mapDraggable(!$isStatic);
+        $this->mapZoomable(!$isStatic);
+
+        return $this;
+    }
+
+    public function recenterTimeout(null|int|Closure $milliseconds): static
+    {
+        $this->recenterMapTimeout = $this->evaluate($milliseconds);
+
+        return $this;
+    }
+
     public function zoom(int|Closure $zoomLevel): static
     {
         $this->defaultZoom = $this->evaluate($zoomLevel);

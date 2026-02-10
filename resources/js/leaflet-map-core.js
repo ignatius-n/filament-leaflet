@@ -622,6 +622,29 @@ export class LeafletMapCore {
             }
         });
 
+        let onmapMoveTimeout = null;
+        Alpine.raw(this.map).on('moveend', () => {
+            if (!this.config.mapConfig.recenterMapTimeout) {
+                return;
+            }
+
+            clearTimeout(onmapMoveTimeout);
+
+            const mapCenter = this.map.getCenter();
+            const mapZoom = this.map.getZoom();
+            if (
+                Math.abs(mapCenter.lat - this.config.defaultCoord[0]) < 1 &&
+                Math.abs(mapCenter.lng - this.config.defaultCoord[1]) < 1 &&
+                Math.abs(mapZoom - this.config.defaultZoom) < 1
+            ) {
+                return;
+            }
+
+            onmapMoveTimeout = setTimeout(() => {
+                this.map.flyTo(this.config.defaultCoord, this.config.defaultZoom);
+            }, this.config.mapConfig.recenterMapTimeout);
+        })
+
         Alpine.raw(this.map).on('draw:drawstart', () => {
             this.isDrawing = true;
         });

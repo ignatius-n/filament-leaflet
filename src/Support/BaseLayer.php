@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 
@@ -293,7 +294,7 @@ abstract class BaseLayer implements Arrayable, Jsonable
     protected function resolveDefaultClosureDependencyForEvaluationByName(string $parameterName): array
     {
         return match ($parameterName) {
-            'record' => [$this->getRecord()],
+            'record', Str::singular(class_basename($this->getRecord())) => [$this->getRecord()],
             $this->getType(), 'layer' => [$this],
             default => []
         };

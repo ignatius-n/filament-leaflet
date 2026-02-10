@@ -21,16 +21,4 @@
     {{ $this->createMarkerAction->getFormToSubmit() }}
     <x-filament-actions::modals />
 
-    @push('styles')
-        <style>
-            {!! $this->getCustomStyles() !!}
-        </style>
-    @endpush
-
-
-    @push('scripts')
-        <script>
-            {!! $this->getAdditionalScripts() !!}
-        </script>
-    @endpush
 </x-filament-widgets::widget>

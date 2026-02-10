@@ -1,6 +1,5 @@
 @php
     $config = $getMapData();
-    $isCircular = $getIsCircular();
 @endphp
 
 <div 
@@ -12,13 +11,4 @@
         column
     />
 
-    @if ($isCircular)
-        @push('styles')
-            <style>
-                .fi-ta-col .leaflet-container {
-                    border-radius: 50%;
-                }
-            </style>
-        @endpush
-    @endif
 </div>

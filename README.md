@@ -25,6 +25,9 @@ A powerful and elegant Leaflet integration for Filament PHP that makes creating 
 - **Dynamic Icons** - Marker icons with automatic sizing and anchor point calculation
 - **Enhanced Shapes** - Factory methods (`fromRecord()`) for all shape classes
 - **JSON Storage** - Store coordinates as JSON in single database column
+- **Map Interaction Control** - Toggle dragging, zooming, and auto-recenter behavior
+- **Static Maps** - Display read-only maps with automatic interaction disabling
+- **Auto-Recenter** - Automatically recenter maps after users pan around
 
 ## Installation
 
@@ -58,6 +61,9 @@ This will publish the Leaflet assets used by the package — the distribution no
 - [Best Practices](#best-practices)
 - [Real-World Example](#real-world-example)
 - [Configuration Reference](#configuration-reference)
+  - [Map Interaction Control](#map-interaction-control)
+  - [Method Reference](#method-reference)
+  - [Concern Methods Reference](#map-configuration-properties--concern-methods-reference)
 - [Troubleshooting](#troubleshooting)
 
 ## Core Components
@@ -106,7 +112,38 @@ class MyMapWidget extends MapWidget
     protected int $defaultZoom = 4;
     protected int $maxZoom = 18;
     protected int $minZoom = 2;
+    
+    // Interaction controls
+    protected bool $mapDraggable = true;
+    protected bool $mapZoomable = true;
+    protected ?int $recenterMapTimeout = null;  // Auto-recenter after X milliseconds
 }
+```
+
+#### Map Interaction Control
+
+Control how users interact with your map:
+
+```php
+class MyMapWidget extends MapWidget
+{
+    // Allow/prevent dragging
+    protected bool $mapDraggable = true;
+    
+    // Allow/prevent zooming (scroll wheel, pinch)
+    protected bool $mapZoomable = true;
+    
+    // Auto-recenter after user pans (in milliseconds)
+    // Set to null to disable
+    protected ?int $recenterMapTimeout = 5000;  // Recenter after 5 seconds
+}
+```
+
+**Static Maps** - Disable all interactions:
+
+```php
+MapPicker::make('location')
+    ->static()  // Equivalent to ->mapDraggable(false)->mapZoomable(false)
 ```
 
 #### Controls
@@ -222,9 +259,20 @@ class DeliveryZone extends Model
 {
     use HasGeoJsonFile;
     
-    public function getGeoJsonFileAttributeName(): string { return 'geojson_file'; }
-    public function getGeoJsonFileDisk(): ?string { return 's3'; }
-    public function getExpirationTime(): ?DateTime { return now()->addHour(); }
+    public function getGeoJsonFileAttributeName(): string
+    {
+        return 'geojson_file';
+    }
+
+    public function getGeoJsonFileDisk(): ?string
+    {
+        return 's3';
+    }
+
+    public function getExpirationTime(): ?DateTime
+    {
+        return now()->addHour();
+    }
 }
 ```
 
@@ -242,6 +290,8 @@ MapPicker::make('location')
     ->center(fn() => [$lat, $lng])
     ->height(fn($record) => 300)
     ->zoom(fn($record) => $record->zoom_level)
+    ->mapDraggable(fn($record) => $record->is_editable)
+    ->recenterTimeout(fn($record) => $record->is_read_only ? 3000 : null)
 ```
 
 ### MapColumn (Table Column)
@@ -257,6 +307,7 @@ MapColumn::make('location')
     ->zoom(5)
     ->pickMarker(fn(Marker $marker) => $marker->icon(size: [14, 25]))
     ->circular()  // Optional: circular display
+    ->static()    // Disable interactions in table preview
 ```
 
 ![Table Column Example](images/table-column.png)
@@ -273,7 +324,15 @@ MapEntry::make('location')
     ->height(284)
     ->zoom(10)
     ->pickMarker(fn(Marker $marker) => $marker->red())
+    ->static()    // Disable interactions (enabled by default)
     ->columnSpanFull()
+```
+
+**Auto-recenter:** Maps automatically recenter after 3 seconds when users pan around. This provides a guided viewing experience while allowing temporary exploration:
+
+```php
+MapEntry::make('location')
+    ->recenterTimeout(5000)  // Recenter after 5 seconds (null to disable)
 ```
 
 ![Infolist Entry Example](images/infolist-entry.png)
@@ -386,28 +445,6 @@ protected function getMarkers(): array
 }
 ```
 
-The `group()` method automatically creates a LayerGroup instance for all layers with the same group name, providing a cleaner syntax when you don't need `LayerGroup::make()` complexity.
-
-**Advanced example with mixed layers:**
-
-```php
-LayerGroup::make([
-    // Markers
-    Marker::make(-23.5505, -46.6333)->title('Store 1')->blue(),
-    Marker::make(-23.5515, -46.6343)->title('Store 2')->blue(),
-    
-    // Shapes
-    Circle::make(-23.5505, -46.6333)
-        ->radiusInKilometers(5)
-        ->blue()
-        ->fillOpacity(0.1),
-    
-    // Popups and tooltips work on all layers
-])
-->name('Store Coverage')
-->id('store-coverage-group');
-```
-
 #### Feature Group
 
 Creates a polygon envelope around all layers in the group. This is useful for visualizing the coverage area or boundary of a set of points:
@@ -431,37 +468,6 @@ protected function getMarkers(): array
         ->dashArray('5, 10'),
     ];
 }
-```
-
-**Real-world example with custom styling:**
-
-```php
-FeatureGroup::make([
-    Marker::make(-23.5505, -46.6333)->title('Warehouse A'),
-    Marker::make(-23.5615, -46.6443)->title('Warehouse B'),
-    Marker::make(-23.5425, -46.6223)->title('Warehouse C'),
-])
-->name('Supply Chain Network')
-->id('supply-chain')
-->orange()          // Border color
-->fillColor(Color::Yellow)  // Fill color
-->fillOpacity(0.15) // Semi-transparent fill
-->weight(3)         // Thicker border
-->opacity(0.8);
-```
-
-**Feature groups with event handlers:**
-
-```php
-FeatureGroup::make($warehouseMarkers)
-    ->name('Warehouses')
-    ->green()
-    ->action(function (FeatureGroup $group) {
-        Notification::make()
-            ->title('Warehouse Zone Clicked')
-            ->body('This is the warehouse coverage area')
-            ->send();
-    });
 ```
 
 #### Marker Cluster
@@ -568,38 +574,6 @@ MarkerCluster::make($markers)
     ]);
 ```
 
-#### Combining Multiple Layer Groups
-
-You can combine different layer groups in the same map:
-
-```php
-use App\Models\Store;
-use App\Models\Warehouse;
-
-protected function getLayers(): array
-{
-    return [
-        // Stores with clustering
-        MarkerCluster::fromModel(Store::class)->name('Retail Stores'),
-        
-        // Warehouses with feature group
-        FeatureGroup::make([
-            Warehouse::all()->map(fn($w) => 
-                Marker::make($w->latitude, $w->longitude)->title($w->name)->red()
-            )->all()
-        ])->name('Warehouses')->orange()->fillOpacity(0.1),
-        
-        // Service areas with shapes
-        LayerGroup::make([
-            Circle::make(-23.5505, -46.6333)->radiusInKilometers(25)->blue(),
-            Circle::make(-23.5505, -46.6333)->radiusInKilometers(50)->dashArray('5, 5'),
-        ])->name('Service Areas'),
-    ];
-}
-```
-
-Layer groups automatically appear in the Leaflet controls when a name is set, allowing users to toggle them on/off from the map interface.
-
 ### Shapes
 
 Draw various geometric shapes on your map:
@@ -615,44 +589,15 @@ protected function getShapes(): array
 {
     return [
         Circle::make(-23.5505, -46.6333)
-            ->radiusInMeters(5000)
+            ->popupContent('10km radius coverage')
+            ->title('Service Area')
             ->blue()
             ->fillBlue()
             ->fillOpacity(0.2)
-            ->title('Service Area'),
-        // Radius in meters (default)
-        Circle::make(-23.5505, -46.6333)
-            ->radius(5000)
-            ->blue()
-            ->fillBlue()
-            ->title('Coverage Area'),
-        
-        // Radius in kilometers
-        Circle::make(-23.5505, -46.6333)
-            ->radiusInKilometers(5)
-            ->red()
-            ->fillOpacity(0.3),
-        
-        // Radius in miles
-        Circle::make(-23.5505, -46.6333)
-            ->radiusInMiles(3)
-            ->green(),
-        
-        // Radius in feet
-        Circle::make(-23.5505, -46.6333)
-            ->radiusInFeet(10000)
-            ->orange(),
-        
-        // Styled circle
-        Circle::make(-23.5505, -46.6333)
-            ->radiusInKilometers(10)
-            ->color(Color::Blue)      // Border color
-            ->fillColor(Color::Blue)  // Fill color
-            ->weight(3)               // Border width
-            ->opacity(0.8)            // Border opacity
-            ->fillOpacity(0.2)        // Fill opacity
-            ->dashArray('5, 10')      // Dashed border
-            ->popupContent('10km radius coverage'),
+            ->radius(10000)           // Radius in meters (default)
+            ->radiusInKilometers(10)  // Radius in kilometers
+            ->radiusInMiles(6.2)      // Radius in miles
+            ->radiusInFeet(32808)     // Radius in feet
     ];
 }
 ```
@@ -667,7 +612,7 @@ Small circles with pixel-based radius (like markers but circular):
 use EduardoRibeiroDev\FilamentLeaflet\Support\Shapes\CircleMarker;
 
 CircleMarker::make(-23.5505, -46.6333)
-    ->radius(45)           // Radius in pixels
+    ->radius(45) // Radius in pixels
     ->red()
     ->fillRed()
     ->weight(2)
@@ -765,7 +710,6 @@ Rectangle::makeFromCoordinates(
 ```
 
 ![Rectangles Example](images/rectangle.png)
-```
 
 #### Shapes from Eloquent Models
 
@@ -986,7 +930,7 @@ use Filament\Notifications\Notification;
 
 Marker::make(-23.5505, -46.6333)
     ->title('Interactive Marker')
-    ->action(function (Marker $marker) {
+    ->action(function (Marker $marker) { // Or ->onClick()
         Notification::make()
             ->title('Marker Clicked!')
             ->body('ID: ' . $marker->getId())
@@ -999,7 +943,7 @@ Marker::make(-23.5505, -46.6333)
 ```php
 Circle::make(-23.5505, -46.6333)
     ->radius(5000)
-    ->action(function (Circle $circle) {
+    ->action(function (Circle $circle) { // Or ->onClick()
         Notification::make()
             ->title('Circle clicked')
             ->send();
@@ -1016,7 +960,7 @@ protected function getMarkers(): array
             record: $store,
             latColumn: 'latitude',
             lngColumn: 'longitude',
-        )->action(function (Marker $marker, Store $record) {
+        )->action(function (Marker $marker, Store $record) { // Or ->onClick()
             Notification::make()
                 ->title("You clicked: {$record->name}")
                 ->body("Address: {$record->address}")
@@ -1410,21 +1354,25 @@ class StoreMapWidget extends MapWidget
 
 ## Configuration Reference
 
-### JavaScript Architecture
+### Map Interaction Configuration
 
-The package uses a two-layer architecture for flexibility:
+Control how users interact with maps at a granular level:
 
-**LeafletMapCore** (`leaflet-map-core.js`)
-- Core Leaflet functionality (map creation, layers, controls, interactions)
-- Independent of Filament/Livewire - can be used standalone
-- Methods: `init()`, `addLayers()`, `setupEventHandlers()`, `updateMapData()`, etc.
+```php
+// Disable all user interactions (read-only maps)
+MapEntry::make('location')
+    ->static()  // Shorthand - disables both dragging and zooming
 
-**leaflet-map** (`leaflet-map.js`)
-- Wrapper for Filament/Livewire integration
-- Handles state synchronization for `MapPicker` fields
-- Manages Livewire method calls and event dispatching
+// Or individually
+MapPicker::make('location')
+    ->mapDraggable(false)           // Prevent map panning
+    ->mapZoomable(true);            // Allow zoom only
 
-This separation allows you to extend core functionality or create custom implementations.
+// Auto-recenter after user explores
+MapColumn::make('location')
+    ->recenterTimeout(3000)         // Recenter after 3 seconds of inactivity
+    ->center(-23.5505, -46.6333)   // Default center position
+```
 
 ### Customization
 
@@ -1486,6 +1434,10 @@ public function getAdditionalScripts(): string
 | `center($lat, $lng)` | Set map center coordinates |
 | `zoom($level)` | Set initial zoom level |
 | `height($pixels)` | Set map height |
+| `mapDraggable($bool)` | Enable/disable map dragging |
+| `mapZoomable($bool)` | Enable/disable map zooming |
+| `static()` | Disable all map interactions (dragging & zooming) |
+| `recenterTimeout($milliseconds)` | Auto-recenter map after X ms of inactivity |
 | `tileLayersUrl($layers)` | Set tile layer(s) |
 | `markers($array)` | Set initial markers |
 | `shapes($array)` | Set initial shapes |
@@ -1509,6 +1461,10 @@ public function getAdditionalScripts(): string
 | `center($lat, $lng)` | Set map center coordinates |
 | `zoom($level)` | Set initial zoom level |
 | `height($pixels)` | Set map height |
+| `mapDraggable($bool)` | Enable/disable map dragging |
+| `mapZoomable($bool)` | Enable/disable map zooming |
+| `static()` | Disable all map interactions (dragging & zooming) |
+| `recenterTimeout($milliseconds)` | Auto-recenter map after X ms of inactivity |
 | `tileLayersUrl($layers)` | Set tile layer(s) |
 | `markers($array)` | Set initial markers |
 | `shapes($array)` | Set initial shapes |
@@ -1531,6 +1487,10 @@ public function getAdditionalScripts(): string
 | `zoom($level)` | Set initial zoom level |
 | `height($pixels)` | Set map height |
 | `circular($value)` | Display map as circular container |
+| `mapDraggable($bool)` | Enable/disable map dragging |
+| `mapZoomable($bool)` | Enable/disable map zooming |
+| `static()` | Disable all map interactions (dragging & zooming) |
+| `recenterTimeout($milliseconds)` | Auto-recenter map after X ms of inactivity |
 | `tileLayersUrl($layers)` | Set tile layer(s) |
 | `markers($array)` | Set initial markers |
 | `shapes($array)` | Set initial shapes |
@@ -1692,60 +1652,27 @@ Available colors for markers and shapes:
 | `getExpirationTime()` | Returns DateTime for temporary URL expiration (default: null = permanent) |
 | `getGeoJsonUrl()` | Returns the accessible URL for the GeoJSON file |
 
-## Troubleshooting
+### Map Configuration Properties
 
-### Markers not appearing
+These properties control core map behavior:
 
-1. Check coordinate validity:
-```php
-Marker::make($lat, $lng)->validate(); // Throws exception if invalid
-```
-
-2. Verify zoom level:
-```php
-protected int $defaultZoom = 12; // Try different values
-```
-
-3. Check marker is in bounds:
-```php
-// Ensure coordinates are visible in your map center/zoom
-protected array $mapCenter = [$your_marker_lat, $your_marker_lng];
-```
-
-### Popups not showing
-
-1. Ensure content is set:
-```php
-$marker->popupContent('Some content'); // Required
-```
-
-2. Check for JavaScript errors in browser console
-
-### Cluster not grouping
-
-1. Increase cluster radius:
-```php
-MarkerCluster::make($markers)
-    ->maxClusterRadius(100) // Increase this value
-```
-
-2. Check zoom level:
-```php
-->disableClusteringAtZoom(15) // Clusters won't show at/above this zoom
-```
-
-### Form not opening on map click
-
-1. Verify model is set:
-```php
-protected ?string $markerModel = YourModel::class;
-```
-
-2. Check column names match:
-```php
-protected string $latitudeColumnName = 'latitude'; // Must match DB
-protected string $longitudeColumnName = 'longitude';
-```
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `$mapCenter` | array | [-14.235, -51.9253] | Initial map center [latitude, longitude] |
+| `$defaultZoom` | int | 4 | Initial zoom level |
+| `$mapHeight` | int | 504 | Map height in pixels |
+| `$mapDraggable` | bool | true | Allow users to pan by dragging |
+| `$mapZoomable` | bool | true | Allow users to zoom (scroll wheel, pinch) |
+| `$recenterMapTimeout` | ?int | null | Auto-recenter after X milliseconds of panning |
+| `$maxZoom` | int | 18 | Maximum zoom level allowed |
+| `$minZoom` | int | 2 | Minimum zoom level allowed |
+| `$hasDrawControl` | bool | false | Show draw/edit toolbar |
+| `$hasFullscreenControl` | bool | false | Show fullscreen button |
+| `$hasSearchControl` | bool | false | Show address search |
+| `$hasScaleControl` | bool | false | Show distance scale |
+| `$hasZoomControl` | bool | true | Show zoom +/- buttons |
+| `$hasAttributionControl` | bool | false | Show attribution text |
+| `$tileLayersUrl` | mixed | OpenStreetMap | Base map tile layers |
 
 ## License
 

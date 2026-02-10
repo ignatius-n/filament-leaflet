@@ -25,4 +25,18 @@
     style="height: {{ $config['mapHeight'] }}px; width: 100%"
 >
     <div id="{{ $config['mapId'] }}"></div>
+
+    @push('styles')
+        <style>
+            {!! $config['customStyles'] !!}
+        </style>
+    @endpush
+
+
+    @push('scripts')
+        <script>
+            {!! $config['customScripts'] !!}
+        </script>
+    @endpush
+    
 </div>
