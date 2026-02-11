@@ -13,6 +13,7 @@ trait HasMapConfig
 {
     // Configurações padrão do mapa
     protected array $mapCenter = [-14.235, -51.9253]; // Centro do Brasil
+    protected bool $autoCenter = false;
     protected int $defaultZoom = 4;
     protected int $mapHeight = 598;
     protected ?int $recenterMapTimeout = null;
@@ -67,6 +68,14 @@ trait HasMapConfig
     protected function getMapCenter(): array
     {
         return $this->mapCenter;
+    }
+
+    /**
+     * Define se o mapa deve ser centralizado na localização atual do usuário.
+     */
+    protected function getAutoCenter(): bool
+    {
+        return $this->autoCenter;
     }
 
     /**
@@ -555,6 +564,7 @@ trait HasMapConfig
             'mapId'         => $this->getId(),
             'mapHeight'     => $this->getMapHeight(),
             'defaultCoord'  => $this->getMapCenter(),
+            'autoCenter'    => $this->getAutoCenter(),
             'defaultZoom'   => $this->getDefaultZoom(),
             'geoJsonColors' => $this->getGeoJsonColors(),
             'geoJsonData'   => $this->getGeoJsonData(),

@@ -109,6 +109,9 @@ class MyMapWidget extends MapWidget
     protected int $defaultZoom = 4;
     protected int $maxZoom = 18;
     protected int $minZoom = 2;
+    
+    // Auto-center to user's current location
+    protected bool $autoCenter = false;
 }
 ```
 
@@ -128,6 +131,9 @@ class MyMapWidget extends MapWidget
     // Auto-recenter after user pans (in milliseconds)
     // Set to null to disable
     protected ?int $recenterMapTimeout = 5000;  // Recenter after 5 seconds
+    
+    // Auto-center to user's current location
+    protected bool $autoCenter = false;
 }
 ```
 
@@ -235,6 +241,7 @@ MapPicker::make('location')
     ->height(300)
     ->center(-23.5505, -46.6333)
     ->zoom(11)
+    ->autoCenter()  // Auto-center to user's location
     ->tileLayersUrl(TileLayer::OpenStreetMap)
     ->columnSpanFull()
 ```
@@ -1243,6 +1250,7 @@ public function getAdditionalScripts(): string
 | Method | Description |
 |--------|-------------|
 | `getHeading()` | Returns the widget heading |
+| `getAutoCenter()` | Returns the auto-center setting |
 | `getMarkers()` | Returns array of markers to display |
 | `getShapes()` | Returns array of shapes to display |
 | `getLayers()` | Returns combined markers and shapes |
@@ -1257,6 +1265,7 @@ public function getAdditionalScripts(): string
 | Method | Description |
 |--------|-------------|
 | `make($name)` | Create a new MapPicker field |
+| `autoCenter(bool)` | Auto-center map to user's current location |
 | `center($lat, $lng)` | Set map center coordinates |
 | `zoom($level)` | Set initial zoom level |
 | `height($pixels)` | Set map height |
@@ -1284,6 +1293,7 @@ public function getAdditionalScripts(): string
 | Method | Description |
 |--------|-------------|
 | `make($name)` | Create a new MapEntry entry |
+| `autoCenter(bool)` | Auto-center map to user's current location |
 | `center($lat, $lng)` | Set map center coordinates |
 | `zoom($level)` | Set initial zoom level |
 | `height($pixels)` | Set map height |
@@ -1309,6 +1319,7 @@ public function getAdditionalScripts(): string
 | Method | Description |
 |--------|-------------|
 | `make($name)` | Create a new MapColumn column |
+| `autoCenter(bool)` | Auto-center map to user's current location |
 | `center($lat, $lng)` | Set map center coordinates |
 | `zoom($level)` | Set initial zoom level |
 | `height($pixels)` | Set map height |
@@ -1487,6 +1498,7 @@ These properties control core map behavior:
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
 | `$mapCenter` | array | [-14.235, -51.9253] | Initial map center [latitude, longitude] |
+| `$autoCenter` | bool | false | Auto-center to user's current location on load |
 | `$defaultZoom` | int | 4 | Initial zoom level |
 | `$mapHeight` | int | 504 | Map height in pixels |
 | `$mapDraggable` | bool | true | Allow users to pan by dragging |

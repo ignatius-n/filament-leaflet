@@ -44,6 +44,13 @@ trait HasMapState
         return $this;
     }
 
+    public function autoCenter(bool|Closure $autoCenter = true): static
+    {
+        $this->autoCenter = $this->evaluate($autoCenter);
+
+        return $this;
+    }
+
     public function height(int|Closure $height): static
     {
         $this->mapHeight = $this->evaluate($height);

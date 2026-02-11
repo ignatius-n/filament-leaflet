@@ -60,6 +60,10 @@ export class LeafletMapCore {
         this.map = L.map(this.config.mapId, this.config.mapConfig || {})
             .setView(this.config.defaultCoord, this.config.defaultZoom);
 
+        if (this.config.autoCenter) {
+            this.map.locate({ setView: true });
+        }
+
         const resizeObserver = new ResizeObserver(() => {
             if (!this.map) {
                 return;
