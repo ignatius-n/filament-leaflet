@@ -40,6 +40,8 @@ trait HasMapConfig
     protected bool $hasRemoveLayersControl = false;
     protected bool $hasRotateLayersControl = false;
     protected bool $hasCutPolygonControl = false;
+    /** @deprecated */
+    protected bool $hasDrawControl = false;
 
     protected int $maxZoom = 18;
     protected int $minZoom = 2;
@@ -148,6 +150,15 @@ trait HasMapConfig
     protected function hasZoomControl(): bool
     {
         return $this->hasZoomControl;
+    }
+
+    /**
+     * @deprecated Use os métodos específicos de controle de desenho.
+     * Define se o controle de desenho deve ser exibido.
+     */
+    protected function hasDrawControl(): bool
+    {
+        return $this->hasDrawControl;
     }
 
     /**
@@ -308,6 +319,10 @@ trait HasMapConfig
      */
     protected function getDrawControls(): array
     {
+        if ($this->hasDrawControl()) {
+            return []; // habilita todos os controles individuais
+        }
+
         return [
             'drawMarker'       => $this->hasDrawMarkerControl(),
             'drawCircleMarker' => $this->hasDrawCircleMarkerControl(),

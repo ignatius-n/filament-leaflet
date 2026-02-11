@@ -130,6 +130,14 @@ trait HasMapState
         return $this;
     }
 
+    /** @deprecated */
+    public function drawControl(bool|Closure $enabled = true): static
+    {
+        $this->hasDrawControl = $this->evaluate($enabled);
+
+        return $this;
+    }
+
     public function drawMarkerControl(bool|Closure $enabled = true): static
     {
         $this->hasDrawMarkerControl = $this->evaluate($enabled);
