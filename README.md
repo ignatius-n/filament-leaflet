@@ -41,7 +41,7 @@ Publish the assets:
 php artisan vendor:publish --tag=filament-leaflet
 ```
 
-This will publish the Leaflet assets used by the package — the distribution now includes draw toolbar, marker cluster control, fullscreen control and geosearch toolbar assets.
+This will publish the Leaflet assets used by the package.
 
 ## Table of Contents
 
@@ -109,9 +109,6 @@ class MyMapWidget extends MapWidget
     protected int $defaultZoom = 4;
     protected int $maxZoom = 18;
     protected int $minZoom = 2;
-    
-    // Auto-center to user's current location
-    protected bool $autoCenter = false;
 }
 ```
 
@@ -316,14 +313,25 @@ use EduardoRibeiroDev\FilamentLeaflet\Tables\MapColumn;
 use EduardoRibeiroDev\FilamentLeaflet\Support\Markers\Marker;
 
 MapColumn::make('location')
-    ->height(72)
-    ->zoom(5)
-    ->pickMarker(fn(Marker $marker) => $marker->icon(size: [14, 25]))
-    ->circular()  // Optional: circular display
+    ->height(100)
+    ->zoom(8)
+    ->pickMarker(fn(Marker $marker) => $marker->black())
     ->static()    // Disable interactions in table preview
 ```
 
 ![Table Column Example](images/table-column.png)
+
+Display circular maps for a unique visual style:
+
+```php
+MapColumn::make('location')
+    ->height(72)
+    ->zoom(5)
+    ->pickMarker(fn(Marker $marker) => $marker->icon(size: [14, 25]))
+    ->circular()  // Optional: circular display
+```
+
+![Table Column Example](images/circular-table-column.png)
 
 ### MapEntry (Infolist)
 

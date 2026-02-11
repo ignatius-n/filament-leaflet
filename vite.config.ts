@@ -25,10 +25,6 @@ export default defineConfig({
                     dest: 'images'
                 },
                 {
-                    src: 'node_modules/leaflet-draw/dist/images/*.png',
-                    dest: 'images'
-                },
-                {
                     src: 'resources/images/*.png',
                     dest: 'images'
                 },

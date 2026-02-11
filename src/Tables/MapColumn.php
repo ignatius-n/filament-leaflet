@@ -11,7 +11,6 @@ class MapColumn extends Column
 {
     use HasMapState {
         getMapHeight as getParentMapHeight;
-        getMapCenter as getParentMapCenter;
         getCustomStyles as getParentCustomStyles;
     }
 
@@ -38,15 +37,6 @@ class MapColumn extends Column
     protected function getMapControls(): array
     {
         return [];
-    }
-
-    protected function getMapCenter(): array
-    {
-        $center = $this->getParentMapCenter();
-        $pickMarkerSize = $this->pickMarker->getIconSize();
-
-        $center[0] += $pickMarkerSize[1] / 45; // compensa a altura do ícone do $pickMarker
-        return $center;
     }
 
     public function getState(): mixed
