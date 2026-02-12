@@ -552,7 +552,7 @@ trait HasMapConfig
                     default => 'Layer ' . ($key + 1)
                 };
 
-                $url = ($layer instanceof TileLayer) ? $layer->value : $layer;
+                $url = ($layer instanceof TileLayer) ? $layer->getUrl() : $layer;
                 $attribution  = ($layer instanceof TileLayer) ? $layer->getAttribution() : null;
 
                 return [$label, $url, $attribution];

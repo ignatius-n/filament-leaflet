@@ -27,8 +27,11 @@ enum TileLayer: string implements HasLabel
 
     // Mapbox (placeholder values - use getUrl() method for proper URLs with env variables)
     case MapboxStreets = 'mapbox://styles/mapbox/streets-v11';
+    case MapboxOutdoors = 'mapbox://styles/mapbox/outdoors-v12';
+    case MapboxLight = 'mapbox://styles/mapbox/light-v11';
     case MapboxDark = 'mapbox://styles/mapbox/dark-v11';
     case MapboxSatellite = 'mapbox://styles/mapbox/satellite-v9';
+    case MapboxSatelliteStreets = 'mapbox://styles/mapbox/satellite-streets-v12';
     case MapboxNavigationDay = 'mapbox://styles/mapbox/navigation-day-v1';
     case MapboxNavigationNight = 'mapbox://styles/mapbox/navigation-night-v1';
 
@@ -59,10 +62,10 @@ enum TileLayer: string implements HasLabel
             self::MapboxDark,
             self::MapboxNavigationDay,
             self::MapboxNavigationNight,
-            self::MapboxSatellite => '&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-//            self::MapboxNavigationDay,
-//            self::MapboxNavigationNight,
-
+            self::MapboxOutdoors,
+            self::MapboxLight,
+            self::MapboxSatelliteStreets,
+            self::MapboxSatellite => '&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a>',
         };
     }
 
@@ -101,6 +104,9 @@ enum TileLayer: string implements HasLabel
             self::MapboxSatellite,
             self::MapboxNavigationDay,
             self::MapboxNavigationNight,
+            self::MapboxOutdoors,
+            self::MapboxLight,
+            self::MapboxSatelliteStreets,
         ];
     }
 
@@ -120,6 +126,9 @@ enum TileLayer: string implements HasLabel
                 self::MapboxSatellite => 'satellite-v9',
                 self::MapboxNavigationDay => 'navigation-day-v1',
                 self::MapboxNavigationNight => 'navigation-night-v1',
+                self::MapboxOutdoors => 'outdoors-v12',
+                self::MapboxLight => 'light-v11',
+                self::MapboxSatelliteStreets => 'satellite-streets-v12',
                 default => 'streets-v11',
             };
 
