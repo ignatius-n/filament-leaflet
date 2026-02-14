@@ -276,7 +276,7 @@ trait HasMapConfig
     /**
      * Retorna as opções de configuração de Zoom.
      */
-    protected function getZoomOptions(): array
+    protected final function getZoomOptions(): array
     {
         return [
             'max' => $this->maxZoom,
@@ -287,7 +287,7 @@ trait HasMapConfig
     /**
      * Retorna as configurações gerais do Leaflet.
      */
-    protected function getMapOptions(): array
+    protected final function getMapOptions(): array
     {
         return [
             'zoomControl'        => false, // Definido em getMapControls
@@ -302,7 +302,7 @@ trait HasMapConfig
     /**
      * Retorna controles definidos para o mapa.
      */
-    protected function getMapControls(): array
+    protected final function getMapControls(): array
     {
         return [
             'attributionControl' => $this->hasAttributionControl(),
@@ -317,7 +317,7 @@ trait HasMapConfig
     /**
      * Retorna as configurações dos controles de desenho do Geoman.
      */
-    protected function getDrawControls(): array
+    protected final function getDrawControls(): array
     {
         if ($this->hasDrawControl()) {
             return []; // habilita todos os controles individuais
@@ -576,23 +576,23 @@ trait HasMapConfig
     public final function getMapData(): array
     {
         return [
-            'mapId'         => $this->getId(),
-            'mapHeight'     => $this->getMapHeight(),
-            'defaultCoord'  => $this->getMapCenter(),
-            'autoCenter'    => $this->getAutoCenter(),
-            'defaultZoom'   => $this->getDefaultZoom(),
-            'geoJsonColors' => $this->getGeoJsonColors(),
-            'geoJsonData'   => $this->getGeoJsonData(),
-            'infoText'      => $this->getGeoJsonTooltip(),
-            'tileLayersUrl' => $this->preparedTileLayersUrl(),
-            'layerGroups'   => $this->preparedLayerGroups(),
-            'layers'        => $this->preparedLayers(),
-            'zoomConfig'    => $this->getZoomOptions(),
-            'mapConfig'     => $this->getMapOptions(),
-            'mapControls'   => $this->getMapControls(),
-            'geoJsonUrl'    => $this->getGeoJsonUrl(),
-            'customStyles'  => $this->getCustomStyles(),
-            'customScripts' => $this->getCustomScripts(),
+            'mapId'           => $this->getId(),
+            'mapHeight'       => $this->getMapHeight(),
+            'defaultCoord'    => $this->getMapCenter(),
+            'autoCenter'      => $this->getAutoCenter(),
+            'defaultZoom'     => $this->getDefaultZoom(),
+            'geoJsonColors'   => $this->getGeoJsonColors(),
+            'geoJsonData'     => $this->getGeoJsonData(),
+            'infoText'        => $this->getGeoJsonTooltip(),
+            'tileLayersUrl'   => $this->preparedTileLayersUrl(),
+            'layerGroupsData' => $this->preparedLayerGroups(),
+            'layersData'      => $this->preparedLayers(),
+            'zoomConfig'      => $this->getZoomOptions(),
+            'mapConfig'       => $this->getMapOptions(),
+            'mapControls'     => $this->getMapControls(),
+            'geoJsonUrl'      => $this->getGeoJsonUrl(),
+            'customStyles'    => $this->getCustomStyles(),
+            'customScripts'   => $this->getCustomScripts(),
         ];
     }
 

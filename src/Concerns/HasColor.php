@@ -2,20 +2,24 @@
 
 namespace EduardoRibeiroDev\FilamentLeaflet\Concerns;
 
+use Closure;
 use EduardoRibeiroDev\FilamentLeaflet\Enums\Color;
 
 trait HasColor
 {
     protected ?string $color = null;
+    protected float $opacity = 1;
 
-    public function color(null|string|Color $color): static
+    public function color(null|string|Closure|Color $color): static
     {
-        if ($color === null) {
+        $newColor = $this->evaluate($color);
+
+        if ($newColor === null) {
             $this->color = null;
         } else {
-            $this->color = $color instanceof Color
-                ? $color->value
-                : Color::from($color)->value;
+            $this->color = $newColor instanceof Color
+                ? $newColor->value
+                : Color::from($newColor)->value;
         }
 
         return $this;
@@ -79,6 +83,12 @@ trait HasColor
         return $this->color($randomColor);
     }
 
+    public function opacity(Closure|float $opacity)
+    {
+        $this->opacity = $this->evaluate($opacity);
+        return $this;
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Getters
@@ -88,6 +98,11 @@ trait HasColor
     public function getColor(): ?string
     {
         return $this->color;
+    }
+
+    public function getOpacity(): float
+    {
+        return $this->opacity;
     }
 
     public function getHexColor(): ?string

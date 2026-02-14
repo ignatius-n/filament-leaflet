@@ -92,11 +92,8 @@ class Marker extends BaseLayer
     protected function getLayerData(): array
     {
         return [
-            'lat' => $this->latitude,
-            'lng' => $this->longitude,
-            'color' => $this->color,
-            'icon' => $this->iconUrl,
-            'iconSize' => $this->iconSize,
+            'coords'    => [$this->latitude, $this->longitude],
+            'icon'      => $this->getIconOptions(),
             'draggable' => $this->isDraggable,
         ];
     }
@@ -141,14 +138,13 @@ class Marker extends BaseLayer
         return $this;
     }
 
-    public function getIconUrl()
+    public function getIconOptions()
     {
-        return $this->iconUrl;
-    }
-
-    public function getIconSize()
-    {
-        return $this->iconSize;
+        return [
+            'color' => $this->color,
+            'url' => $this->iconUrl,
+            'size' => $this->iconSize,
+        ];
     }
 
     public function draggable(Closure|bool $condition = true): static

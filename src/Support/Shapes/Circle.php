@@ -113,16 +113,16 @@ class Circle extends Shape
     protected function getShapeData(): array
     {
         return [
-            'center' => $this->center,
+            'center'  => $this->center,
         ];
     }
 
     protected function getShapeOptions(): array
     {
-        return array_merge(
-            parent::getShapeOptions(),
-            ['radius' => $this->radius]
-        );
+        return [
+            'radius' => $this->radius,
+            ...parent::getShapeOptions()
+        ];
     }
 
     public function isValid(): bool

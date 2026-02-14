@@ -3,6 +3,7 @@
 namespace EduardoRibeiroDev\FilamentLeaflet\Support;
 
 use Closure;
+use DateTime;
 use Filament\Support\Concerns\EvaluatesClosures;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -77,16 +78,16 @@ abstract class BaseLayer implements Arrayable, Jsonable
     /**
      * Configura o conteúdo do tooltip.
      */
-    public function tooltipContent(?string $content): static
+    public function tooltipContent(null|Closure|string $content): static
     {
-        $this->tooltipData['content'] = $content;
+        $this->tooltipOption('content', $content);
         return $this;
     }
 
     /**
      * Define se o tooltip será permanente.
      */
-    public function tooltipPermanent(bool $permanent = true): static
+    public function tooltipPermanent(Closure|bool $permanent = true): static
     {
         $this->tooltipOption('permanent', $permanent);
         return $this;
@@ -95,7 +96,7 @@ abstract class BaseLayer implements Arrayable, Jsonable
     /**
      * Define a direção do tooltip (ex: 'auto', 'top', 'bottom', 'left', 'right').
      */
-    public function tooltipDirection(string $direction = 'auto'): static
+    public function tooltipDirection(Closure|string $direction = 'auto'): static
     {
         $this->tooltipOption('direction', $direction);
         return $this;
@@ -106,18 +107,18 @@ abstract class BaseLayer implements Arrayable, Jsonable
      */
     public function tooltipOption(string $option, mixed $value): static
     {
-        $this->tooltipOptions([$option => $value]);
+        $this->tooltipData[$option] = $this->evaluate($value);
         return $this;
     }
 
     /**
      * Define opções adicionais para o tooltip.
      */
-    public function tooltipOptions(array $options): static
+    public function tooltipOptions(Closure|array $options): static
     {
         $this->tooltipData['options'] = array_merge(
             $this->tooltipData['options'] ?? [],
-            $options
+            (array) $this->evaluate($options)
         );
         return $this;
     }
@@ -126,10 +127,10 @@ abstract class BaseLayer implements Arrayable, Jsonable
      * Método de conveniência para configurar tooltip completo
      */
     public function tooltip(
-        string $content,
-        bool $permanent = false,
-        string $direction = 'auto',
-        array $options = []
+        Closure|string $content,
+        Closure|bool $permanent = false,
+        Closure|string $direction = 'auto',
+        Closure|array $options = []
     ): static {
         return $this
             ->tooltipContent($content)
@@ -147,31 +148,31 @@ abstract class BaseLayer implements Arrayable, Jsonable
     /**
      * Configura o título do popup.
      */
-    public function popupTitle(?string $title): static
+    public function popupTitle(null|Closure|string $title): static
     {
-        $this->popupData['title'] = $title;
+        $this->popupOption('title', $title);
         return $this;
     }
 
     /**
      * Configura o conteúdo do popup.
      */
-    public function popupContent(?string $content): static
+    public function popupContent(null|Closure|string $content): static
     {
-        $this->popupData['content'] = $content;
+        $this->popupOption('content', $content);
         return $this;
     }
 
     /**
      * Define opções adicionais para o popup.
      */
-    public function popupFields(array|Collection $fields): static
+    public function popupFields(array|Collection $fields, Closure|string $dateFormat = 'dd/MM/YYYY'): static
     {
         $collectedFields = is_array($fields) ? collect($fields) : $fields;
 
-        $mappedFields = $collectedFields->mapWithKeys(function($value, $key) {
+        $mappedFields = $collectedFields->mapWithKeys(function($value, $key) use ($dateFormat) {
             $label = str($key)->replace(['-', '_'], ' ')->title()->toString();
-            $content = (string) $value;
+            $content = $value instanceof DateTime ? $value->format($dateFormat) : $value;
             
             return [__($label) => __($content) ?: '--'];
         })->toArray();
@@ -189,18 +190,18 @@ abstract class BaseLayer implements Arrayable, Jsonable
      */
     public function popupOption(string $option, mixed $value): static
     {
-        $this->popupOptions([$option => $value]);
+        $this->popupData[$option] = $this->evaluate($value);
         return $this;
     }
 
     /**
      * Define opções adicionais para o popup.
      */
-    public function popupOptions(array $options): static
+    public function popupOptions(Closure|array $options): static
     {
         $this->popupData['options'] = array_merge(
             $this->popupData['options'] ?? [],
-            $options
+            (array) $this->evaluate($options)
         );
         return $this;
     }
@@ -209,9 +210,9 @@ abstract class BaseLayer implements Arrayable, Jsonable
      * Método de conveniência para definir popup completo
      */
     public function popup(
-        string $content,
-        array $fields = [],
-        array $options = []
+        Closure|string $content,
+        Closure|array $fields = [],
+        Closure|array $options = []
     ): static {
         return $this
             ->popupContent($content)
@@ -222,7 +223,7 @@ abstract class BaseLayer implements Arrayable, Jsonable
     /**
      * Método de conveniência para definir popupTitle e tooltipContent
      */
-    public function title(?string $title)
+    public function title(null|Closure|string $title)
     {
         return $this
             ->tooltipContent($title)
@@ -293,8 +294,10 @@ abstract class BaseLayer implements Arrayable, Jsonable
      */
     protected function resolveDefaultClosureDependencyForEvaluationByName(string $parameterName): array
     {
+        $modelName = class_basename($this->getRecord());
+
         return match ($parameterName) {
-            'record', Str::singular(class_basename($this->getRecord())) => [$this->getRecord()],
+            'record', Str::camel($modelName) => [$this->getRecord()],
             $this->getType(), 'layer' => [$this],
             default => []
         };
@@ -325,9 +328,9 @@ abstract class BaseLayer implements Arrayable, Jsonable
     /**
      * Define o ID do layer.
      */
-    public function id(string $id): static
+    public function id(Closure|string $id): static
     {
-        $this->id = $id;
+        $this->id = (string) $this->evaluate($id);
         return $this;
     }
 
@@ -359,9 +362,9 @@ abstract class BaseLayer implements Arrayable, Jsonable
     /**
      * Define se o layer é editável.
      */
-    public function editable(bool $editable = true): static
+    public function editable(Closure|bool $editable = true): static
     {
-        $this->isEditable = $editable;
+        $this->isEditable = (bool) $this->evaluate($editable);
         return $this;
     }
 
@@ -383,7 +386,7 @@ abstract class BaseLayer implements Arrayable, Jsonable
             'clickAction'  => isset($this->clickAction),
             'onMouseOver'  => $this->onMouseOverScript,
             'onMouseOut'   => $this->onMouseOutScript,
-            'pmIgnore'     => !$this->isEditable,
+            'options'      => ['pmIgnore' => !$this->isEditable],
         ];
 
         if (array_filter($this->tooltipData)) {

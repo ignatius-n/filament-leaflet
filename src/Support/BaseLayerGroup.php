@@ -2,7 +2,6 @@
 
 namespace EduardoRibeiroDev\FilamentLeaflet\Support;
 
-use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasOptions;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Traits\Conditionable;
@@ -12,7 +11,6 @@ abstract class BaseLayerGroup implements Arrayable, Jsonable
 {
     use Conditionable;
     use Macroable;
-    use HasOptions;
 
     protected ?string $id = null;
     protected ?array $layers = null;
@@ -130,9 +128,8 @@ abstract class BaseLayerGroup implements Arrayable, Jsonable
     protected function getLayerGroupData(): array
     {
         return [
-            'type'     => $this->getType(),
-            'options'  => $this->getOptions(),
-            'name'     => $this->getName(),
+            'type' => $this->getType(),
+            'name' => $this->getName(),
         ];
     }
 

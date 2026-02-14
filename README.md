@@ -148,24 +148,24 @@ Enable/disable map controls:
 ```php
 class MyMapWidget extends MapWidget
 {
-    protected bool $hasAttributionControl = false;
+    protected bool $hasAttributionControl = true;
     protected bool $hasScaleControl = true;
     protected bool $hasZoomControl = true;
     protected bool $hasFullscreenControl = true;
     protected bool $hasSearchControl = true;
 
-    protected bool $hasDrawMarkerControl = false;
-    protected bool $hasDrawCircleMarkerControl = false;
-    protected bool $hasDrawCircleControl = false;
-    protected bool $hasDrawPolylineControl = false;
-    protected bool $hasDrawRectangleControl = false;
-    protected bool $hasDrawPolygonControl = false;
-    protected bool $hasDrawTextControl = false;
-    protected bool $hasEditLayersControl = false;
-    protected bool $hasDragLayersControl = false;
-    protected bool $hasRemoveLayersControl = false;
-    protected bool $hasRotateLayersControl = false;
-    protected bool $hasCutPolygonControl = false;
+    protected bool $hasDrawMarkerControl = true;
+    protected bool $hasDrawCircleMarkerControl = true;
+    protected bool $hasDrawCircleControl = true;
+    protected bool $hasDrawPolylineControl = true;
+    protected bool $hasDrawRectangleControl = true;
+    protected bool $hasDrawPolygonControl = true;
+    protected bool $hasDrawTextControl = true;
+    protected bool $hasEditLayersControl = true;
+    protected bool $hasDragLayersControl = true;
+    protected bool $hasRemoveLayersControl = true;
+    protected bool $hasRotateLayersControl = true;
+    protected bool $hasCutPolygonControl = true;
 }
 ```
 
@@ -174,13 +174,9 @@ class MyMapWidget extends MapWidget
 Conditionally show controls at runtime:
 
 ```php
-public function getMapControls(): array
+protected function hasDrawCircleControl(): bool
 {
-    $controls = parent::getMapControls();
-    if (!auth()?->user()?->is_admin) {
-        $controls['fullscreenControl'] = false;
-    }
-    return $controls;
+    return auth()?->user()?->is_admin;
 }
 ```
 
@@ -208,23 +204,6 @@ class MyMapWidget extends MapWidget
 ![Widget With Custom Tile Layers Example](images/tile-layers.png)
 
 **Available providers:** `OpenStreetMap`, `GoogleStreets`, `GoogleSatellite`, `GoogleHybrid`, `GoogleTerrain`, `EsriWorldImagery`, `EsriWorldStreetMap`, `EsriNatGeo`, `CartoPositron`, `CartoDarkMatter`
-
-#### Map Options
-
-Fine-tune Leaflet behavior:
-
-```php
-public function getMapOptions(): array
-{
-    return [
-        'scrollWheelZoom' => true,
-        'doubleClickZoom' => true,
-        'dragging' => true,
-        'touchZoom' => true,
-        'keyboard' => true,
-    ];
-}
-```
 
 ### MapPicker (Form Field)
 
@@ -1130,7 +1109,7 @@ class BrazilDensityWidget extends MapWidget
         '#E31A1C', '#BD0026', '#800026',
     ];
     
-    public function getGeoJsonData(): array
+    protected function getGeoJsonData(): array
     {
         return [
             'SP' => 166.23,  // São Paulo
@@ -1139,7 +1118,7 @@ class BrazilDensityWidget extends MapWidget
         ];
     }
     
-    public function getGeoJsonTooltip(): string
+    protected function getGeoJsonTooltip(): string
     {
         return <<<HTML
             <h4>{state}</h4>
@@ -1241,7 +1220,7 @@ public function getCustomStyles(): string
 Execute JavaScript after map initialization:
 
 ```php
-public function getAdditionalScripts(): string
+public function getCustomScripts(): string
 {
     return <<<JS
         function customFunction() {

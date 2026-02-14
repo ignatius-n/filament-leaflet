@@ -41,8 +41,7 @@ document.addEventListener('livewire:init', () => {
                 }
 
                 let markerOptions = this.config.state.pickMarker;
-                markerOptions.lat = coords.lat;
-                markerOptions.lng = coords.lng;
+                markerOptions.coords = Object.values(coords);
 
                 this.pickMarker = this.mapCore.createMarker(markerOptions);
 

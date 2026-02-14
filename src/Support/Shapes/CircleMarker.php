@@ -87,10 +87,10 @@ class CircleMarker extends Shape
 
     protected function getShapeOptions(): array
     {
-        return array_merge(
-            parent::getShapeOptions(),
-            ['radius' => $this->radius]
-        );
+        return [
+            'radius' => $this->radius,
+            ...parent::getShapeOptions()
+        ];
     }
 
     public function isValid(): bool

@@ -18,8 +18,8 @@ export class LeafletMapCore {
         this.map = null;
         this.config = config;
         this.imgsPath = imgsPath;
-        this.layers = [];
-        this.layerGroups = {};
+        this.layers = new Map();
+        this.layerGroups = new Map();
         this.baseLayers = {};
         this.geoJsonLayer = null;
         this.info = null;
@@ -43,7 +43,6 @@ export class LeafletMapCore {
         }
 
         this.addLayers();
-        this.setupLayerControl();
     }
 
     /**
@@ -184,94 +183,107 @@ export class LeafletMapCore {
         };
     }
 
+    removeLayer(layerData) {
+        let layer = this.layers.get(layerData.id);
+
+        if (!layer) return;
+
+        Alpine.raw(this.map).removeLayer(Alpine.raw(layer.layer));
+    }
+
+    addLayer(layerData) {
+        let layer = null;
+
+        switch (layerData.type) {
+            case 'marker':
+                layer = this.createMarker(layerData);
+                break;
+            case 'circle':
+                layer = this.createCircle(layerData);
+                break;
+            case 'circleMarker':
+                layer = this.createCircleMarker(layerData);
+                break;
+            case 'rectangle':
+                layer = this.createRectangle(layerData);
+                break;
+            case 'polygon':
+                layer = this.createPolygon(layerData);
+                break;
+            case 'polyline':
+                layer = this.createPolyline(layerData);
+                break;
+            default:
+                console.warn(`Tipo de layer desconhecido: ${layerData.type}`);
+                return;
+        }
+
+        if (!layer) return;
+
+        layer.options.group = layerData.group || null;
+
+        if (layerData.popup) {
+            this.bindPopup(layer, layerData.popup);
+        }
+
+        if (layerData.tooltip) {
+            this.bindTooltip(layer, layerData.tooltip);
+        }
+
+        if (layerData.clickAction && this.callbacks.onLayerClick) {
+            layer.on('click', () => {
+                this.callbacks.onLayerClick(layer.options.layerId);
+            });
+        }
+
+        if (layerData.onMouseOver) {
+            layer.on('mouseover', function () {
+                eval(layerData.onMouseOver);
+            });
+        }
+
+        if (layerData.onMouseOut) {
+            layer.on('mouseout', function () {
+                eval(layerData.onMouseOut);
+            });
+        }
+
+        if (layerData.group) {
+            const group = this.layerGroups.get(layerData.group);
+            layer.addTo(Alpine.raw(group.layer));
+        } else {
+            layer.addTo(Alpine.raw(this.map));
+        }
+
+        this.layers.set(layerData.id, {
+            layer: Alpine.raw(layer),
+            data: layerData
+        });
+    }
+
     /**
      * Adiciona camadas ao mapa
      * Callback onLayerClick pode ser passado para personalizar o comportamento
      */
     addLayers() {
-        const layers = Alpine.raw(this.config.layers);
+        const layers = Alpine.raw(this.config.layersData);
         if (!layers?.length) return;
 
-        layers.forEach(layerData => {
-            let layer = null;
-
-            switch (layerData.type) {
-                case 'marker':
-                    layer = this.createMarker(layerData);
-                    break;
-                case 'circle':
-                    layer = this.createCircle(layerData);
-                    break;
-                case 'circleMarker':
-                    layer = this.createCircleMarker(layerData);
-                    break;
-                case 'rectangle':
-                    layer = this.createRectangle(layerData);
-                    break;
-                case 'polygon':
-                    layer = this.createPolygon(layerData);
-                    break;
-                case 'polyline':
-                    layer = this.createPolyline(layerData);
-                    break;
-                default:
-                    console.warn(`Tipo de layer desconhecido: ${layerData.type}`);
-                    return;
-            }
-
-            if (!layer) return;
-
-            layer.options.layerId = layerData.id || null;
-            layer.options.group = layerData.group || null;
-
-            if (layerData.popup) {
-                this.bindPopup(layer, layerData.popup);
-            }
-
-            if (layerData.tooltip) {
-                this.bindTooltip(layer, layerData.tooltip);
-            }
-
-            if (layerData.clickAction && this.callbacks.onLayerClick) {
-                layer.on('click', () => {
-                    this.callbacks.onLayerClick(layer.options.layerId);
-                });
-            }
-
-            if (layerData.onMouseOver) {
-                layer.on('mouseover', function () {
-                    eval(layerData.onMouseOver);
-                });
-            }
-
-            if (layerData.onMouseOut) {
-                layer.on('mouseout', function () {
-                    eval(layerData.onMouseOut);
-                });
-            }
-
-            if (layerData.group) {
-                Alpine.raw(this.layerGroups[layerData.group]['layer']).addLayer(layer);
-            } else {
-                layer.addTo(Alpine.raw(this.map));
-            }
-
-            Alpine.raw(this.layers).push(layer);
-        });
+        layers.forEach(layerData => this.addLayer(layerData));
     }
 
     /**
      * Adiciona grupos de camadas
      */
     addLayerGroups() {
-        const groups = Alpine.raw(this.config.layerGroups);
+        const groupsData = Alpine.raw(this.config.layerGroupsData);
 
-        if (!Object.keys(groups)?.length > 0) return;
+        if (!Object.keys(groupsData)?.length > 0) return;
 
-        groups.forEach(layerGroupData => {
+        groupsData.forEach(layerGroupData => {
             let layerGroup = null;
 
-            layerGroupData.options.pmIgnore = true;
+            layerGroupData.options = { pmIgnore: true };
             switch (layerGroupData.type) {
                 case 'group':
                     layerGroup = L.layerGroup(layerGroupData.options);
@@ -280,97 +292,78 @@ export class LeafletMapCore {
                     layerGroup = L.featureGroup(layerGroupData.options);
                     break;
                 case 'cluster':
-                    layerGroup = L.markerClusterGroup({
-                        ...layerGroupData.options,
-                        spiderLegPolylineOptions: { pmIgnore: true }
-                    });
+                    layerGroup = L.markerClusterGroup(layerGroupData.options);
                     break;
+                default:
+                    console.warn(`Tipo de grupo desconhecido: ${layerGroupData.type}`);
+                    return;
             }
 
             if (!layerGroup) return;
 
+            this.layerGroups.set(layerGroupData.id, {
+                name: layerGroupData.name,
+                layer: layerGroup,
+            });
+
             layerGroup.addTo(Alpine.raw(this.map));
-
-            this.layerGroups[layerGroupData.id] = {
-                'name': layerGroupData.name,
-                'layer': layerGroup
-            };
         });
     }
 
-    /**
-     * Cria um marcador
-     */
-    createMarker(data) {
-        if (data.lat == undefined || data.lng == undefined) return null;
+    createMarker(markerData) {
+        const icon = this.createIcon(markerData.icon);
 
-        return L.marker([data.lat, data.lng], {
-            icon: this.createIcon(data),
-            draggable: data.draggable || false,
-            pmIgnore: data.pmIgnore || false
+        const marker = L.marker(markerData.coords, {
+            icon: icon,
+            draggable: markerData.draggable,
         });
+
+        return marker;
     }
 
-    /**
-     * Cria um círculo
-     */
-    createCircle(data) {
-        if (!data.center) return null;
-        return L.circle(data.center, data.options || {});
+    createCircle(circleData) {
+        const circle = L.circle(circleData.center, circleData.options);
+        return circle;
     }
 
-    /**
-     * Cria um marcador circular
-     */
-    createCircleMarker(data) {
-        if (!data.center) return null;
-        return L.circleMarker(data.center, data.options || {});
+    createCircleMarker(circleMarkerData) {
+        const circleMarker = L.circleMarker(circleMarkerData.center, circleMarkerData.options);
+        return circleMarker;
     }
 
-    /**
-     * Cria um retângulo
-     */
-    createRectangle(data) {
-        if (!data.bounds) return null;
-        return L.rectangle(data.bounds, data.options || {});
+    createRectangle(rectangleData) {
+        const rectangle = L.rectangle(rectangleData.bounds, rectangleData.options);
+        return rectangle;
     }
 
-    /**
-     * Cria um polígono
-     */
-    createPolygon(data) {
-        if (!data.points) return null;
-        return L.polygon(data.points, data.options || {});
+    createPolygon(polygonData) {
+        const polygon = L.polygon(polygonData.points, polygonData.options);
+        return polygon;
     }
 
-    /**
-     * Cria uma polilinha
-     */
-    createPolyline(data) {
-        if (!data.points) return null;
-        return L.polyline(data.points, data.options || {});
+    createPolyline(polylineData) {
+        const polyline = L.polyline(polylineData.point, polylineData.options);
+        return polyline;
     }
 
-    /**
-     * Cria um ícone para marcadores
-     */
-    createIcon(marker) {
-        const options = {
-            iconSize: marker.iconSize || [25, 41],
-            iconAnchor: marker.iconSize ? [marker.iconSize[0] / 2, marker.iconSize[1]] : [12, 41],
-            popupAnchor: marker.iconSize ? [1, (marker.iconSize[1] / 1.25) * -1] : [1, -34],
-            shadowSize: marker.iconSize ? [Math.max(...marker.iconSize), Math.max(...marker.iconSize)] : [41, 41]
-        };
+    createIcon(iconData) {
+        const color = iconData?.color || 'blue';
+        const url = iconData?.url;
+        const size = iconData?.size || [25, 41];
+        const maxSize = Math.max(...size);
 
-        if (marker.icon) {
-            options.iconUrl = marker.icon;
-        } else {
-            const color = marker.color || 'blue';
-            options.iconUrl = `${this.imgsPath}/marker-icon-2x-${color}.png`;
-            options.shadowUrl = `${this.imgsPath}/marker-shadow.png`;
-        }
+        const iconAnchor = [size[0] / 2, size[1]];
+        const popupAnchor = [0, (size[1] / 1.25) * -1];
+        const shadowSize = [maxSize, maxSize];
 
-        return L.icon(options);
+        return L.icon({
+            iconUrl: url || `${this.imgsPath}/marker-icon-2x-${color}.png`,
+            iconSize: size,
+            iconAnchor: iconAnchor,
+            popupAnchor: popupAnchor,
+            shadowUrl: `${this.imgsPath}/marker-shadow.png`,
+            shadowSize: shadowSize,
+        });
     }
 
     /**
@@ -380,16 +373,16 @@ export class LeafletMapCore {
         let html = '<div class="custom-popup">';
 
         if (popupConfig.title) {
-            html += `<h4>${popupConfig.title}</h4>`;
+            html += `<strong>${popupConfig.title}</strong>`;
         }
 
         if (popupConfig.content) {
-            html += popupConfig.content;
+            html += `<div>${popupConfig.content}</div>`;
         }
 
-        if (popupConfig.fields && Object.keys(popupConfig.fields).length > 0) {
-            Object.entries(popupConfig.fields).forEach(([key, value]) => {
-                html += `<p><span class="field-label">${key}:</span> ${value}</p>`;
+        if (popupConfig.actions && popupConfig.actions.length > 0) {
+            popupConfig.actions.forEach(action => {
+                html += `<button onclick="${action.action}">${action.label}</button>`;
             });
         }
 
@@ -412,7 +405,7 @@ export class LeafletMapCore {
      * Configura o controle de camadas
      */
     setupLayerControl() {
-        let layerGroups = Object.values(this.layerGroups)
+        let layerGroups = Array.from(this.layerGroups.values())
             .filter((group) => group && group.name)
             .map((group) => [group.name, group.layer]);
 
@@ -465,6 +458,8 @@ export class LeafletMapCore {
         if (this.config.mapControls.drawControls) {
             this.setupDrawControl();
         }
+
+        this.setupLayerControl();
     }
 
     /**
@@ -593,7 +588,7 @@ export class LeafletMapCore {
         Alpine.raw(this.map).on('pm:globaldrawmodetoggled', (e) => {
             this.isDrawing = e.enabled;
         });
-        
+
         Alpine.raw(this.map).on('pm:globaleditmodetoggled', (e) => {
             this.isDrawing = e.enabled;
         });
@@ -619,24 +614,38 @@ export class LeafletMapCore {
      * Atualiza os dados do mapa
      */
     updateMapData(newConfig) {
+        const oldConfig = this.config;
         this.config = newConfig;
+
+        let layersToAdd = [];
+        let layersToRemove = [];
+
+        oldConfig.layersData.forEach((layerData) => {
+            if (!this.config.layersData.find((newLayer) => newLayer.id == layerData.id)) {
+                layersToRemove.push(layerData);
+            }
+        });
+
+        this.config.layersData.forEach((layerData) => {
+            if (!oldConfig.layersData.find((oldLayer) => oldLayer.id == layerData.id)) {
+                layersToAdd.push(layerData);
+            }
+        });
+
+        layersToRemove.forEach((layerData) => this.removeLayer(layerData));
+        layersToAdd.forEach((layerData) => this.addLayer(layerData));
 
         if (Object.keys(this.config.geoJsonData)?.length) {
             this.setupInfoControl();
             this.loadGeoJson();
         }
-
-        this.clearLayers();
-        this.addLayerGroups();
-        this.addLayers();
-        this.setupLayerControl();
     }
 
     /**
      * Limpa todas as camadas do mapa
      */
     clearLayers() {
-        this.layers.forEach(layer => {
+        Object.values(this.layers).forEach(({ layer }) => {
             if (layer.options.group) {
                 Alpine.raw(this.layerGroups[layer.options.group].layer).removeLayer(Alpine.raw(layer));
             } else {
@@ -644,13 +653,13 @@ export class LeafletMapCore {
             }
         });
 
-        this.layers = [];
+        this.layers.clear();
 
         Object.values(this.layerGroups).forEach(({ layer }) => {
             Alpine.raw(this.map).removeLayer(Alpine.raw(layer));
         });
 
-        this.layerGroups = {};
+        this.layerGroups.clear();
 
         if (this.layerControl) {
             Alpine.raw(this.map).removeControl(this.layerControl);

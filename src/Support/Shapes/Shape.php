@@ -2,16 +2,18 @@
 
 namespace EduardoRibeiroDev\FilamentLeaflet\Support\Shapes;
 
+use Closure;
 use EduardoRibeiroDev\FilamentLeaflet\Support\BaseLayer;
 use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasColor;
 use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasFillColor;
-use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasOptions;
 
 abstract class Shape extends BaseLayer
 {
     use HasColor;
     use HasFillColor;
-    use HasOptions;
+
+    protected ?int $weight = null;
+    protected ?string $dashArray = null;
 
     /**
      * Retorna os dados específicos da forma.
@@ -21,34 +23,20 @@ abstract class Shape extends BaseLayer
     /**
      * Define a espessura da borda em pixels.
      */
-    public function weight(int $weight): static
+    public function weight(null|Closure|int $weight): static
     {
-        return $this->option('weight', $weight);
-    }
-
-    /**
-     * Define a opacidade da borda (0.0 a 1.0).
-     */
-    public function opacity(float $opacity): static
-    {
-        return $this->option('opacity', $opacity);
-    }
-
-    /**
-     * Define a opacidade do preenchimento (0.0 a 1.0).
-     */
-    public function fillOpacity(float $opacity): static
-    {
-        return $this->option('fillOpacity', $opacity);
+        $this->weight = $this->evaluate($weight);
+        return $this;
     }
 
     /**
      * Define o estilo do traço (tracejado).
      * Ex: '5, 10' (5px linha, 10px espaço).
      */
-    public function dashArray(string $dashArray): static
+    public function dashArray(null|Closure|string $dashArray): static
     {
-        return $this->option('dashArray', $dashArray);
+        $this->dashArray = $this->evaluate($dashArray);
+        return $this;
     }
 
     /**
@@ -56,13 +44,14 @@ abstract class Shape extends BaseLayer
      */
     protected function getShapeOptions(): array
     {
-        return array_merge(
-            $this->getOptions(),
-            array_filter([
-                'color' => $this->getHexColor(),
-                'fillColor' => $this->getHexFillColor(),
-            ])
-        );
+        return [
+            'color'       => $this->getHexColor(),
+            'fillColor'   => $this->getHexFillColor(),
+            'opacity'     => $this->getOpacity(),
+            'fillOpacity' => $this->getFillOpacity(),
+            'weight'      => $this->weight,
+            'dashArray'   => $this->dashArray
+        ];
     }
 
     protected function getLayerData(): array
