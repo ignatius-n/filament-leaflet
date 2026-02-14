@@ -20,8 +20,8 @@ class MapEntry extends Entry
         }
 
         return [
-            $this->latitudeFieldName => $record->{$this->latitudeFieldName},
-            $this->longitudeFieldName => $record->{$this->longitudeFieldName}
+            $this->latitudeFieldName => $record->{$this->latitudeFieldName} ?? $this->mapCenter[0],
+            $this->longitudeFieldName => $record->{$this->longitudeFieldName} ?? $this->mapCenter[1]
         ];
     }
 

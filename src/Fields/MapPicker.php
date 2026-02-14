@@ -19,7 +19,7 @@ class MapPicker extends Field
     {
         parent::setUp();
         $this->height(284);
-        $this->saveRelationshipsUsing(function($record, $state) {
+        $this->saveRelationshipsUsing(function ($record, $state) {
             if ($this->storeAsJson) {
                 $record->{$this->getName()} = [
                     $this->latitudeFieldName => $state[$this->latitudeFieldName],
@@ -39,8 +39,8 @@ class MapPicker extends Field
                 $this->state($record->{$this->getName()});
             } else {
                 $this->state([
-                    $this->latitudeFieldName => $record->{$this->latitudeFieldName},
-                    $this->longitudeFieldName => $record->{$this->longitudeFieldName}
+                    $this->latitudeFieldName => $record->{$this->latitudeFieldName} ?? $this->mapCenter[0],
+                    $this->longitudeFieldName => $record->{$this->longitudeFieldName} ?? $this->mapCenter[1]
                 ]);
             }
         });
