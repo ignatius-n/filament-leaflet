@@ -28,13 +28,17 @@ trait HasMapState
     protected ?Closure $onMapClickCallback = null;
     protected ?Closure $onLayerClickCallback = null;
 
-    public function center(float|array|Closure $latitudeOrCoordinates, float|Closure $longitude): static
+    public function center(float|array|Closure $latitudeOrCoordinates, null|float|Closure $longitude = null): static
     {
         $latitudeOrCoordinates = $this->evaluate($latitudeOrCoordinates);
 
         if (is_array($latitudeOrCoordinates)) {
             $this->mapCenter = $latitudeOrCoordinates;
         } else {
+            if ($longitude === null) {
+                throw new \InvalidArgumentException('Longitude must be provided when using latitude and longitude as separate parameters.');
+            }
+            
             $this->mapCenter = [
                 $latitudeOrCoordinates,
                 $this->evaluate($longitude),
