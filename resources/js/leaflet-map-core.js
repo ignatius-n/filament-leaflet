@@ -230,9 +230,11 @@ export class LeafletMapCore {
             this.bindTooltip(layer, layerData.tooltip);
         }
 
-        if (layerData.clickAction && this.callbacks.onLayerClick) {
+        if (layerData.clickAction) {
             layer.on('click', () => {
-                this.callbacks.onLayerClick(layer.options.layerId);
+                if (this.callbacks.onLayerClick) {
+                    this.callbacks.onLayerClick(layerData.id);
+                }
             });
         }
 

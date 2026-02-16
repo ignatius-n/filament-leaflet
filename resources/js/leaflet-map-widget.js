@@ -28,7 +28,7 @@ document.addEventListener('livewire:init', () => {
                     },
 
                     onLayerClick: (layerId) => {
-                        this.$wire.call('handleLayerClick', [layerId]);
+                        this.$wire.call('handleLayerClick', layerId);
                     },
                 };
 

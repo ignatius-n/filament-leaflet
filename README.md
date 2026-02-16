@@ -571,11 +571,7 @@ MarkerCluster::make($markers)
     ->spiderfyOnMaxZoom(true)           // Spread markers at max zoom
     ->removeOutsideVisibleBounds(true)  // Remove markers outside viewport for performance
     ->disableClusteringAtZoom(15)       // Stop clustering at zoom level 15+
-    ->animate(true)                     // Animate cluster changes
-    ->options([                         // Custom Leaflet options
-        'maxClusterRadius' => 100,
-        'animateAddingMarkers' => true,
-    ]);
+    ->animate(true);                    // Animate cluster changes;
 ```
 
 ### Shapes
@@ -822,12 +818,6 @@ Circle::make(-23.5505, -46.6333)
     // Fill styling
     ->fillColor(Color::Green)   // Fill color
     ->fillOpacity(0.3)          // Fill opacity (0-1)
-    
-    // Custom options
-    ->options([
-        'className' => 'custom-shape',
-        'interactive' => true,
-    ]);
 ```
 
 ### Editable Layers
@@ -1357,7 +1347,6 @@ public function getCustomScripts(): string
 | `fillOpacity($value)` | Set fill opacity (0-1) |
 | `dashArray($pattern)` | Set dash pattern |
 | `editable($bool)` | Make shape editable on the map |
-| `options($array)` | Set custom options |
 | `popup($content, $fields, $options)` | Configure popup |
 | `tooltip($content, $permanent, $direction, $options)` | Configure tooltip |
 | `action($callback)` | Set click handler |
@@ -1410,7 +1399,6 @@ public function getCustomScripts(): string
 | `id($id)` | Set group ID |
 | `name($name)` | Set group name |
 | `option($key, $value)` | Set a group option |
-| `options($array)` | Set multiple group options |
 | `getLayers()` | Get all layers in the group |
 
 #### LayerGroup
