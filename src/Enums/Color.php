@@ -4,6 +4,7 @@ namespace EduardoRibeiroDev\FilamentLeaflet\Enums;
 
 use Filament\Support\Colors\Color as FilamentColor;
 
+/** @deprecated use \Filament\Support\Colors\Color instead. */
 class Color extends FilamentColor
 {
     public const Black = [

@@ -23,11 +23,14 @@ A powerful and elegant Leaflet integration for Filament PHP that makes creating 
 - **Layer Groups** - Organize markers and shapes with automatic coverage area calculation
 - **Editable Layers & Draw Control** - Edit markers and shapes directly on the map
 - **Dynamic Icons** - Marker icons with automatic sizing and anchor point calculation
-- **Enhanced Shapes** - Factory methods (`fromRecord()`) for all shape classes
+- **Enhanced Shapes** - Factory methods (`fromRecord()`) for all shape classes with support for JSON columns
 - **JSON Storage** - Store coordinates as JSON in single database column
 - **Map Interaction Control** - Toggle dragging, zooming, and auto-recenter behavior
 - **Static Maps** - Display read-only maps with automatic interaction disabling
 - **Auto-Recenter** - Automatically recenter maps after users pan around
+- **Mapbox Tile Layer Support** - New tile layer provider with configurable Access Token and tile size
+- **Marker CRUD Actions** - Built-in view, edit, and delete actions for markers on the map
+- **Coordinate DTO** - Improved handling of latitude/longitude pairs with dedicated DTO class
 
 ## Installation
 
@@ -203,7 +206,58 @@ class MyMapWidget extends MapWidget
 
 ![Widget With Custom Tile Layers Example](images/tile-layers.png)
 
-**Available providers:** `OpenStreetMap`, `GoogleStreets`, `GoogleSatellite`, `GoogleHybrid`, `GoogleTerrain`, `EsriWorldImagery`, `EsriWorldStreetMap`, `EsriNatGeo`, `CartoPositron`, `CartoDarkMatter`
+**Available providers:** `OpenStreetMap`, `GoogleStreets`, `GoogleSatellite`, `GoogleHybrid`, `GoogleTerrain`, `EsriWorldImagery`, `EsriWorldStreetMap`, `EsriNatGeo`, `CartoPositron`, `CartoDarkMatter`, `Mapbox`
+
+**Mapbox Tile Layer:**
+
+To use Mapbox tiles, configure your access token in `.env` or `config/services.php`:
+
+**Environment variables:**
+
+```env
+MAPBOX_ACCESS_TOKEN=your_mapbox_access_token_here
+MAPBOX_TILE_SIZE=512
+```
+
+**Or in config/services.php:**
+
+```php
+'mapbox' => [
+    'token' => env('MAPBOX_ACCESS_TOKEN'),
+    'tile_size' => env('MAPBOX_TILE_SIZE', 512),
+],
+```
+
+Then use the Mapbox tile layer in your widget:
+
+```php
+use EduardoRibeiroDev\FilamentLeaflet\Enums\TileLayer;
+
+class MyMapWidget extends MapWidget
+{
+    // Single Mapbox layer
+    protected TileLayer|string|array $tileLayersUrl = TileLayer::MapboxStreets;
+}
+```
+
+**Available Mapbox providers:**
+
+- `TileLayer::MapboxStreets` - Streets layer
+- `TileLayer::MapboxOutdoors` - Outdoors layer
+- `TileLayer::MapboxLight` - Light layer
+- `TileLayer::MapboxDark` - Dark layer
+- `TileLayer::MapboxSatellite` - Satellite layer
+
+**Or use multiple Mapbox layers:**
+
+```php
+protected TileLayer|string|array $tileLayersUrl = [
+    'Street Map' => TileLayer::OpenStreetMap,
+    'Mapbox Streets' => TileLayer::MapboxStreets,
+    'Mapbox Satellite' => TileLayer::MapboxSatellite,
+    'Mapbox Outdoors' => TileLayer::MapboxOutdoors,
+];
+```
 
 ### MapPicker (Form Field)
 
@@ -358,7 +412,24 @@ protected function getMarkers(): array
 
 #### Marker Colors
 
-Available: `blue()`, `red()`, `green()`, `orange()`, `yellow()`, `violet()`, `grey()`, `black()`, `gold()`, `randomColor()`, or `color(Color::Blue)`
+Markers accept colors in multiple formats:
+
+**Using Color Enum:**
+```php
+Marker::make(-23.5505, -46.6333)
+    ->color(Color::Blue)  // Enum constant
+    ->blue()              // Convenience method
+```
+
+**Using string formats:**
+```php
+Marker::make(-23.5505, -46.6333)
+    ->color('#3388ff')           // Hex color
+    ->color('rgb(51, 136, 255)') // RGB color
+    ->color('oklch(59% 0.15 262)')  // OKLCH color
+```
+
+**Available convenience methods:** `blue()`, `red()`, `green()`, `orange()`, `yellow()`, `violet()`, `grey()`, `black()`, `gold()`, `randomColor()`
 
 #### From Eloquent Models
 
@@ -739,6 +810,19 @@ protected function getShapes(): array
 }
 ```
 
+**Improved Support for JSON Columns:**
+
+Shapes now intelligently handle JSON-stored coordinates:
+
+```php
+Circle::fromRecord(
+    record: $zone,
+    jsonColumn: 'center_coordinates',  // Stores: { "lat": -23.5505, "lng": -46.6333 }
+    latColumn: 'lat',                   // Keys within the JSON
+    lngColumn: 'lng',
+);
+```
+
 Each shape type supports the `fromRecord()` method with common parameters:
 - `record`: The Eloquent model instance
 - `latColumn`/`lngColumn`: Column names for coordinates (for Circle, CircleMarker)
@@ -1043,6 +1127,43 @@ class LocationMapWidget extends MapWidget
 
 When users click the map, a form modal opens to create a new marker. If coordinates are stored as JSON, the widget automatically converts latitude/longitude into the configured JSON column.
 
+**Built-in Marker Actions:**
+
+Define custom actions to execute when clicking markers with records using the `$markerClickAction` property:
+
+```php
+use App\Models\Store;
+
+class LocationMapWidget extends MapWidget
+{
+    protected ?string $markerModel = Store::class;
+    protected string $latitudeColumnName = 'latitude';
+    protected string $longitudeColumnName = 'longitude';
+    
+    // Define the action to execute when a marker is clicked
+    protected ?string $markerClickAction = 'view'; // 'view', 'edit', 'delete' or null
+    
+    protected function getMarkers(): array
+    {
+        return Store::all()->map(fn($store) => 
+            Marker::fromRecord(
+                record: $store,
+                latColumn: 'latitude',
+                lngColumn: 'longitude',
+                titleColumn: 'name',
+            )
+        )->all();
+    }
+}
+```
+
+**Available marker click actions:**
+
+- `'view'` - Display a read-only modal with the marker's record details
+- `'edit'` - Open an edit form for the marker's record (default)
+- `'delete'` - Prompt to delete the marker's record
+- `null` - No action
+
 **Using a Resource Form:**
 
 ```php
@@ -1239,6 +1360,9 @@ public function getCustomScripts(): string
 | `refreshMap()` | Manually refresh the map |
 | `afterMarkerCreated($record)` | Hook after marker creation |
 | `mutateFormDataBeforeCreate($data)` | Transform form data before save |
+| `$markerClickAction` | Define action for marker clicks (view/edit/delete) |
+| `$markerModel` | Eloquent model class for markers (enables CRUD) |
+| `$markerResource` | Optional Filament Resource for marker actions |
 
 #### MapPicker
 
@@ -1446,7 +1570,9 @@ public function getCustomScripts(): string
 
 ## Color Reference
 
-Available colors for markers and shapes:
+Markers and shapes accept colors from multiple sources:
+
+**Color Enum Constants:**
 
 - `Color::Blue` / `->blue()` - #3388ff
 - `Color::Red` / `->red()` - #f03
@@ -1457,6 +1583,22 @@ Available colors for markers and shapes:
 - `Color::Grey` / `->grey()` - #666
 - `Color::Black` / `->black()` - #000
 - `Color::Gold` / `->gold()` - #ffd700
+
+## Tile Layer Reference
+
+Available tile layer providers:
+
+- `TileLayer::OpenStreetMap` - Free, open-source map tile provider
+- `TileLayer::GoogleStreets` - Google Streets map layer
+- `TileLayer::GoogleSatellite` - Google Satellite imagery layer
+- `TileLayer::GoogleHybrid` - Google hybrid (streets + satellite) layer
+- `TileLayer::GoogleTerrain` - Google terrain layer
+- `TileLayer::EsriWorldImagery` - ESRI World Imagery layer
+- `TileLayer::EsriWorldStreetMap` - ESRI World Street Map
+- `TileLayer::EsriNatGeo` - ESRI National Geographic layer
+- `TileLayer::CartoPositron` - Carto Positron light map
+- `TileLayer::CartoDarkMatter` - Carto Dark Matter map
+- `TileLayer::Mapbox` - Mapbox tiles (requires configured Access Token)
 
 ## Concern Methods Reference
 
