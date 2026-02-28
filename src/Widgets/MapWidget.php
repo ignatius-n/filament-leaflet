@@ -18,12 +18,17 @@ use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\Hidden;
 use Filament\Widgets\Widget;
 use Exception;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 
 abstract class MapWidget extends Widget implements HasSchemas, HasActions
 {
     use InteractsWithSchemas;
     use InteractsWithActions;
-    use HasMapConfig;
+    use HasMapConfig {
+        handleLayerClick as handleMapLayerClick;
+    }
 
     // Configurações do widget
     protected static bool $isLazy = false;
@@ -37,6 +42,7 @@ abstract class MapWidget extends Widget implements HasSchemas, HasActions
     protected string $longitudeColumnName = 'longitude';
     protected ?string $jsonCoordinatesColumnName = null;
     protected int $formColumns = 2;
+    protected ?string $markerClickAction = 'edit';
 
     /**
      * Retorna o título do widget
@@ -56,6 +62,27 @@ abstract class MapWidget extends Widget implements HasSchemas, HasActions
                 $this->getLongitudeColumnName() => $longitude
             ]);
         }
+    }
+
+    public function handleLayerClick(string $layerId): void
+    {
+        if ($this->markerModel) {
+            $layer = $this->getLayerById($layerId);
+
+            if (($record = $layer->getRecord())) {
+                $action = match ($this->markerClickAction) {
+                    'view' => 'viewMarker',
+                    'edit' => 'editMarker',
+                    'delete' => 'deleteMarker',
+                    default => throw new Exception('Invalid markerClickAction configuration: ' . $this->markerClickAction),
+                };
+
+
+                $this->mountAction($action, compact('record'));
+            }
+        }
+
+        $this->handleMapLayerClick($layerId);
     }
 
     /**
@@ -150,11 +177,42 @@ abstract class MapWidget extends Widget implements HasSchemas, HasActions
                 try {
                     $newRecord = $model::create($data);
                     $this->refreshMap();
-                    $this->dispatch('marker-created');
+                    $this->dispatch('marker-updated');
                     $this->afterMarkerCreated($newRecord);
                 } catch (Exception $e) {
                     throw new Exception('Error on creating Marker: ' . $e->getMessage());
                 }
+            });
+    }
+
+    public function viewMarkerAction(): ViewAction
+    {
+        return ViewAction::make('viewMarker')
+            ->schema(fn(Schema $schema) => $this->getFormSchema($schema))
+            ->record(fn($arguments) => $arguments['record']);
+    }
+
+    public function editMarkerAction(): EditAction
+    {
+        return EditAction::make('editMarker')
+            ->record(fn($arguments) => $arguments['record'])
+            ->schema(fn(Schema $schema) => $this->getFormSchema($schema))
+            ->mutateDataUsing(fn(array $data) => $this->mutateFormDataBeforeCreate($data))
+            ->using(function (Model $record, array $data) {
+                $record->update($data);
+                $this->refreshMap();
+                $this->dispatch('marker-updated');
+            });
+    }
+
+    public function deleteMarkerAction(): DeleteAction
+    {
+        return DeleteAction::make('deleteMarker')
+            ->record(fn($arguments) => $arguments['record'])
+            ->using(function (Model $record) {
+                $record->delete();
+                $this->refreshMap();
+                $this->dispatch('marker-updated');
             });
     }
 
@@ -170,8 +228,8 @@ abstract class MapWidget extends Widget implements HasSchemas, HasActions
             $jsonCol = $this->getJsonCoordinatesColumnName();
 
             $data[$jsonCol] = [
-                'latitude' => $data[$latCol],
-                'longitude' => $data[$lngCol]
+                $latCol => $data[$latCol],
+                $lngCol => $data[$lngCol]
             ];
 
             unset($data[$latCol], $data[$lngCol]);

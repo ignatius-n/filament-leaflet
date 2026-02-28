@@ -21,11 +21,11 @@ export default defineConfig({
         viteStaticCopy({
             targets: [
                 {
-                    src: 'node_modules/leaflet/dist/images/*.png',
+                    src: 'node_modules/leaflet/dist/images/layers.png',
                     dest: 'images'
                 },
                 {
-                    src: 'resources/images/*.png',
+                    src: 'node_modules/leaflet/dist/images/layers-2x.png',
                     dest: 'images'
                 },
             ]

@@ -17,8 +17,6 @@
 
     </x-filament::section>
 
-    {{-- Obtém apenas o formulário da ação (modal) --}}
-    {{ $this->createMarkerAction->getFormToSubmit() }}
     <x-filament-actions::modals />
 
 </x-filament-widgets::widget>

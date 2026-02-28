@@ -60,6 +60,10 @@ document.addEventListener('livewire:init', () => {
                     onLayerClick: (layerId) => {
                         this.callColumnMethod('handleLayerClick', { layerId: layerId });
                     },
+
+                    onLayerUpdated: (layerId, data) => {
+                        this.callColumnMethod('handleLayerUpdated', { layerId: layerId, data: data });
+                    }
                 };
 
                 this.mapCore.setupEventHandlers(callbacks);

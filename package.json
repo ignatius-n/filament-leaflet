@@ -25,6 +25,7 @@
     "vite-plugin-static-copy": "^3.1.4"
   },
   "dependencies": {
+    "@ctrl/tinycolor": "^4.2.0",
     "@geoman-io/leaflet-geoman-free": "^2.19.2",
     "leaflet": "^1.9.4",
     "leaflet-draw": "^1.0.4",

@@ -8,6 +8,7 @@ import 'leaflet.fullscreen/dist/Control.FullScreen.css';
 import 'leaflet-geosearch/dist/geosearch.css';
 import '../css/index.css';
 
+import { TinyColor } from '@ctrl/tinycolor'
 import "@geoman-io/leaflet-geoman-free";
 import 'leaflet.markercluster'
 import { FullScreen } from 'leaflet.fullscreen';
@@ -230,13 +231,11 @@ export class LeafletMapCore {
             this.bindTooltip(layer, layerData.tooltip);
         }
 
-        if (layerData.clickAction) {
-            layer.on('click', () => {
-                if (this.callbacks.onLayerClick) {
-                    this.callbacks.onLayerClick(layerData.id);
-                }
-            });
-        }
+        layer.on('click', () => {
+            if (this.callbacks.onLayerClick) {
+                this.callbacks.onLayerClick(layerData.id);
+            }
+        });
 
         if (layerData.onMouseOver) {
             layer.on('mouseover', function () {
@@ -250,14 +249,58 @@ export class LeafletMapCore {
             });
         }
 
-        if (layerData.group) {
-            const group = this.layerGroups.get(layerData.group);
-            layer.addTo(Alpine.raw(group.layer));
+        if (layerData.isEditable) {
+            layer.pm.enable();
         } else {
-            layer.addTo(Alpine.raw(this.map));
+            layer.pm.disable();
         }
 
-        this.layers.set(layerData.id, {
+        const updateHandler = (e) => {
+            if (this.callbacks.onLayerUpdated) {
+                const target = e.target;
+                console.log(target);
+                let data = {};
+
+                if (target instanceof L.Marker) {
+                    data = target.getLatLng();
+                } else if (target instanceof L.Circle || target instanceof L.CircleMarker) {
+                    data = {
+                        lat: target.getLatLng().lat,
+                        lng: target.getLatLng().lng,
+                        radius: target.getRadius(),
+                    };
+                } else if (target instanceof L.Rectangle) {
+                    const bounds = Object.values(target.getBounds()).map((latlng) => [latlng.lat, latlng.lng]);
+                    data = {
+                        bounds: bounds,
+                    };
+                } else if (target instanceof L.Polygon) {
+                    const latlngs = target.getLatLngs()[0].map((latlng) => [latlng.lat, latlng.lng]);
+                    data = {
+                        points: latlngs,
+                    };
+                } else if (target instanceof L.Polyline) {
+                    const latlngs = target.getLatLngs().map((latlng) => [latlng.lat, latlng.lng]);
+                    data = {
+                        points: latlngs,
+                    };
+                }
+
+                this.callbacks.onLayerUpdated(layerData.id, data);
+            }
+        };
+
+        layer.on('dragend', updateHandler);
+        layer.on('pm:update', updateHandler);
+
+        if (layerData.group) {
+            const group = this.layerGroups.get(layerData.group);
+            Alpine.raw(layer).addTo(Alpine.raw(group.layer));
+        } else {
+            Alpine.raw(layer).addTo(Alpine.raw(this.map));
+        }
+
+        Alpine.raw(this.layers).set(layerData.id, {
             layer: Alpine.raw(layer),
             data: layerData
         });
@@ -344,28 +387,84 @@ export class LeafletMapCore {
     }
 
     createPolyline(polylineData) {
-        const polyline = L.polyline(polylineData.point, polylineData.options);
+        const polyline = L.polyline(polylineData.points, polylineData.options);
         return polyline;
     }
 
     createIcon(iconData) {
-        const color = iconData?.color || 'blue';
         const url = iconData?.url;
-        const size = iconData?.size || [25, 41];
-        const maxSize = Math.max(...size);
+        const size = iconData?.size || [24, 36];
 
+        // Leaflet Anchors
         const iconAnchor = [size[0] / 2, size[1]];
         const popupAnchor = [0, (size[1] / 1.25) * -1];
-        const shadowSize = [maxSize, maxSize];
+        const tooltipAnchor = [0, (size[1] / 1.25) * -1];
 
-        return L.icon({
-            iconUrl: url || `${this.imgsPath}/marker-icon-2x-${color}.png`,
+        let iconOptions = {
             iconSize: size,
             iconAnchor: iconAnchor,
             popupAnchor: popupAnchor,
-            shadowUrl: `${this.imgsPath}/marker-shadow.png`,
-            shadowSize: shadowSize,
-        });
+            tooltipAnchor: tooltipAnchor
+        };
+
+        if (url) {
+            iconOptions.iconUrl = url;
+            return L.icon(iconOptions);
+        } else {
+            const colorManager = new TinyColor(iconData?.color || 'blue');
+            const color = colorManager.toHexString();
+            const darkColor = colorManager.darken(15).toHexString();
+
+            const gradientId = `grad-${color.replace('#', '')}`;
+            const shadowId = `shadow-${color.replace('#', '')}`;
+
+            const pathData = "M12 0C5.4 0 0 5.4 0 12c0 9 12 24 12 24s12-15 12-24C24 5.4 18.6 0 12 0z";
+
+            iconOptions.className = '';
+            iconOptions.html = `
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                viewBox="0 0 24 36" 
+                width="${size[0]}" 
+                height="${size[1]}" 
+                style="overflow: visible; display: block;"
+            >
+            <defs>
+                <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%"   stop-color="${color}" />
+                <stop offset="100%" stop-color="${darkColor}" />
+                </linearGradient>
+                
+                <!-- Blur filter -->
+                <filter id="${shadowId}" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" />
+                </filter>
+            </defs>
+    
+            <!-- SHADOW -->
+            <path 
+                d="${pathData}" 
+                fill="rgba(0,0,0,0.25)" 
+                filter="url(#${shadowId})"
+                transform="translate(12, 36) skewX(-30) scale(1, 0.5) translate(-12, -30)"
+            />
+    
+            <!-- MARKER -->
+            <path 
+                d="${pathData}" 
+                fill="url(#${gradientId})" 
+                stroke="${darkColor}" 
+                stroke-width="1" 
+            />
+    
+            <!-- DOT -->
+            <circle cx="12" cy="12" r="6" fill="white" stroke="${darkColor}" stroke-width="1" />
+    
+            </svg>
+            `;
+
+            return L.divIcon(iconOptions);
+        }
     }
 
     /**
@@ -500,9 +599,7 @@ export class LeafletMapCore {
             searchLabel: this.getTranslation('enter_address', ''),
 
             marker: {
-                icon: this.createIcon({
-                    color: 'blue'
-                }),
+                icon: this.createIcon(),
                 draggable: false,
             },
         });
@@ -533,9 +630,7 @@ export class LeafletMapCore {
             snappable: true,
             snapDistance: 20,
             markerStyle: {
-                icon: this.createIcon({
-                    color: 'blue'
-                })
+                icon: this.createIcon()
             }
         });
 

@@ -4,13 +4,12 @@ namespace EduardoRibeiroDev\FilamentLeaflet\Support\Groups;
 
 use EduardoRibeiroDev\FilamentLeaflet\Support\BaseLayerGroup;
 use EduardoRibeiroDev\FilamentLeaflet\Support\Shapes\Polygon;
-use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasColor;
-use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasFillColor;
+use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasPath;
+use EduardoRibeiroDev\FilamentLeaflet\DTO\Coordinate;
 
 class FeatureGroup extends BaseLayerGroup
 {
-    use HasColor;
-    use HasFillColor;
+    use HasPath;
 
     /*
     |--------------------------------------------------------------------------
@@ -28,14 +27,70 @@ class FeatureGroup extends BaseLayerGroup
         $layers = parent::getLayers();
 
         $points = array_map(fn($layer) => $layer->getCoordinates(), $layers);
-        $polygon = Polygon::make($points)
+
+        $boundaryPointsObjects = count($points) > 3
+            ? $this->getConvexHull($points)
+            : $points;
+
+        $boundaryPointsArray = array_map(fn($coord) => $coord->toArray(), $boundaryPointsObjects);
+
+        $polygon = Polygon::make($boundaryPointsArray)
             ->color($this->getColor())
             ->fillColor($this->getFillColor())
-            ->options($this->getOptions('polygon'));
+            ->opacity($this->getOpacity())
+            ->fillOpacity($this->getFillOpacity())
+            ->weight($this->getWeight())
+            ->smoothFactor($this->getSmoothFactor())
+            ->dashArray($this->getDashArray())
+            ->dashOffset($this->getDashOffset())
+            ->stroke($this->getStroke())
+            ->lineCap($this->getLineCap())
+            ->lineJoin($this->getLineJoin())
+            ->fill($this->getFill())
+            ->fillRule($this->getFillRule())
+            ->noClip($this->getNoClip());
 
         $layers[] = $this->modifyLayerUsing($polygon);
 
         return $layers;
+    }
+
+    /**
+     * @param Coordinate[] $points
+     * @return Coordinate[]
+     */
+    private function getConvexHull(array $points): array
+    {
+        usort($points, function (Coordinate $a, Coordinate $b) {
+            return $a->lat <=> $b->lat ?: $a->lng <=> $b->lng;
+        });
+
+        $lower = [];
+        foreach ($points as $p) {
+            while (count($lower) >= 2 && $this->crossProduct($lower[count($lower) - 2], $lower[count($lower) - 1], $p) <= 0) {
+                array_pop($lower);
+            }
+            $lower[] = $p;
+        }
+
+        $upper = [];
+        for ($i = count($points) - 1; $i >= 0; $i--) {
+            $p = $points[$i];
+            while (count($upper) >= 2 && $this->crossProduct($upper[count($upper) - 2], $upper[count($upper) - 1], $p) <= 0) {
+                array_pop($upper);
+            }
+            $upper[] = $p;
+        }
+
+        array_pop($upper);
+        array_pop($lower);
+
+        return array_merge($lower, $upper);
+    }
+
+    private function crossProduct(Coordinate $o, Coordinate $a, Coordinate $b): float
+    {
+        return ($a->lat - $o->lat) * ($b->lng - $o->lng) - ($a->lng - $o->lng) * ($b->lat - $o->lat);
     }
 
     /*
@@ -44,36 +99,8 @@ class FeatureGroup extends BaseLayerGroup
     |--------------------------------------------------------------------------
     */
 
-    /**
-     * Define a espessura da borda em pixels.
-     */
-    public function weight(int $weight): static
+    public function getDefaultFillOpacity(): float
     {
-        return $this->option('weight', $weight, 'polygon');
-    }
-
-    /**
-     * Define a opacidade da borda (0.0 a 1.0).
-     */
-    public function opacity(float $opacity): static
-    {
-        return $this->option('opacity', $opacity, 'polygon');
-    }
-
-    /**
-     * Define a opacidade do preenchimento (0.0 a 1.0).
-     */
-    public function fillOpacity(float $opacity): static
-    {
-        return $this->option('fillOpacity', $opacity, 'polygon');
-    }
-
-    /**
-     * Define o estilo do traço (tracejado).
-     * Ex: '5, 10' (5px linha, 10px espaço).
-     */
-    public function dashArray(string $dashArray): static
-    {
-        return $this->option('dashArray', $dashArray, 'polygon');
+        return 0.35;
     }
 }

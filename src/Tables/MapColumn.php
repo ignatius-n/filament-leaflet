@@ -95,7 +95,7 @@ class MapColumn extends Column
         $this->height(72);
         $this->width(108);
         $this->zoom(5);
-        $this->recenterTimeout(3000);
+        $this->recenterTimeout(5000);
         $this->minZoom(0);
         $this->pickMarker(fn(Marker $marker) => $marker->icon(size: [14, 25]));
     }

@@ -29,6 +29,6 @@ class MapEntry extends Entry
     {
         parent::setUp();
         $this->height(284);
-        $this->recenterTimeout(3000);
+        $this->recenterTimeout(5000);
     }
 }

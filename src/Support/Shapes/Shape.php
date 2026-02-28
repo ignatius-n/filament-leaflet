@@ -4,16 +4,11 @@ namespace EduardoRibeiroDev\FilamentLeaflet\Support\Shapes;
 
 use Closure;
 use EduardoRibeiroDev\FilamentLeaflet\Support\BaseLayer;
-use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasColor;
-use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasFillColor;
+use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasPath;
 
 abstract class Shape extends BaseLayer
 {
-    use HasColor;
-    use HasFillColor;
-
-    protected ?int $weight = null;
-    protected ?string $dashArray = null;
+    use HasPath;
 
     /**
      * Retorna os dados específicos da forma.
@@ -21,36 +16,25 @@ abstract class Shape extends BaseLayer
     abstract protected function getShapeData(): array;
 
     /**
-     * Define a espessura da borda em pixels.
-     */
-    public function weight(null|Closure|int $weight): static
-    {
-        $this->weight = $this->evaluate($weight);
-        return $this;
-    }
-
-    /**
-     * Define o estilo do traço (tracejado).
-     * Ex: '5, 10' (5px linha, 10px espaço).
-     */
-    public function dashArray(null|Closure|string $dashArray): static
-    {
-        $this->dashArray = $this->evaluate($dashArray);
-        return $this;
-    }
-
-    /**
      * Retorna o array de opções visuais mesclado com as cores definidas.
      */
     protected function getShapeOptions(): array
     {
         return [
-            'color'       => $this->getHexColor(),
-            'fillColor'   => $this->getHexFillColor(),
-            'opacity'     => $this->getOpacity(),
-            'fillOpacity' => $this->getFillOpacity(),
-            'weight'      => $this->weight,
-            'dashArray'   => $this->dashArray
+            'color'        => $this->getRgbColor(500),
+            'fillColor'    => $this->getRgbFillColor(400),
+            'opacity'      => $this->getOpacity(),
+            'fillOpacity'  => $this->getFillOpacity(),
+            'weight'       => $this->getWeight(),
+            'smoothFactor' => $this->getSmoothFactor(),
+            'dashArray'    => $this->getDashArray(),
+            'dashOffset'   => $this->getDashOffset(),
+            'stroke'       => $this->getStroke(),
+            'lineCap'      => $this->getLineCap(),
+            'lineJoin'     => $this->getLineJoin(),
+            'fill'         => $this->getFill(),
+            'fillRule'     => $this->getFillRule(),
+            'noClip'       => $this->getNoClip(),
         ];
     }
 
@@ -60,5 +44,10 @@ abstract class Shape extends BaseLayer
             $this->getShapeData(),
             ['options' => $this->getShapeOptions()]
         );
+    }
+
+    public function getDefaultFillOpacity(): float
+    {
+        return 0.35;
     }
 }

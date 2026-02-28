@@ -30,6 +30,10 @@ document.addEventListener('livewire:init', () => {
                     onLayerClick: (layerId) => {
                         this.$wire.call('handleLayerClick', layerId);
                     },
+
+                    onLayerUpdated: (layerId, data) => {
+                        this.$wire.call('handleLayerUpdated', layerId, data);
+                    }
                 };
 
                 this.mapCore.setupEventHandlers(callbacks);

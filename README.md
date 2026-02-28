@@ -629,12 +629,12 @@ Draw custom polygons:
 use EduardoRibeiroDev\FilamentLeaflet\Support\Shapes\Polygon;
 
 // Define a polygon area
-Polygon::make([
+Polygon::make(
     [-23.5505, -46.6333],
     [-23.5515, -46.6343],
     [-23.5525, -46.6323],
     [-23.5505, -46.6333], // Close the polygon
-])
+)
 ->green()
 ->fillGreen()
 ->fillOpacity(0.3)
@@ -660,12 +660,12 @@ Draw lines connecting multiple points:
 use EduardoRibeiroDev\FilamentLeaflet\Support\Shapes\Polyline;
 
 // Route or path
-Polyline::make([
+Polyline::make(
     [-23.5505, -46.6333],
     [-23.5515, -46.6343],
     [-23.5525, -46.6353],
     [-23.5535, -46.6363],
-])
+)
 ->blue()
 ->weight(4)
 ->opacity(0.7)
@@ -735,13 +735,15 @@ protected function getShapes(): array
             descriptionColumn: 'description',
             popupFieldsColumns: ['address', 'radius'],
         );
-    })->toArray();
+    })->all();
 }
 ```
 
 Each shape type supports the `fromRecord()` method with common parameters:
 - `record`: The Eloquent model instance
 - `latColumn`/`lngColumn`: Column names for coordinates (for Circle, CircleMarker)
+- `radiusColumn`: Column name for radius (for Circle, CircleMarker)
+- `jsonColumn`: Column name for JSON coordinates (case of storing lat/lng as JSON)
 - `pointsColumn`: Column name for points array (for Polygon, Polyline)
 - `boundsColumn`: Column name for bounds array (for Rectangle)
 - `titleColumn`: Column name for the shape title
@@ -757,6 +759,7 @@ Circle::fromRecord(
     record: $zone,
     latColumn: 'center_lat',
     lngColumn: 'center_lng',
+    radiusColumn: 'coverage_radius_km',
     titleColumn: 'zone_name',
     descriptionColumn: 'zone_description',
     mapRecordCallback: fn(Circle $circle, $record) => 
@@ -962,7 +965,7 @@ protected function getMarkers(): array
             
             return redirect()->route('stores.show', $record);
         });
-    })->toArray();
+    })->all();
 }
 ```
 
@@ -1132,7 +1135,7 @@ To customize translations:
 php artisan vendor:publish --tag=filament-leaflet-translations
 ```
 
-Then edit files in `resources/lang/`.
+Then edit files in `lang/vendor/filament-leaflet`.
 
 ## Best Practices
 
@@ -1143,7 +1146,7 @@ Then edit files in `resources/lang/`.
 // Bad: 1000 individual markers
 protected function getMarkers(): array
 {
-    return Store::all()->map(fn($s) => Marker::fromRecord($s))->toArray();
+    return Store::all()->map(fn($s) => Marker::fromRecord($s))->all();
 }
 
 // Good: Clustered markers

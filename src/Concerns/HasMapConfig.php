@@ -496,14 +496,21 @@ trait HasMapConfig
     }
 
     /**
+     * Evento disparado quando um layer é atualizado (ex: arrastado, editado).
+     */
+    public final function handleLayerUpdated(string $layerId, array $data): void
+    {
+        if (($layer = $this->getLayerById($layerId))) {
+            $layer->updateLayer($data);
+        }
+    }
+
+    /**
      * Evento disparado quando um layer é clicado
      */
     public function handleLayerClick(string $layerId): void
     {
-        // Busca o layer e executa sua ação
-        $layer = $this->getLayerById($layerId);
-
-        if ($layer) {
+        if (($layer = $this->getLayerById($layerId))) {
             $layer->execClickAction();
         }
     }

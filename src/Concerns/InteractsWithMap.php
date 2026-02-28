@@ -7,7 +7,7 @@ use Livewire\Attributes\On;
 
 trait InteractsWithMap
 {
-    #[On('marker-created')]
+    #[On('marker-updated')]
     public function resetTable(): void
     {
         parent::resetTable();
