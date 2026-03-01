@@ -41,7 +41,7 @@ class FeatureGroup extends BaseLayerGroup
             ->fillOpacity($this->getFillOpacity())
             ->weight($this->getWeight())
             ->smoothFactor($this->getSmoothFactor())
-            ->dashArray($this->getDashArray())
+            ->dashArray(...$this->getDashArray())
             ->dashOffset($this->getDashOffset())
             ->stroke($this->getStroke())
             ->lineCap($this->getLineCap())

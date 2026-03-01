@@ -68,7 +68,7 @@ trait HasPath
      * @example $shape->dashArray(5, 10); // 5px dash followed by 10px gap.
      * @example $shape->dashArray(5, 10, 2, 10); // 5px dash, 10px gap, 2px dash, 10px gap.
      */
-    public function dashArray(null|Closure|int ...$dashArray): static
+    public function dashArray(null|Closure|int|string ...$dashArray): static
     {
         $this->dashArray = array_map(fn($dash) => $this->evaluate($dash), $dashArray);
         return $this;

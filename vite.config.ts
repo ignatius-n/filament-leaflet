@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite';
 import path from 'path';
-import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
     build: {
@@ -16,19 +15,5 @@ export default defineConfig({
                 inlineDynamicImports: true,
             },
         },
-    },
-    plugins: [
-        viteStaticCopy({
-            targets: [
-                {
-                    src: 'node_modules/leaflet/dist/images/layers.png',
-                    dest: 'images'
-                },
-                {
-                    src: 'node_modules/leaflet/dist/images/layers-2x.png',
-                    dest: 'images'
-                },
-            ]
-        })
-    ]
+    }
 });

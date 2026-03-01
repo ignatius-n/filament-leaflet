@@ -565,7 +565,7 @@ trait HasMapState
         }
 
         return [
-            $state[$this->latitudeFieldName],
+            $state[$this->latitudeFieldName] + 0.5 ** ($this->getDefaultZoom() - 4),
             $state[$this->longitudeFieldName]
         ];
     }

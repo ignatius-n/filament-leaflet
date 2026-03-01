@@ -8,16 +8,16 @@ use Filament\Support\Colors\Color as FilamentColor;
 class Color extends FilamentColor
 {
     public const Black = [
-        50 => 'oklch(0.985 0 0)',
-        100 => 'oklch(0.97 0 0)',
-        200 => 'oklch(0.922 0 0)',
-        300 => 'oklch(0.87 0 0)',
-        400 => 'oklch(0.708 0 0)',
-        500 => 'oklch(0.556 0 0)',
-        600 => 'oklch(0.439 0 0)',
-        700 => 'oklch(0.371 0 0)',
-        800 => 'oklch(0.269 0 0)',
-        900 => 'oklch(0.205 0 0)',
+        50 => 'oklch(0.634 0 0)',
+        100 => 'oklch(0.585 0 0)',
+        200 => 'oklch(0.521 0 0)',
+        300 => 'oklch(0.478 0 0)',
+        400 => 'oklch(0.412 0 0)',
+        500 => 'oklch(0.362 0 0)',
+        600 => 'oklch(0.314 0 0)',
+        700 => 'oklch(0.264 0 0)',
+        800 => 'oklch(0.204 0 0)',
+        900 => 'oklch(0.198 0 0)',
         950 => 'oklch(0.145 0 0)',
     ];
 

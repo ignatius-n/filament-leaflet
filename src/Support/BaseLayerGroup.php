@@ -2,6 +2,7 @@
 
 namespace EduardoRibeiroDev\FilamentLeaflet\Support;
 
+use Filament\Support\Concerns\EvaluatesClosures;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Traits\Conditionable;
@@ -11,6 +12,7 @@ abstract class BaseLayerGroup implements Arrayable, Jsonable
 {
     use Conditionable;
     use Macroable;
+    use EvaluatesClosures;
 
     protected ?string $id = null;
     protected ?array $layers = null;

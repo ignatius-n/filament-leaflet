@@ -15,10 +15,9 @@ import { FullScreen } from 'leaflet.fullscreen';
 import { EsriProvider, GeoSearchControl } from 'leaflet-geosearch';
 
 export class LeafletMapCore {
-    constructor(config, imgsPath = '/vendor/filament-leaflet/images') {
+    constructor(config) {
         this.map = null;
         this.config = config;
-        this.imgsPath = imgsPath;
         this.layers = new Map();
         this.layerGroups = new Map();
         this.baseLayers = {};
@@ -458,7 +457,7 @@ export class LeafletMapCore {
             />
     
             <!-- DOT -->
-            <circle cx="12" cy="12" r="6" fill="white" stroke="${darkColor}" stroke-width="1" />
+            <circle cx="12" cy="12" r="5" fill="white" stroke="${darkColor}" stroke-width="1" />
     
             </svg>
             `;
