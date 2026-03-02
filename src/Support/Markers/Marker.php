@@ -6,6 +6,8 @@ use Closure;
 use EduardoRibeiroDev\FilamentLeaflet\Enums\Color;
 use EduardoRibeiroDev\FilamentLeaflet\Support\BaseLayer;
 use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasColor;
+use Filament\Support\Enums\IconSize;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Model;
 
 class Marker extends BaseLayer
@@ -23,6 +25,7 @@ class Marker extends BaseLayer
     // Configurações de Ícone
     protected ?string $iconUrl = null;
     protected array $iconSize = [24, 36];
+    protected ?Heroicon $heroicon = null;
 
 
     final public function __construct(float $latitude = 0, float $longitude = 0)
@@ -33,9 +36,9 @@ class Marker extends BaseLayer
 
     /**
      * Convenience method to create a Marker instance with given latitude and longitude.
-      * @param float $latitude The latitude for the marker.
-      * @param float $longitude The longitude for the marker.
-      * @return static A new Marker instance with the specified coordinates.
+     * @param float $latitude The latitude for the marker.
+     * @param float $longitude The longitude for the marker.
+     * @return static A new Marker instance with the specified coordinates.
      */
     public static function make(float $latitude, float $longitude): static
     {
@@ -153,6 +156,11 @@ class Marker extends BaseLayer
     public function iconUrl(null|Closure|string $url = null): static
     {
         $this->iconUrl = $this->evaluate($url);
+
+        if ($this->iconUrl !== null) {
+            $this->heroicon = null;
+        }
+
         return $this;
     }
 
@@ -161,9 +169,24 @@ class Marker extends BaseLayer
      * @param Closure|array $size An array with width and height or a Closure that returns such an array.
      * @return $this
      */
-    public function iconSize(Closure|array $size = [25, 41]): static
+    public function iconSize(Closure|array $size = [24, 36]): static
     {
         $this->iconSize = (array) $this->evaluate($size);
+        return $this;
+    }
+
+    public function heroicon(null|string|Heroicon|Closure $icon = null): static
+    {
+        $evaluatedIcon = $this->evaluate($icon);
+
+        $this->heroicon = ($evaluatedIcon instanceof Heroicon || $evaluatedIcon === null)
+            ? $evaluatedIcon
+            : Heroicon::tryFrom(str_replace('heroicon-', '', $evaluatedIcon));
+
+        if ($this->heroicon !== null) {
+            $this->iconUrl = null;
+        }
+
         return $this;
     }
 
@@ -173,19 +196,36 @@ class Marker extends BaseLayer
      * @param Closure|array $size An array with width and height or a Closure that returns such an array.
      * @return $this
      */
-    public function icon(null|Closure|string $url = null, Closure|array $size = [25, 41]): static
+    public function icon(null|Closure|Heroicon|string $icon = null, Closure|array $size = [24, 36]): static
     {
-        $this->iconUrl($url);
+        $evaluatedIcon = $this->evaluate($icon);
+        if ($evaluatedIcon instanceof Heroicon || str_starts_with($icon, 'heroicon') || Heroicon::tryFrom($evaluatedIcon) !== null) {
+            $this->heroicon($icon);
+        } else {
+            $this->iconUrl($icon);
+        }
+
         $this->iconSize($size);
         return $this;
+    }
+
+    private function resolveHeroicon(): ?string
+    {
+        if ($this->heroicon === null) {
+            return null;
+        }
+
+        $iconClass = $this->heroicon->getIconForSize(IconSize::Small);
+        return svg($iconClass)->toHtml();
     }
 
     public function getIconOptions()
     {
         return [
-            'color' => $this->getRgbColor(500),
-            'url'   => $this->iconUrl,
-            'size'  => $this->iconSize,
+            'color'    => $this->getRgbColor(500),
+            'url'      => $this->iconUrl,
+            'size'     => $this->iconSize,
+            'heroicon' => $this->resolveHeroicon(),
         ];
     }
 

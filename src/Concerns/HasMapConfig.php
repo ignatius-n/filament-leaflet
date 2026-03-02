@@ -43,7 +43,7 @@ trait HasMapConfig
     /** @deprecated */
     protected bool $hasDrawControl = false;
 
-    protected int $maxZoom = 18;
+    protected int $maxZoom = 19;
     protected int $minZoom = 2;
 
     /** @var TileLayer|string|array */

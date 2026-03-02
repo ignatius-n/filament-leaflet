@@ -23,6 +23,7 @@ A powerful and elegant Leaflet integration for Filament PHP that makes creating 
 - **Layer Groups** - Organize markers and shapes with automatic coverage area calculation
 - **Editable Layers & Draw Control** - Edit markers and shapes directly on the map
 - **Dynamic Icons** - Marker icons with automatic sizing and anchor point calculation
+- **Heroicon Support** - Use Filament Heroicons directly in markers with automatic SVG rendering
 - **Enhanced Shapes** - Factory methods (`fromRecord()`) for all shape classes with support for JSON columns
 - **JSON Storage** - Store coordinates as JSON in single database column
 - **Map Interaction Control** - Toggle dragging, zooming, and auto-recenter behavior
@@ -360,7 +361,7 @@ Display circular maps for a unique visual style:
 MapColumn::make('location')
     ->height(72)
     ->zoom(5)
-    ->pickMarker(fn(Marker $marker) => $marker->icon(size: [14, 25]))
+    ->pickMarker(fn(Marker $marker) => $marker->iconSize([14, 25]))
     ->circular()  // Optional: circular display
 ```
 
@@ -398,7 +399,7 @@ MapEntry::make('location')
 
 ```php
 use EduardoRibeiroDev\FilamentLeaflet\Support\Markers\Marker;
-use EduardoRibeiroDev\FilamentLeaflet\Enums\Color;
+use Filament\Support\Colors\Color;
 
 protected function getMarkers(): array
 {
@@ -406,18 +407,55 @@ protected function getMarkers(): array
         Marker::make(-23.5505, -46.6333)->title('Simple marker'),
         Marker::make(-23.5212, -46.4243)->green()->title('Colored marker'),
         Marker::make(-23.5266, -46.5412)->icon('https://leafletjs.com/examples/custom-icons/leaf-red.png', [32, 72]),
+        Marker::make(-23.5300, -46.6400)->violet()->icon('heroicon-user-circle')->title('Heroicon marker'),
     ];
 }
 ```
+
+![Markers Example](images/markers.png)
+
+#### Marker Icons
+
+Markers support multiple icon types with different visual behaviors:
+
+**Custom Icon URL** (replaces the entire marker):
+```php
+Marker::make(-23.5505, -46.6333)
+    ->icon('https://example.com/icon.png', [32, 72])
+    ->title('Custom Icon Marker')
+```
+
+When using a custom icon URL, the entire marker is replaced with your custom image - the marker's color, gradient, and shadow are ignored.
+
+**Heroicons (Filament Icons)** (icon in center):
+```php
+use Filament\Support\Icons\Heroicon;
+
+Marker::make(-23.5505, -46.6333)
+    ->icon(Heroicon::BuildingLibrary)        // Using Heroicon enum
+    ->icon('heroicon-building-library')      // Using string
+    ->heroicon('building-library')           // Using explicit heroicon() method
+    ->iconSize([36, 54])
+    ->title('Heroicon Marker')
+    ->color(Color::Indigo);
+```
+
+![Heroicon Marker Example](images/heroicon-marker.png)
+
+When using Heroicons, the marker keeps its default styled appearance with the color gradient and shadow, and the Heroicon is automatically rendered in the center in white. The marker's color settings (`.blue()`, `.red()`, etc.) are fully respected.
+
+**Icon Appearance:**
+- **Icon URL**: Fully replaces marker appearance (color is ignored)
+- **Heroicon**: Keeps marker style (with color, gradient, shadow) with the icon rendered in the center
 
 #### Marker Colors
 
 Markers accept colors in multiple formats:
 
-**Using Color Enum:**
+**Using Color Class:**
 ```php
 Marker::make(-23.5505, -46.6333)
-    ->color(Color::Blue)  // Enum constant
+    ->color(Color::Blue)  // Color class constant
     ->blue()              // Convenience method
 ```
 
@@ -558,7 +596,6 @@ protected function getMarkers(): array
             Marker::make(-23.5515, -46.6343)->title('Location 2'),
             Marker::make(-23.5525, -46.6353)->title('Location 3'),
         ])
-        ->blue()
         ->maxClusterRadius(80)
         ->showCoverageOnHover()
         ->spiderfyOnMaxZoom(),
@@ -1453,7 +1490,10 @@ public function getCustomScripts(): string
 | `id($id)` | Set marker ID |
 | `title($title)` | Set title (tooltip & popup) |
 | `color($color)` | Set marker color |
-| `icon($url, $size)` | Set custom icon |
+| `icon($icon, $size)` | Set custom icon URL or Heroicon |
+| `iconUrl($url)` | Set custom icon URL |
+| `iconSize($size)` | Set icon size as [width, height] |
+| `heroicon($icon)` | Set Heroicon (string or Heroicon enum) |
 | `draggable($bool)` | Make marker draggable |
 | `editable($bool)` | Make marker editable on the map |
 | `group($group)` | Assign to group (string or BaseLayerGroup) |
@@ -1571,18 +1611,6 @@ public function getCustomScripts(): string
 ## Color Reference
 
 Markers and shapes accept colors from multiple sources:
-
-**Color Enum Constants:**
-
-- `Color::Blue` / `->blue()` - #3388ff
-- `Color::Red` / `->red()` - #f03
-- `Color::Green` / `->green()` - #3c3
-- `Color::Orange` / `->orange()` - #f80
-- `Color::Yellow` / `->yellow()` - #fd0
-- `Color::Violet` / `->violet()` - #a0f
-- `Color::Grey` / `->grey()` - #666
-- `Color::Black` / `->black()` - #000
-- `Color::Gold` / `->gold()` - #ffd700
 
 ## Tile Layer Reference
 
