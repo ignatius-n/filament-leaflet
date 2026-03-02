@@ -421,9 +421,11 @@ Markers support multiple icon types with different visual behaviors:
 **Custom Icon URL** (replaces the entire marker):
 ```php
 Marker::make(-23.5505, -46.6333)
-    ->icon('https://example.com/icon.png', [32, 72])
+    ->icon('https://example.com/icon.png', [54, 54])
     ->title('Custom Icon Marker')
 ```
+
+![Custom Icon Marker Example](images/custom-marker.png)
 
 When using a custom icon URL, the entire marker is replaced with your custom image - the marker's color, gradient, and shadow are ignored.
 
