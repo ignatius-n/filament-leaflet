@@ -549,7 +549,7 @@ trait HasMapState
             $pickMarker = new Marker;
 
             if ($this->isDisabled()) {
-                $pickMarker->grey();
+                $pickMarker-gray();
             }
         }
 

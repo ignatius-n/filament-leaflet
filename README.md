@@ -469,7 +469,7 @@ Marker::make(-23.5505, -46.6333)
     ->color('oklch(59% 0.15 262)')  // OKLCH color
 ```
 
-**Available convenience methods:** `blue()`, `red()`, `green()`, `orange()`, `yellow()`, `violet()`, `grey()`, `black()`, `gold()`, `randomColor()`
+**Available convenience methods:** `blue()`, `red()`, `green()`, `orange()`, `yellow()`, `violet()`, `gray()`, `black()`, `gold()`, `randomColor()`
 
 #### From Eloquent Models
 
@@ -658,7 +658,7 @@ MarkerCluster::fromModel(
             'open' => $marker->green(),
             'busy' => $marker->orange(),
             'closed' => $marker->red(),
-            default => $marker->grey(),
+            default => $marker->gray(),
         };
         
         // Add popup with custom fields
