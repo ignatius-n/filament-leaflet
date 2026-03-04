@@ -4,6 +4,7 @@ namespace EduardoRibeiroDev\FilamentLeaflet\Widgets;
 
 use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasMapConfig;
 use EduardoRibeiroDev\FilamentLeaflet\Enums\Color;
+use EduardoRibeiroDev\FilamentLeaflet\Support\BaseLayer;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
@@ -27,11 +28,10 @@ abstract class MapWidget extends Widget implements HasSchemas, HasActions
     use InteractsWithSchemas;
     use InteractsWithActions;
     use HasMapConfig {
-        handleLayerClick as handleMapLayerClick;
+        handleLayerClick as private handleMapLayerClick;
     }
 
     // Configurações do widget
-    protected static bool $isLazy = false;
     protected string $view = 'filament-leaflet::widgets.map-widget';
     protected ?string $heading = null;
 
@@ -64,25 +64,26 @@ abstract class MapWidget extends Widget implements HasSchemas, HasActions
         }
     }
 
-    public function handleLayerClick(string $layerId): void
+    public function handleLayerClick(string|BaseLayer $layerId): void
     {
-        if ($this->markerModel) {
-            $layer = $this->getLayerById($layerId);
+        $layer = $this->getLayerById($layerId);
+        $this->handleMapLayerClick($layer);
 
-            if (($record = $layer->getRecord())) {
-                $action = match ($this->markerClickAction) {
-                    'view' => 'viewMarker',
-                    'edit' => 'editMarker',
-                    'delete' => 'deleteMarker',
-                    default => throw new Exception('Invalid markerClickAction configuration: ' . $this->markerClickAction),
-                };
-
-
-                $this->mountAction($action, compact('record'));
-            }
+        if (!$this->markerModel) {
+            return;
         }
 
-        $this->handleMapLayerClick($layerId);
+        if (($record = $layer->getRecord())) {
+            $action = match ($this->markerClickAction) {
+                'view' => 'viewMarker',
+                'edit' => 'editMarker',
+                'delete' => 'deleteMarker',
+                default => throw new Exception('Invalid markerClickAction configuration: ' . $this->markerClickAction),
+            };
+
+
+            $this->mountAction($action, compact('record'));
+        }
     }
 
     /**

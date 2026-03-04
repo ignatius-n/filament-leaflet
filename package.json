@@ -31,6 +31,7 @@
     "leaflet-geosearch": "^4.2.2",
     "leaflet.fullscreen": "^5.1.1",
     "leaflet.markercluster": "^1.5.3",
+    "vite-plugin-static-copy": "^3.2.0",
     "vue": "^3.5.26"
   }
 }

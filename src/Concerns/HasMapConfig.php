@@ -508,9 +508,13 @@ trait HasMapConfig
     /**
      * Evento disparado quando um layer é clicado
      */
-    public function handleLayerClick(string $layerId): void
+    public function handleLayerClick(string|BaseLayer $layerId): void
     {
-        if (($layer = $this->getLayerById($layerId))) {
+        $layer = $layerId instanceof BaseLayer
+            ? $layerId
+            : $this->getLayerById($layerId);
+
+        if ($layer) {
             $layer->execClickAction();
         }
     }
