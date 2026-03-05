@@ -408,12 +408,6 @@ export class LeafletMapCore {
             tooltipAnchor: tooltipAnchor
         };
 
-        const shadowStyle = `
-        filter: brightness(0) blur(2px) opacity(0.5);
-        transform: skewX(-35deg) scale(0.65);
-        transform-origin: bottom center;
-        `;
-
         if (url) {
             iconOptions.html = `
             <div style="position: relative; width: ${size[0]}px; height: ${size[1]}px; overflow: visible;">
@@ -425,7 +419,9 @@ export class LeafletMapCore {
                     height: 100%;
                     left: 0;
                     top: 0;
-                    ${shadowStyle}
+                    filter: brightness(0) blur(2px) opacity(0.5);
+                    transform: skewX(-35deg) scale(0.65);
+                    transform-origin: bottom center;
                     z-index: 0;
                     pointer-events: none; /* Evita que o mouse interaja com a sombra */
                 "/>
@@ -449,6 +445,7 @@ export class LeafletMapCore {
             const darkColor = colorManager.darken(15).toHexString();
 
             const gradientId = `grad-${color.replace('#', '')}`;
+            const shadowId = `shadow-${color.replace('#', '')}`;
             const pathData = "M12 0C5.4 0 0 5.4 0 12c0 9 12 24 12 24s12-15 12-24C24 5.4 18.6 0 12 0z";
 
             let innerIcon;
@@ -480,13 +477,18 @@ export class LeafletMapCore {
                     <stop offset="0%"   stop-color="${color}" />
                     <stop offset="100%" stop-color="${darkColor}" />
                 </linearGradient>
+
+                <filter id="${shadowId}" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" />
+                </filter>
             </defs>
 
             <!-- SHADOW -->
             <path 
                 d="${pathData}" 
                 fill="rgba(0,0,0,0.25)"
-                style="${shadowStyle}"
+                filter="url(#${shadowId})"
+                transform="translate(12, 36) skewX(-30) scale(1, 0.5) translate(-12, -30)"
             />
 
             <!-- MARKER -->

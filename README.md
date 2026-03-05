@@ -427,7 +427,7 @@ Marker::make(-23.5505, -46.6333)
 
 ![Custom Icon Marker Example](images/custom-marker.png)
 
-When using a custom icon URL, the entire marker is replaced with your custom image - the marker's color, gradient, and shadow are ignored.
+When using a custom icon URL, the entire marker is replaced with your custom image - the marker's color is ignored.
 
 **Heroicons (Filament Icons)** (icon in center):
 ```php
@@ -444,11 +444,11 @@ Marker::make(-23.5505, -46.6333)
 
 ![Heroicon Marker Example](images/heroicon-marker.png)
 
-When using Heroicons, the marker keeps its default styled appearance with the color gradient and shadow, and the Heroicon is automatically rendered in the center in white. The marker's color settings (`.blue()`, `.red()`, etc.) are fully respected.
+When using Heroicons, the marker keeps its default styled appearance with the color gradient, and the Heroicon is automatically rendered in the center in white. The marker's color settings (`.blue()`, `.red()`, etc.) are fully respected.
 
 **Icon Appearance:**
 - **Icon URL**: Fully replaces marker appearance (color is ignored)
-- **Heroicon**: Keeps marker style (with color, gradient, shadow) with the icon rendered in the center
+- **Heroicon**: Keeps marker style (with color gradient) with the icon rendered in the center
 
 #### Marker Colors
 
