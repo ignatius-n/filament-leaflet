@@ -38,7 +38,6 @@ class FilamentLeafletServiceProvider extends PackageServiceProvider
         );
 
         $this->publishes([
-            __DIR__ . '/../resources/dist/images' => public_path('vendor/filament-leaflet/images'),
             __DIR__ . '/../resources/json/maps' => public_path('vendor/filament-leaflet/maps')
         ], 'filament-leaflet');
     }
