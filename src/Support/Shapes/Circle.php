@@ -3,7 +3,6 @@
 namespace EduardoRibeiroDev\FilamentLeaflet\Support\Shapes;
 
 use Closure;
-use EduardoRibeiroDev\FilamentLeaflet\Enums\Color;
 use Illuminate\Database\Eloquent\Model;
 
 class Circle extends Shape
@@ -40,7 +39,7 @@ class Circle extends Shape
      * @param string|null $titleColumn Optional column name for circle title (default: 'title').
      * @param string|null $descriptionColumn Optional column name for circle description (default: 'description').
      * @param array|null $popupFieldsColumns Optional array of column names to include in popup (default: all except id, lat, lng, radius, title, description, timestamps).
-     * @param string|Color|null $color Optional circle color.
+     * @param string|array|null $color Optional circle color.
      * @param bool $syncRecord Whether to sync changes back to the record when the shape is edited on the map (default: true).
      * @param Closure|null $mapRecordCallback Optional Closure to further customize the circle based on the record.
      * @return static A new Circle instance configured based on the provided record.
@@ -54,7 +53,7 @@ class Circle extends Shape
         ?string $titleColumn = 'title',
         ?string $descriptionColumn = 'description',
         ?array $popupFieldsColumns = null,
-        null|string|Color $color = null,
+        string|array|null $color = null,
         bool $syncRecord = true,
         ?Closure $mapRecordCallback = null
     ): static {

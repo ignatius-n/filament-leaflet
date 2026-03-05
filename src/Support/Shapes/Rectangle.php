@@ -3,7 +3,6 @@
 namespace EduardoRibeiroDev\FilamentLeaflet\Support\Shapes;
 
 use Closure;
-use EduardoRibeiroDev\FilamentLeaflet\Enums\Color;
 use Illuminate\Database\Eloquent\Model;
 
 class Rectangle extends Shape
@@ -53,7 +52,7 @@ class Rectangle extends Shape
      * @param string|null $titleColumn Optional column name for rectangle title (default: 'title').
      * @param string|null $descriptionColumn Optional column name for rectangle description (default: 'description').
      * @param array|null $popupFieldsColumns Optional array of column names to include in popup (default: all except id, boundsColumn, titleColumn, descriptionColumn, created_at, updated_at).
-     * @param string|Color|null $color Optional rectangle color.
+     * @param string|array|null $color Optional rectangle color.
      * @param bool $syncRecord Whether to sync changes back to the record when the shape is edited on the map (default: true).
      * @param Closure|null $mapRecordCallback Optional Closure to further customize the rectangle based on the record.
      * @return static A new Rectangle instance configured based on the provided record.
@@ -64,7 +63,7 @@ class Rectangle extends Shape
         ?string $titleColumn = 'title',
         ?string $descriptionColumn = 'description',
         ?array $popupFieldsColumns = null,
-        null|string|Color $color = null,
+        string|array|null $color = null,
         bool $syncRecord = true,
         ?Closure $mapRecordCallback = null
     ): static {

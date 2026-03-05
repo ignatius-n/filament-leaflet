@@ -3,7 +3,6 @@
 namespace EduardoRibeiroDev\FilamentLeaflet\Support\Markers;
 
 use Closure;
-use EduardoRibeiroDev\FilamentLeaflet\Enums\Color;
 use EduardoRibeiroDev\FilamentLeaflet\Support\BaseLayer;
 use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasColor;
 use Filament\Support\Enums\IconSize;
@@ -54,7 +53,7 @@ class Marker extends BaseLayer
      * @param string|null $titleColumn Optional column name for marker title (default: 'title').
      * @param string|null $descriptionColumn Optional column name for marker description (default: 'description').
      * @param array|null $popupFieldsColumns Optional array of column names to include in popup (default: all except id, lat, lng, title, description, timestamps).
-     * @param string|Color|null $color Optional marker color.
+     * @param string|array|null $color Optional marker color.
      * @param bool $syncRecord Whether to sync changes back to the record when the marker is dragged on the map (default: true).
      * @param string|Closure|null $iconUrl Optional URL or Closure to determine the marker's icon URL.
      * @param Closure|null $mapRecordCallback Optional Closure to further customize the marker based on the record.
@@ -68,7 +67,7 @@ class Marker extends BaseLayer
         ?string $titleColumn = 'title',
         ?string $descriptionColumn = 'description',
         ?array $popupFieldsColumns = null,
-        null|string|Color $color = null,
+        string|array|null $color = null,
         bool $syncRecord = true,
         ?string $iconUrl = null,
         ?Closure $mapRecordCallback = null

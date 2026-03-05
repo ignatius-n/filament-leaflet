@@ -1157,7 +1157,7 @@ class LocationMapWidget extends MapWidget
     {
         return [
             TextInput::make('name')->required(),
-            Select::make('color')->options(Color::class),
+            ColorPicker::make('color')->rgb(),
             Textarea::make('description')->columnSpanFull(),
         ];
     }

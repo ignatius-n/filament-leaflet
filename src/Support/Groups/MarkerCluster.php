@@ -58,7 +58,7 @@ class MarkerCluster extends BaseLayerGroup
      * @param string|null $titleColumn The name of the column in the model that contains the title for the marker popups. Default is null.
      * @param string|null $descriptionColumn The name of the column in the model that contains the description for the marker popups. Default is null.
      * @param array|null $popupFieldsColumns An array of column names in the model that should be included as fields in the marker popups. Default is null.
-     * @param string|Color|null $color The color to be used for the markers in this cluster. This can be a string representing a color (e.g., 'red', '#ff0000') or an instance of the Color enum. Default is null.
+     * @param string|array|null $color The color to be used for the markers in this cluster. This can be a string representing a color (e.g., 'red', '#ff0000') or an instance of the Color enum. Default is null.
      * @param string|null $iconUrl The URL of the icon to be used for each marker in this cluster. Default is null.
      * @param Closure|null $mapRecordCallback A callback to map each Eloquent record to a Marker instance. The callback should accept an instance of Illuminate\Database\Eloquent\Model and return a Marker instance. This allows you to customize how each record is transformed into a marker, including setting custom properties or using different columns for the marker's attributes. Default is null.
      * @param Closure|null $modifyQueryCallback A callback to modify the Eloquent query used to fetch records for the markers. The callback should accept an instance of Illuminate\Database\Eloquent\Builder and return the modified query builder. This allows you to apply additional constraints, eager loading, or any other query modifications before the records are fetched and transformed into markers. Default is null.
@@ -72,7 +72,7 @@ class MarkerCluster extends BaseLayerGroup
         ?string $titleColumn = null,
         ?string $descriptionColumn = null,
         ?array $popupFieldsColumns = null,
-        null|string|Color $color = null,
+        string|array|null $color = null,
         ?string $iconUrl = null,
         ?Closure $mapRecordCallback = null,
         ?Closure $modifyQueryCallback = null

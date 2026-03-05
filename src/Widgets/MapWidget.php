@@ -3,7 +3,6 @@
 namespace EduardoRibeiroDev\FilamentLeaflet\Widgets;
 
 use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasMapConfig;
-use EduardoRibeiroDev\FilamentLeaflet\Enums\Color;
 use EduardoRibeiroDev\FilamentLeaflet\Support\BaseLayer;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -11,7 +10,7 @@ use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
-use Filament\Forms\Components\Select;
+use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -97,10 +96,8 @@ abstract class MapWidget extends Widget implements HasSchemas, HasActions
                 ->required()
                 ->maxLength(255),
 
-            Select::make('color')
-                ->translateLabel()
-                ->native(false)
-                ->options(Color::class),
+            ColorPicker::make('color')
+                ->translateLabel(),
 
             Textarea::make('description')
                 ->translateLabel()
