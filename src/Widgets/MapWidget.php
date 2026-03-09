@@ -46,9 +46,9 @@ abstract class MapWidget extends Widget implements HasSchemas, HasActions
     /**
      * Retorna o título do widget
      */
-    public function getHeading(): string
+    public function getHeading(): ?string
     {
-        return $this->heading ?? __('Map');
+        return $this->heading;
     }
 
     // === CREATE ACTION & FORM ===

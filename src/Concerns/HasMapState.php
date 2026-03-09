@@ -3,6 +3,7 @@
 namespace EduardoRibeiroDev\FilamentLeaflet\Concerns;
 
 use Closure;
+use EduardoRibeiroDev\FilamentLeaflet\DTO\Coordinate;
 use EduardoRibeiroDev\FilamentLeaflet\Enums\TileLayer;
 use EduardoRibeiroDev\FilamentLeaflet\Support\Markers\Marker;
 use Filament\Support\Components\Attributes\ExposedLivewireMethod;
@@ -549,7 +550,7 @@ trait HasMapState
             $pickMarker = new Marker;
 
             if ($this->isDisabled()) {
-                $pickMarker-gray();
+                $pickMarker->gray();
             }
         }
 
@@ -609,7 +610,7 @@ trait HasMapState
         $this->evaluate($this->onMapClickCallback, [
             'latitude' => $latitude,
             'longitude' => $longitude,
-            'coordinates' => [$latitude, $longitude]
+            'coordinates' => new Coordinate($latitude, $longitude)
         ]);
     }
 

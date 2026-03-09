@@ -576,7 +576,7 @@ protected function getMarkers(): array
             ->fillBlue()
             ->fillOpacity(0.3)
             ->weight(3)
-            ->dashArray('5, 10'),
+            ->dashArray(5, 10),
     ];
 }
 ```
@@ -600,6 +600,7 @@ protected function getMarkers(): array
         ])
         ->maxClusterRadius(80)
         ->showCoverageOnHover()
+        ->name('Locations')
         ->spiderfyOnMaxZoom(),
     ];
 }
@@ -1127,12 +1128,14 @@ MapPicker::make('location')
 Handle layer (marker/shape) clicks:
 
 ```php
+use EduardoRibeiroDev\FilamentLeaflet\Support\BaseLayer;
+
 MapPicker::make('location')
     ->height(300)
-    ->onLayerClick(function (array $layer) {
+    ->onLayerClick(function (BaseLayer $layer) {
         Notification::make()
             ->title('Layer Clicked')
-            ->body("Layer ID: {$layer['id']}")
+            ->body("Layer ID: {$layer->getId()} - Type: {$layer->getType()}")
             ->send();
     });
 ```

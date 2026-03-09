@@ -21,8 +21,8 @@ abstract class Shape extends BaseLayer
     protected function getShapeOptions(): array
     {
         return [
-            'color'        => $this->getRgbColor(500),
-            'fillColor'    => $this->getRgbFillColor(400),
+            'color'        => $this->getRgbColor(600),
+            'fillColor'    => $this->getRgbFillColor(500),
             'opacity'      => $this->getOpacity(),
             'fillOpacity'  => $this->getFillOpacity(),
             'weight'       => $this->getWeight(),
